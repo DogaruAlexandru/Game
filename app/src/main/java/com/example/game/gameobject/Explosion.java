@@ -34,7 +34,7 @@ public class Explosion {
         ((ExplosionTile) tilemap.getTilemap()[row][column]).setExplosion(this);
     }
 
-    public void update() {
+    public void update(List<Explosion> explosionRemoveList) {
         --updatesBeforeDisappear;
 
         if (updatesBeforeDisappear == 0) {
@@ -43,7 +43,7 @@ public class Explosion {
 
             tilemap.setTilemapChanged(true);
 
-            explosionList.remove(this);
+            explosionRemoveList.add(this);
         }
     }
 }

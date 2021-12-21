@@ -9,8 +9,6 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import androidx.appcompat.content.res.AppCompatResources;
-
 import com.example.game.gameobject.Bomb;
 import com.example.game.gameobject.Explosion;
 import com.example.game.gameobject.Player;
@@ -19,12 +17,10 @@ import com.example.game.gamepanel.Button;
 import com.example.game.gamepanel.Joystick;
 import com.example.game.gamepanel.Performance;
 import com.example.game.graphics.Animator;
-import com.example.game.graphics.Sprite;
 import com.example.game.graphics.SpriteSheet;
 import com.example.game.map.Tilemap;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class Game extends SurfaceView implements SurfaceHolder.Callback {
@@ -182,13 +178,17 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         button.update();
         player.update();
 
+        List<Bomb> bombRemoveList = new ArrayList<>();
         for (int idx = 0; idx < bombList.size(); ++idx) {
-            bombList.get(idx).update();
+            bombList.get(idx).update(bombRemoveList);
         }
+        bombList.removeAll(bombRemoveList);
 
+        List<Explosion> explosionRemoveList = new ArrayList<>();
         for (int idx = 0; idx < explosionList.size(); ++idx) {
-            explosionList.get(idx).update();
+            explosionList.get(idx).update(explosionRemoveList);
         }
+        explosionList.removeAll(explosionRemoveList);
     }
 
     public void pause() {

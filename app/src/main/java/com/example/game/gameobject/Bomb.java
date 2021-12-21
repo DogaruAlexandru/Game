@@ -35,41 +35,42 @@ public class Bomb {
         tilemap.setTilemapChanged(true);
     }
 
-    public void update() {
+    public void update(List<Bomb> bombRemoveList) {
         --updatesBeforeExplosion;
 
         if (updatesBeforeExplosion == 0) {
-            triggerExplosion();
+            triggerExplosion(bombRemoveList);
         }
     }
 
-    public void triggerExplosion() {
+    public void triggerExplosion(List<Bomb> bombRemoveList) {
         explosionList.add(new Explosion(row, column, explosionList, tilemap));
 
-        explodeLength(-1, 0);
-        explodeLength(0, -1);
-        explodeLength(1, 0);
-        explodeLength(0, 1);
+        explodeLength(bombRemoveList, -1, 0);
+        explodeLength(bombRemoveList, 0, -1);
+        explodeLength(bombRemoveList, 1, 0);
+        explodeLength(bombRemoveList, 0, 1);
 
-        bombList.remove(this);
+        if (!bombRemoveList.contains(this))
+            bombRemoveList.add(this);
 
         tilemap.setTilemapChanged(true);
     }
 
-    private void explodeLength(int idxRow, int idxColumn) {
+    private void explodeLength(List<Bomb> bombRemoveList, int idxRow, int idxColumn) {
         for (int idx = 1; idx < range; ++idx) {
             switch (tilemap.getTilemap()[row + idxRow * idx][column + idxColumn * idx].
                     getLayoutType()) {
                 case BOMB:
                     ((BombTile) tilemap.getTilemap()[row + idxRow * idx][column + idxColumn * idx])
-                            .getBomb().triggerExplosion();
+                            .getBomb().triggerExplosion(bombRemoveList);
                 case WALL:
                     return;
                 case CRATE:
                     //todo
                 default:
-                    explosionList.add(new Explosion(row + idxRow * idx, column + idxColumn * idx,
-                            explosionList, tilemap));
+                    explosionList.add(new Explosion(row + idxRow * idx,
+                            column + idxColumn * idx, explosionList, tilemap));
             }
         }
     }
