@@ -61,14 +61,10 @@ public class Player {
         defaultMaxSpeed = Utils.getPlayerDefaultMaxSpeed();
 
         Rect tileRect = tilemap.getTilemap()[rowTile][columnTile].getMapLocationRect();
-        playerRect = new Rect(
-                tileRect.left + tilemap.getMapRect().left,
-                tileRect.top + tilemap.getMapRect().top,
-                tileRect.right + tilemap.getMapRect().left,
-                tileRect.bottom + tilemap.getMapRect().top);
+        playerRect = new Rect(tileRect);
 
-        positionX = tileRect.left + tilemap.getMapRect().left;
-        positionY = tileRect.top + tilemap.getMapRect().top;
+        positionX = tileRect.left;
+        positionY = tileRect.top;
         velocityX = 0;
         velocityY = 0;
         directionX = 0.0;
@@ -98,8 +94,8 @@ public class Player {
         playerState.update();
 
         if (button.getIsPressed()) {
-            int rowIdx = (playerRect.centerY() - tilemap.getMapRect().top) / playerRect.width();
-            int columnIdx = (playerRect.centerX() - tilemap.getMapRect().left) / playerRect.height();
+            int rowIdx = playerRect.centerY() / playerRect.width();
+            int columnIdx = playerRect.centerX() / playerRect.height();
             if (tilemap.getTilemap()[rowIdx][columnIdx].getLayoutType() != Tile.LayoutType.BOMB &&
                     tilemap.getTilemap()[rowIdx][columnIdx].getLayoutType() != Tile.LayoutType.EXPLOSION)
                 bombList.add(new Bomb(bombRange, rowIdx, columnIdx, bombList, explosionList, tilemap));

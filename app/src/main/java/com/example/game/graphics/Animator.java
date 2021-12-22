@@ -23,14 +23,17 @@ public class Animator {
 
     public void draw(Canvas canvas, Player player) {
         int idxNotMovingFrame = 0;
+        Rect drawnRect = new Rect(player.getPlayerRect());
+        drawnRect.offset(Utils.mapOffsetX, Utils.mapOffsetY);
+
         switch (player.getPlayerState().getState()) {
             case NOT_MOVING:
-                playerSpriteArray[idxNotMovingFrame].draw(canvas, player.getPlayerRect(),
+                playerSpriteArray[idxNotMovingFrame].draw(canvas, drawnRect,
                         player.getRotationAngle());
                 break;
             case STARTED_MOVING:
                 updatesBeforeNextMoveFrame = MAX_UPDATES_BEFORE_NEXT_MOVE_FRAME;
-                playerSpriteArray[idxMovingFrame].draw(canvas, player.getPlayerRect(),
+                playerSpriteArray[idxMovingFrame].draw(canvas, drawnRect,
                         player.getRotationAngle());
                 break;
             case IS_MOVING:
@@ -39,7 +42,7 @@ public class Animator {
                     updatesBeforeNextMoveFrame = MAX_UPDATES_BEFORE_NEXT_MOVE_FRAME;
                     toggleIdxMovingFrame();
                 }
-                playerSpriteArray[idxMovingFrame].draw(canvas, player.getPlayerRect(),
+                playerSpriteArray[idxMovingFrame].draw(canvas, drawnRect,
                         player.getRotationAngle());
                 break;
             default:

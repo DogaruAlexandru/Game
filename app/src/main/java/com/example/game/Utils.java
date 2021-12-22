@@ -8,6 +8,8 @@ public class Utils {
     public static int screenHeight = 0;
     public static int screenWidth = 0;
     public static int spriteSizeOnScreen = 0;
+    public static int mapOffsetX = 0;
+    public static int mapOffsetY = 0;
     public static final Random RANDOM = new Random();
 
     public static double getDistanceBetweenPoints(double p1x, double p1y, double p2x, double p2y) {

@@ -46,6 +46,8 @@ public class Tilemap {
                 screenCenterY - mapHeightOffset,
                 screenCenterX + mapWidthOffset,
                 screenCenterY + mapHeightOffset);
+        Utils.mapOffsetX = mapRect.left;
+        Utils.mapOffsetY = mapRect.top;
 
         initializeTilemap();
     }
