@@ -82,7 +82,7 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
 
         player = new Player(getContext(), joystick, button, 1, 1, tilemap,
                 new Animator(spriteSheet.getGreenPlayerSpriteArray()), bombList, explosionList,
-                2, 4);
+                2, 4, 4);
 
         setFocusable(true);
     }

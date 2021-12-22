@@ -1,5 +1,7 @@
 package com.example.game.map;
 
+import static com.example.game.Utils.spriteSizeOnScreen;
+
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -10,7 +12,6 @@ import com.example.game.graphics.SpriteSheet;
 public class Tilemap {
 
     private final SpriteSheet spriteSheet;
-    private final int spriteSizeOnScreen;
     private final int mapHeightOffset;
     private final int mapWidthOffset;
 
@@ -32,8 +33,7 @@ public class Tilemap {
         this.numberOfColumnTiles = numberOfColumnTiles;
         tilemapChanged = false;
 
-        Utils.spriteSizeOnScreen = Utils.screenHeight / numberOfRowTiles;
-        spriteSizeOnScreen = Utils.spriteSizeOnScreen;
+        spriteSizeOnScreen = Utils.screenHeight / numberOfRowTiles;
 
         mapLayout = new MapLayout(numberOfRowTiles, numberOfColumnTiles);
 
