@@ -39,6 +39,7 @@ public class Player {
     private List<Bomb> bombList;
     private List<Explosion> explosionList;
 
+    private int livesCount;
     private int bombRange;
     private int speedUps;
     private int bombsNumber;
@@ -47,7 +48,8 @@ public class Player {
 
     public Player(Context context, Joystick joystick, Button button, int rowTile, int columnTile,
                   Tilemap tilemap, Animator animator, List<Bomb> bombList,
-                  List<Explosion> explosionList, int speedUps, int bombRange, int bombsNumber) {
+                  List<Explosion> explosionList, int speedUps, int bombRange, int bombsNumber,
+                  int livesCount) {
 
         this.joystick = joystick;
         this.button = button;
@@ -58,6 +60,7 @@ public class Player {
         this.animator = animator;
         this.playerState = new PlayerState(this);
 
+        this.livesCount = livesCount;
         this.speedUps = speedUps;
         this.bombRange = bombRange;
         this.bombsNumber = bombsNumber;
@@ -96,11 +99,19 @@ public class Player {
         // Update player state for animation
         playerState.update();
 
+        // Use bomb
         if (button.getIsPressed()) {
             int rowIdx = playerRect.centerY() / playerRect.width();
             int columnIdx = playerRect.centerX() / playerRect.height();
             if (tilemap.getTilemap()[rowIdx][columnIdx].getLayoutType() == Tile.LayoutType.WALK) {
-                bombList.add(new Bomb(bombRange, rowIdx, columnIdx, bombList, explosionList, tilemap));
+                int count = 0;
+                for (int i = 0; i < bombList.size(); i++) {
+                    if (bombList.get(i).getPlayer() == this)
+                        ++count;
+                }
+                if (count != bombsNumber)
+                    bombList.add(new Bomb(bombRange, rowIdx, columnIdx, this,
+                            bombList, explosionList, tilemap));
             }
         }
     }
@@ -123,7 +134,6 @@ public class Player {
         if (velocityX == 0 && velocityY == 0)
             return;
 
-        //todo collision detections
         //todo if player close too the edge, help him get into the alley
 
         Rect newRect = new Rect(playerRect);
@@ -131,119 +141,82 @@ public class Player {
 
         if (velocityX != 0)
             if (velocityX < 0) {
+
                 //goes left
-
-                float aux = newRect.left % spriteSizeOnScreen - spriteSizeOnScreen;
-                if (aux > velocityX)
-                    velocityX = aux;
-
-                //map wall
-                if (tilemap.insideMapLeft() >= newRect.left) {
-                    velocityX = 0;
-                }
-
                 //tile collision
+
                 int newColumn = newRect.left / spriteSizeOnScreen;
                 int newTopRow = newRect.top / spriteSizeOnScreen;
-                int newBottomRow = (newRect.left - 1) / spriteSizeOnScreen;
+                int newBottomRow = (newRect.bottom - 1) / spriteSizeOnScreen;
 
-                tileDetectionX(newTopRow, newColumn);
-                tileDetectionX(newBottomRow, newColumn);
-
-            } else {
-                //goes right
-
-                float aux = (newRect.right - 1) % spriteSizeOnScreen;
-                if (aux < velocityX)
-                    velocityX = aux;
-
-                //map wall
-                if (tilemap.insideMapRight() <= newRect.right) {
-                    velocityX = 0;
+                if (velocityChanging(newTopRow, newColumn) ||
+                        velocityChanging(newBottomRow, newColumn)) {
+                    int aux = -playerRect.left % spriteSizeOnScreen;
+                    velocityX = aux > velocityX ? aux : velocityX;
                 }
 
+            } else {
+
+                //goes right
                 //tile collision
 
                 int newColumn = (newRect.right - 1) / spriteSizeOnScreen;
                 int newTopRow = newRect.top / spriteSizeOnScreen;
-                int newBottomRow = (newRect.left - 1) / spriteSizeOnScreen;
+                int newBottomRow = (newRect.bottom - 1) / spriteSizeOnScreen;
 
-                tileDetectionX(newTopRow, newColumn);
-                tileDetectionX(newBottomRow, newColumn);
+                if (velocityChanging(newTopRow, newColumn) ||
+                        velocityChanging(newBottomRow, newColumn)) {
+                    int aux = (spriteSizeOnScreen - playerRect.right %
+                            spriteSizeOnScreen) % spriteSizeOnScreen;
+                    velocityX = aux < velocityX ? aux : velocityX;
+                }
 
             }
         else if (velocityY < 0) {
+
             //goes up
-
-            float aux = newRect.top % spriteSizeOnScreen - spriteSizeOnScreen;
-            if (aux > velocityX)
-                velocityX = aux;
-
-            //map wall
-            if (tilemap.insideMapTop() >= newRect.top) {
-                velocityY = 0;
-            }
-
             //tile collision
 
             int newRow = newRect.top / spriteSizeOnScreen;
             int newLeftColumn = newRect.left / spriteSizeOnScreen;
             int newRightColumn = (newRect.right - 1) / spriteSizeOnScreen;
 
-            tileDetectionY(newRow, newLeftColumn);
-            tileDetectionY(newRow, newRightColumn);
-
-        } else {
-            //goes down
-
-            float aux = (newRect.bottom - 1) % spriteSizeOnScreen;
-            if (aux < velocityX)
-                velocityX = aux;
-
-            //map wall
-            if (tilemap.insideMapBottom() <= newRect.bottom) {
-                velocityY = 0;
+            if (velocityChanging(newRow, newLeftColumn) ||
+                    velocityChanging(newRow, newRightColumn)) {
+                int aux = -playerRect.top % spriteSizeOnScreen;
+                velocityY = aux > velocityY ? aux : velocityY;
             }
 
+        } else {
+
+            //goes down
             //tile collision
 
             int newRow = (newRect.bottom - 1) / spriteSizeOnScreen;
             int newLeftColumn = newRect.left / spriteSizeOnScreen;
             int newRightColumn = (newRect.right - 1) / spriteSizeOnScreen;
 
-            tileDetectionY(newRow, newLeftColumn);
-            tileDetectionY(newRow, newRightColumn);
+            if (velocityChanging(newRow, newLeftColumn) ||
+                    velocityChanging(newRow, newRightColumn)) {
+                int aux = (spriteSizeOnScreen - playerRect.bottom
+                        % spriteSizeOnScreen) % spriteSizeOnScreen;
+                velocityY = aux < velocityY ? aux : velocityY;
+            }
 
         }
     }
 
-    private void tileDetectionX(int row, int column) {
+    private boolean velocityChanging(int row, int column) {
         switch (tilemap.getTilemap()[row][column].getLayoutType()) {
             case WALL:
             case CRATE:
             case BOMB:
-                velocityX = 0;
-                break;
+                return true;
             case EXPLOSION:
-                //todo die
-                break;
+                --livesCount;
+                return false;
             default:
-                break;
-        }
-    }
-
-    private void tileDetectionY(int row, int column) {
-        switch (tilemap.getTilemap()[row][column].getLayoutType()) {
-            case WALL:
-            case CRATE:
-            case BOMB:
-                velocityY = 0;
-                break;
-            case EXPLOSION:
-                //todo die
-                break;
-            default:
-                break;
+                return false;
         }
     }
 

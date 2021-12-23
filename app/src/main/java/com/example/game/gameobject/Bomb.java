@@ -10,15 +10,17 @@ import java.util.List;
 
 public class Bomb {
     private final int TIME_TILL_EXPLOSION = (int) (MAX_UPS * 2);
-    private int range;
-    private int row;
-    private int column;
-    private int updatesBeforeExplosion;
-    private List<Bomb> bombList;
-    private List<Explosion> explosionList;
-    private Tilemap tilemap;
+    private final Player player;
+    private final int range;
+    private final int row;
+    private final int column;
+    private final List<Bomb> bombList;
+    private final List<Explosion> explosionList;
+    private final Tilemap tilemap;
 
-    public Bomb(int range, int row, int column, List<Bomb> bombList,
+    private int updatesBeforeExplosion;
+
+    public Bomb(int range, int row, int column, Player player, List<Bomb> bombList,
                 List<Explosion> explosionList, Tilemap tilemap) {
         this.range = range;
         this.row = row;
@@ -26,6 +28,7 @@ public class Bomb {
         this.bombList = bombList;
         this.explosionList = explosionList;
         this.tilemap = tilemap;
+        this.player = player;
 
         updatesBeforeExplosion = TIME_TILL_EXPLOSION;
 
@@ -68,10 +71,17 @@ public class Bomb {
                     return;
                 case CRATE:
                     //todo
+//                    explosionList.add(new Explosion(row + idxRow * idx,
+//                            column + idxColumn * idx, explosionList, tilemap));
+                    return;
                 default:
                     explosionList.add(new Explosion(row + idxRow * idx,
                             column + idxColumn * idx, explosionList, tilemap));
             }
         }
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 }
