@@ -68,15 +68,19 @@ public class Bomb {
                     ((BombTile) tilemap.getTilemap()[row + idxRow * idx][column + idxColumn * idx])
                             .getBomb().triggerExplosion(bombRemoveList);
                 case WALL:
+                case EXPLOSION:
                     return;
                 case CRATE:
                     //todo
-//                    explosionList.add(new Explosion(row + idxRow * idx,
-//                            column + idxColumn * idx, explosionList, tilemap));
-                    return;
-                default:
                     explosionList.add(new Explosion(row + idxRow * idx,
                             column + idxColumn * idx, explosionList, tilemap));
+                    return;
+                case WALK:
+                    explosionList.add(new Explosion(row + idxRow * idx,
+                            column + idxColumn * idx, explosionList, tilemap));
+                    break;
+                default:
+                    break;
             }
         }
     }

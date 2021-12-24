@@ -10,17 +10,15 @@ import com.example.game.Utils;
 import com.example.game.gamepanel.Button;
 import com.example.game.gamepanel.Joystick;
 import com.example.game.graphics.Animator;
-import com.example.game.map.BombTile;
-import com.example.game.map.ExplosionTile;
 import com.example.game.map.Tile;
 import com.example.game.map.Tilemap;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Player {
 
     private final float INCREASE_IN_SPEED_BY_POWER_UP = .4f;
+    private final float SPEED_MINIMIZING = .8f;
 
     private final Joystick joystick;
     private final Button button;
@@ -134,75 +132,127 @@ public class Player {
         if (velocityX == 0 && velocityY == 0)
             return;
 
-        //todo if player close too the edge, help him get into the alley
-
         Rect newRect = new Rect(playerRect);
         newRect.offset((int) velocityX, (int) velocityY);
 
         if (velocityX != 0)
             if (velocityX < 0) {
-
-                //goes left
-                //tile collision
-
-                int newColumn = newRect.left / spriteSizeOnScreen;
-                int newTopRow = newRect.top / spriteSizeOnScreen;
-                int newBottomRow = (newRect.bottom - 1) / spriteSizeOnScreen;
-
-                if (velocityChanging(newTopRow, newColumn) ||
-                        velocityChanging(newBottomRow, newColumn)) {
-                    int aux = -playerRect.left % spriteSizeOnScreen;
-                    velocityX = aux > velocityX ? aux : velocityX;
-                }
-
+                goesLeft(newRect);
             } else {
-
-                //goes right
-                //tile collision
-
-                int newColumn = (newRect.right - 1) / spriteSizeOnScreen;
-                int newTopRow = newRect.top / spriteSizeOnScreen;
-                int newBottomRow = (newRect.bottom - 1) / spriteSizeOnScreen;
-
-                if (velocityChanging(newTopRow, newColumn) ||
-                        velocityChanging(newBottomRow, newColumn)) {
-                    int aux = (spriteSizeOnScreen - playerRect.right %
-                            spriteSizeOnScreen) % spriteSizeOnScreen;
-                    velocityX = aux < velocityX ? aux : velocityX;
-                }
-
+                goesRight(newRect);
             }
         else if (velocityY < 0) {
+            goesUp(newRect);
+        } else {
+            goesDown(newRect);
+        }
+    }
 
-            //goes up
-            //tile collision
+    private void goesDown(Rect newRect) {
+        int newRow = (newRect.bottom - 1) / spriteSizeOnScreen;
+        int newLeftColumn = newRect.left / spriteSizeOnScreen;
+        int newRightColumn = (newRect.right - 1) / spriteSizeOnScreen;
 
-            int newRow = newRect.top / spriteSizeOnScreen;
-            int newLeftColumn = newRect.left / spriteSizeOnScreen;
-            int newRightColumn = (newRect.right - 1) / spriteSizeOnScreen;
+        boolean leftBool = velocityChanging(newRow, newLeftColumn);
+        boolean rightBool = velocityChanging(newRow, newRightColumn);
 
-            if (velocityChanging(newRow, newLeftColumn) ||
-                    velocityChanging(newRow, newRightColumn)) {
+        if (leftBool) {
+            if (rightBool) {
+                int aux = (spriteSizeOnScreen - playerRect.bottom
+                        % spriteSizeOnScreen) % spriteSizeOnScreen;
+                velocityY = aux < velocityY ? aux : velocityY;
+            } else {
+                velocityX = velocityY * SPEED_MINIMIZING;
+                velocityY = 0;
+                int aux = (spriteSizeOnScreen - playerRect.right %
+                        spriteSizeOnScreen) % spriteSizeOnScreen;
+                velocityX = aux < velocityX ? aux : velocityX;
+            }
+        } else if (rightBool) {
+            velocityX = -velocityY * SPEED_MINIMIZING;
+            velocityY = 0;
+            int aux = -playerRect.left % spriteSizeOnScreen;
+            velocityX = aux > velocityX ? aux : velocityX;
+        }
+    }
+
+    private void goesUp(Rect newRect) {
+        int newRow = newRect.top / spriteSizeOnScreen;
+        int newLeftColumn = newRect.left / spriteSizeOnScreen;
+        int newRightColumn = (newRect.right - 1) / spriteSizeOnScreen;
+
+        boolean leftBool = velocityChanging(newRow, newLeftColumn);
+        boolean rightBool = velocityChanging(newRow, newRightColumn);
+
+        if (leftBool) {
+            if (rightBool) {
                 int aux = -playerRect.top % spriteSizeOnScreen;
                 velocityY = aux > velocityY ? aux : velocityY;
+            } else {
+                velocityX = -velocityY * SPEED_MINIMIZING;
+                velocityY = 0;
+                int aux = playerRect.left % spriteSizeOnScreen;
+                velocityX = aux < velocityX ? aux : velocityX;
             }
+        } else if (rightBool) {
+            velocityX = velocityY * SPEED_MINIMIZING;
+            velocityY = 0;
+            int aux = -playerRect.right % spriteSizeOnScreen;
+            velocityX = aux > velocityX ? aux :velocityX;
+        }
+    }
 
-        } else {
+    private void goesRight(Rect newRect) {
+        int newColumn = (newRect.right - 1) / spriteSizeOnScreen;
+        int newTopRow = newRect.top / spriteSizeOnScreen;
+        int newBottomRow = (newRect.bottom - 1) / spriteSizeOnScreen;
 
-            //goes down
-            //tile collision
+        boolean topBool = velocityChanging(newTopRow, newColumn);
+        boolean bottomBool = velocityChanging(newBottomRow, newColumn);
 
-            int newRow = (newRect.bottom - 1) / spriteSizeOnScreen;
-            int newLeftColumn = newRect.left / spriteSizeOnScreen;
-            int newRightColumn = (newRect.right - 1) / spriteSizeOnScreen;
-
-            if (velocityChanging(newRow, newLeftColumn) ||
-                    velocityChanging(newRow, newRightColumn)) {
+        if (topBool) {
+            if (bottomBool) {
+                int aux = (spriteSizeOnScreen - playerRect.right %
+                        spriteSizeOnScreen) % spriteSizeOnScreen;
+                velocityX = aux < velocityX ? aux : velocityX;
+            } else {
+                velocityY = velocityX * SPEED_MINIMIZING;
+                velocityX = 0;
                 int aux = (spriteSizeOnScreen - playerRect.bottom
                         % spriteSizeOnScreen) % spriteSizeOnScreen;
                 velocityY = aux < velocityY ? aux : velocityY;
             }
+        } else if (bottomBool) {
+            velocityY = -velocityX * SPEED_MINIMIZING;
+            velocityX = 0;
+            int aux = -playerRect.top % spriteSizeOnScreen;
+            velocityY = aux > velocityY ? aux : velocityY;
+        }
+    }
 
+    private void goesLeft(Rect newRect) {
+        int newColumn = newRect.left / spriteSizeOnScreen;
+        int newTopRow = newRect.top / spriteSizeOnScreen;
+        int newBottomRow = (newRect.bottom - 1) / spriteSizeOnScreen;
+
+        boolean topBool = velocityChanging(newTopRow, newColumn);
+        boolean bottomBool = velocityChanging(newBottomRow, newColumn);
+
+        if (topBool) {
+            if (bottomBool) {
+                int aux = -playerRect.left % spriteSizeOnScreen;
+                velocityX = aux > velocityX ? aux : velocityX;
+            } else {
+                velocityY = -velocityX * SPEED_MINIMIZING;
+                velocityX = 0;
+                int aux = spriteSizeOnScreen - playerRect.top % spriteSizeOnScreen;
+                velocityY = aux < velocityY ? aux : velocityY;
+            }
+        } else if (bottomBool) {
+            velocityY = velocityX * SPEED_MINIMIZING;
+            velocityX = 0;
+            int aux = - playerRect.bottom % spriteSizeOnScreen;
+            velocityY = aux > velocityY ? aux : velocityY;
         }
     }
 
@@ -234,7 +284,7 @@ public class Player {
         }
         if (Math.abs(actuatorX) < Math.abs(actuatorY)) {
             velocityY = (actuatorY / Math.abs(actuatorY)) * defaultMaxSpeed *
-                    (1 + INCREASE_IN_SPEED_BY_POWER_UP * speedUps);
+                    (1 + (INCREASE_IN_SPEED_BY_POWER_UP * speedUps));
             velocityX = 0;
             return;
         }
