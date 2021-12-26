@@ -23,10 +23,10 @@ public class Sprite {
         canvas.drawBitmap(spriteSheet.getBitmap(), spriteRect, displayRect, paint);
     }
 
-    public void draw(Canvas canvas, Rect displayRect, float rotationAngle) {
+    public void draw(Canvas canvas, Rect displayRect, float rotationAngle, Paint paint) {
         canvas.save();
         canvas.rotate(rotationAngle, displayRect.exactCenterX(), displayRect.exactCenterY());
-        canvas.drawBitmap(spriteSheet.getBitmap(), spriteRect, displayRect, null);
+        canvas.drawBitmap(spriteSheet.getBitmap(), spriteRect, displayRect, paint);
         canvas.restore();
     }
 }

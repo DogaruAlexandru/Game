@@ -3,6 +3,7 @@ package com.example.game.graphics;
 import static com.example.game.GameLoop.MAX_UPS;
 
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.Log;
 
@@ -21,7 +22,7 @@ public class Animator {
         this.playerSpriteArray = playerSpriteArray;
     }
 
-    public void draw(Canvas canvas, Player player) {
+    public void draw(Canvas canvas, Player player, Paint paint) {
         int idxNotMovingFrame = 0;
         Rect drawnRect = new Rect(player.getPlayerRect());
         drawnRect.offset(Utils.mapOffsetX, Utils.mapOffsetY);
@@ -29,12 +30,12 @@ public class Animator {
         switch (player.getPlayerState().getState()) {
             case NOT_MOVING:
                 playerSpriteArray[idxNotMovingFrame].draw(canvas, drawnRect,
-                        player.getRotationAngle());
+                        player.getRotationAngle(), paint);
                 break;
             case STARTED_MOVING:
                 updatesBeforeNextMoveFrame = MAX_UPDATES_BEFORE_NEXT_MOVE_FRAME;
                 playerSpriteArray[idxMovingFrame].draw(canvas, drawnRect,
-                        player.getRotationAngle());
+                        player.getRotationAngle(), paint);
                 break;
             case IS_MOVING:
                 --updatesBeforeNextMoveFrame;
@@ -43,7 +44,7 @@ public class Animator {
                     toggleIdxMovingFrame();
                 }
                 playerSpriteArray[idxMovingFrame].draw(canvas, drawnRect,
-                        player.getRotationAngle());
+                        player.getRotationAngle(), paint);
                 break;
             default:
                 break;

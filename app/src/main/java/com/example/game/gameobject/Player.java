@@ -1,9 +1,11 @@
 package com.example.game.gameobject;
 
+import static com.example.game.GameLoop.MAX_UPS;
 import static com.example.game.Utils.spriteSizeOnScreen;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.Rect;
 
 import com.example.game.Utils;
@@ -19,6 +21,8 @@ public class Player {
 
     private final float INCREASE_IN_SPEED_BY_POWER_UP = .4f;
     private final float SPEED_MINIMIZING = .8f;
+    private final int INVINCIBILITY_TIME = (int) MAX_UPS * 2;
+    private final Paint INVINCIBILITY_PAINT;
 
     private final Joystick joystick;
     private final Button button;
@@ -27,6 +31,7 @@ public class Player {
     private double velocityX, velocityY;
     private double directionX, directionY;
     private double positionX, positionY;
+    private Paint usedPaint;
 
     private Rect playerRect;
     private double defaultMaxSpeed;
@@ -41,6 +46,7 @@ public class Player {
     private int bombRange;
     private int speedUps;
     private int bombsNumber;
+    private int time = 0;
     //    private boolean canThrow;
     //    private boolean canKick;
 
@@ -73,10 +79,14 @@ public class Player {
         velocityY = 0;
         directionX = 0.0;
         directionY = 1.0;
+
+        INVINCIBILITY_PAINT = new Paint();
+        INVINCIBILITY_PAINT.setAlpha(80);
+        usedPaint = null;
     }
 
     public void draw(Canvas canvas) {
-        animator.draw(canvas, this);
+        animator.draw(canvas, this, usedPaint);
     }
 
     public void update() {
@@ -99,18 +109,58 @@ public class Player {
 
         // Use bomb
         if (button.getIsPressed()) {
-            int rowIdx = playerRect.centerY() / playerRect.width();
-            int columnIdx = playerRect.centerX() / playerRect.height();
-            if (tilemap.getTilemap()[rowIdx][columnIdx].getLayoutType() == Tile.LayoutType.WALK) {
-                int count = 0;
-                for (int i = 0; i < bombList.size(); i++) {
-                    if (bombList.get(i).getPlayer() == this)
-                        ++count;
-                }
-                if (count != bombsNumber)
-                    bombList.add(new Bomb(bombRange, rowIdx, columnIdx, this,
-                            bombList, explosionList, tilemap));
+            useBomb();
+        }
+
+        // Player in explosion
+        handleDeath();
+    }
+
+    private void handleDeath() {
+        if (time == 0) {
+            int bottom = (playerRect.bottom - 1) / spriteSizeOnScreen;
+            int left = playerRect.left / spriteSizeOnScreen;
+            int right = (playerRect.right - 1) / spriteSizeOnScreen;
+            int top = playerRect.top / spriteSizeOnScreen;
+
+            if (tileIsLayoutType(bottom, left, Tile.LayoutType.EXPLOSION) ||
+                    tileIsLayoutType(bottom, right, Tile.LayoutType.EXPLOSION) ||
+                    tileIsLayoutType(top, left, Tile.LayoutType.EXPLOSION) ||
+                    tileIsLayoutType(top, right, Tile.LayoutType.EXPLOSION)) {
+                --livesCount;
+                time = INVINCIBILITY_TIME;
+                usedPaint = INVINCIBILITY_PAINT;
             }
+        } else {
+            --time;
+            int aux = time % 4;
+            switch (aux) {
+                case 0:
+                    usedPaint = null;
+                    break;
+                case 2:
+                    usedPaint = INVINCIBILITY_PAINT;
+                    break;
+            }
+        }
+    }
+
+    private boolean tileIsLayoutType(int row, int column, Tile.LayoutType explosion) {
+        return tilemap.getTilemap()[row][column].getLayoutType() == explosion;
+    }
+
+    private void useBomb() {
+        int rowIdx = playerRect.centerY() / playerRect.width();
+        int columnIdx = playerRect.centerX() / playerRect.height();
+        if (tileIsLayoutType(rowIdx, columnIdx, Tile.LayoutType.WALK)) {
+            int count = 0;
+            for (int i = 0; i < bombList.size(); i++) {
+                if (bombList.get(i).getPlayer() == this)
+                    ++count;
+            }
+            if (count != bombsNumber)
+                bombList.add(new Bomb(bombRange, rowIdx, columnIdx, this,
+                        bombList, explosionList, tilemap));
         }
     }
 
@@ -133,7 +183,7 @@ public class Player {
             return;
 
         Rect newRect = new Rect(playerRect);
-        newRect.offset((int) velocityX, (int) velocityY);
+        newRect.offsetTo((int) (positionX + velocityX), (int) (positionY + velocityY));
 
         if (velocityX != 0)
             if (velocityX < 0) {
@@ -198,7 +248,7 @@ public class Player {
             velocityX = velocityY * SPEED_MINIMIZING;
             velocityY = 0;
             int aux = -playerRect.right % spriteSizeOnScreen;
-            velocityX = aux > velocityX ? aux :velocityX;
+            velocityX = aux > velocityX ? aux : velocityX;
         }
     }
 
@@ -251,7 +301,7 @@ public class Player {
         } else if (bottomBool) {
             velocityY = velocityX * SPEED_MINIMIZING;
             velocityX = 0;
-            int aux = - playerRect.bottom % spriteSizeOnScreen;
+            int aux = -playerRect.bottom % spriteSizeOnScreen;
             velocityY = aux > velocityY ? aux : velocityY;
         }
     }
@@ -262,9 +312,6 @@ public class Player {
             case CRATE:
             case BOMB:
                 return true;
-            case EXPLOSION:
-                --livesCount;
-                return false;
             default:
                 return false;
         }
@@ -277,14 +324,12 @@ public class Player {
 
         // Select direction by actuator value
         if (Math.abs(actuatorX) > Math.abs(actuatorY)) {
-            velocityX = (actuatorX / Math.abs(actuatorX)) * defaultMaxSpeed *
-                    (1 + INCREASE_IN_SPEED_BY_POWER_UP * speedUps);
+            velocityX = actuatorX * defaultMaxSpeed * (1 + INCREASE_IN_SPEED_BY_POWER_UP * speedUps);
             velocityY = 0;
             return;
         }
         if (Math.abs(actuatorX) < Math.abs(actuatorY)) {
-            velocityY = (actuatorY / Math.abs(actuatorY)) * defaultMaxSpeed *
-                    (1 + (INCREASE_IN_SPEED_BY_POWER_UP * speedUps));
+            velocityY = actuatorY * defaultMaxSpeed * (1 + INCREASE_IN_SPEED_BY_POWER_UP * speedUps);
             velocityX = 0;
             return;
         }

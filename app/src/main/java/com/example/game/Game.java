@@ -174,10 +174,6 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void update() {
-        joystick.update();
-        button.update();
-        player.update();
-
         List<Bomb> bombRemoveList = new ArrayList<>();
         for (int idx = 0; idx < bombList.size(); ++idx) {
             bombList.get(idx).update(bombRemoveList);
@@ -189,6 +185,10 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
             explosionList.get(idx).update(explosionRemoveList);
         }
         explosionList.removeAll(explosionRemoveList);
+
+        joystick.update();
+        button.update();
+        player.update();
     }
 
     public void pause() {
