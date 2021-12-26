@@ -112,7 +112,7 @@ public class Player {
             useBomb();
         }
 
-        // Player in explosion
+        // Player death handler
         handleDeath();
     }
 
