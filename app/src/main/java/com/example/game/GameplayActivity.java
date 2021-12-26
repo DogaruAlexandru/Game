@@ -7,7 +7,7 @@ import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
-public class MainActivity extends Activity {
+public class GameplayActivity extends Activity {
 
     private Game game;
 
@@ -53,6 +53,6 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        /*super.onBackPressed();*/
     }
 }
