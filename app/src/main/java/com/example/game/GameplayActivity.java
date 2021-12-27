@@ -1,13 +1,11 @@
 package com.example.game;
 
-import android.app.Activity;
-
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Window;
-import android.view.WindowManager;
 
-public class GameplayActivity extends Activity {
+import androidx.appcompat.app.AppCompatActivity;
+
+public class GameplayActivity extends AppCompatActivity {
 
     private Game game;
 
