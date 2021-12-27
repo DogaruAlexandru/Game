@@ -118,10 +118,11 @@ public class Player {
 
     private void handleDeath() {
         if (time == 0) {
-            int bottom = (playerRect.bottom - 1) / spriteSizeOnScreen;
-            int left = playerRect.left / spriteSizeOnScreen;
-            int right = (playerRect.right - 1) / spriteSizeOnScreen;
-            int top = playerRect.top / spriteSizeOnScreen;
+            int safe = spriteSizeOnScreen / 5;//todo
+            int bottom = (playerRect.bottom - 1 - safe) / spriteSizeOnScreen;
+            int left = (playerRect.left + safe) / spriteSizeOnScreen;
+            int right = (playerRect.right - 1 - safe) / spriteSizeOnScreen;
+            int top = (playerRect.top + safe) / spriteSizeOnScreen;
 
             if (tileIsLayoutType(bottom, left, Tile.LayoutType.EXPLOSION) ||
                     tileIsLayoutType(bottom, right, Tile.LayoutType.EXPLOSION) ||
