@@ -7,45 +7,56 @@
     tools:context=".SetupActivity">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/titleTV"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:text="@string/title"
         android:textAlignment="center"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintBottom_toTopOf="@+id/buttonJoin"
+        app:layout_constraintBottom_toTopOf="@+id/joinBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/buttonCreate"
+        android:id="@+id/createBtn"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:text="@string/create"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/buttonJoin" />
+        app:layout_constraintTop_toBottomOf="@+id/joinBtn" />
 
     <Button
-        android:id="@+id/buttonJoin"
+        android:id="@+id/joinBtn"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:text="@string/join"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/titleTV" />
 
     <EditText
-        android:id="@+id/editText"
+        android:id="@+id/codeEdt"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:hint="@string/enter_code"
         android:textAlignment="center"
-        app:layout_constraintBottom_toTopOf="@+id/buttonJoin"
+        app:layout_constraintBottom_toTopOf="@+id/joinBtn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/loadingPB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
