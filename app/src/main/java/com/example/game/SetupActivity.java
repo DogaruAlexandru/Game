@@ -3,19 +3,26 @@ package com.example.game;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.game.model.PlayerData;
+import com.example.game.model.ServerData;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.Random;
 
 public class SetupActivity extends AppCompatActivity {
 
@@ -25,14 +32,11 @@ public class SetupActivity extends AppCompatActivity {
     private EditText codeEdt;
     private TextView titleTV;
 
-    private boolean isCodeMaker = true;
-    private boolean codeFound = false;
-    private boolean checkTemp = true;
-    private String code = "null";
-    private String keyValue = "null";
+    private DatabaseReference reference;
+    private FirebaseAuth auth;
+    private FirebaseUser user;
 
-    FirebaseDatabase database;
-    FirebaseAuth auth;
+    Bundle bundle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,16 +54,24 @@ public class SetupActivity extends AppCompatActivity {
 
         createBtn = findViewById(R.id.createBtn);
         createBtn.setOnClickListener(v -> createGameActivity());
+
+        bundle = getIntent().getExtras();
+        reference = FirebaseDatabase.getInstance().getReference();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = auth.getCurrentUser();
-        if (currentUser == null)
+        user = auth.getCurrentUser();
+        if (user == null) {
             signInAnonymously();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
     private void signInAnonymously() {
@@ -67,43 +79,131 @@ public class SetupActivity extends AppCompatActivity {
             if (task.isSuccessful()) {
                 // Sign in success, update UI with the signed-in user's information
                 Log.d("AnonymousAuth", "signInAnonymously:success");
-                FirebaseUser user = auth.getCurrentUser();
+                user = auth.getCurrentUser();
+//                Toast.makeText(SetupActivity.this, "Authentication sign up succeeded.",
+//                        Toast.LENGTH_SHORT).show();
             } else {
                 // If sign in fails, display a message to the user.
                 Log.w("AnonymousAuth", "signInAnonymously:failure", task.getException());
                 Toast.makeText(SetupActivity.this, "Authentication failed.",
                         Toast.LENGTH_SHORT).show();
+                super.onBackPressed();
             }
         });
     }
 
     private void createGameActivity() {
-        Intent intent = new Intent(this, GameplayActivity.class);
-        startActivity(intent);
+        if (codeEdt.getText().toString().length() > 3) {
+            createGameData();
+            return;
+        }
+        Toast.makeText(SetupActivity.this, "Code needs to have at least 4 characters.",
+                Toast.LENGTH_SHORT).show();
     }
 
     private void joinGameActivity() {
-//        Intent intent = new Intent(this, GameplayActivity.class);
-//        startActivity(intent);
-
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message2");
-
-        myRef.setValue("Hello, World!");
+        if (codeEdt.getText().toString().length() > 3) {
+            getGameData();
+            return;
+        }
+        Toast.makeText(SetupActivity.this, "Code needs to have at least 4 characters.",
+                Toast.LENGTH_SHORT).show();
     }
 
-    private void accepted() {
-        Intent intent = new Intent(this, GameplayActivity.class);
+    private void getGameData() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.hasChild(codeEdt.getText().toString())) {
+                    Toast.makeText(SetupActivity.this, "Code not found.",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                DataSnapshot gameInstance = snapshot.child(codeEdt.getText().toString());
+                if (gameInstance.getChildrenCount() > 4) {
+                    Toast.makeText(SetupActivity.this, "All spots taken.",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                Utils.generator = new Random((long) gameInstance.child("seed").getValue());
+
+                PlayerData playerData = new PlayerData();
+                playerData.playerName = "";
+                if (bundle != null)
+                    playerData.playerName = bundle.getString("playerName");
+
+                if (!gameInstance.hasChild("player1")) {
+                    reference.child(codeEdt.getText().toString()).
+                            child("player1").setValue(playerData);
+                    bundle.putString("playerId", "player1");
+
+                } else if (!gameInstance.hasChild("player2")) {
+                    reference.child(codeEdt.getText().toString()).
+                            child("player2").setValue(playerData);
+                    bundle.putString("playerId", "player2");
+
+                } else if (!gameInstance.hasChild("player3")) {
+                    reference.child(codeEdt.getText().toString()).
+                            child("player3").setValue(playerData);
+                    ;
+                    bundle.putString("playerId", "player3");
+
+                } else if (!gameInstance.hasChild("player4")) {
+                    reference.child(codeEdt.getText().toString()).
+                            child("player4").setValue(playerData);
+                    bundle.putString("playerId", "player4");
+                }
+
+                goToNextActivity();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d("firebase", "Error getting data");
+            }
+        });
+    }
+
+    private void createGameData() {
+        reference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.hasChild(codeEdt.getText().toString())) {
+                    Toast.makeText(SetupActivity.this, "Code already in use.",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                Random generator = new Random();
+                long seed = generator.nextLong();
+                generator.setSeed(seed);
+                Utils.generator = generator;
+
+                PlayerData playerData = new PlayerData();
+                playerData.playerName = "";
+                if (bundle != null)
+                    playerData.playerName = bundle.getString("playerName");
+
+                ServerData data = new ServerData(seed, playerData, null,
+                        null, null);
+                reference.child(codeEdt.getText().toString()).setValue(data);
+
+                goToNextActivity();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.d("firebase", "Error getting data");
+            }
+        });
+    }
+
+    private void goToNextActivity() {
+        Intent intent = new Intent(this, PlayersDisplayActivity.class);
+        bundle.putString("code", codeEdt.getText().toString());
+        intent.putExtras(bundle);
         startActivity(intent);
-
-        loadingPB.setVisibility(View.GONE);
-        codeEdt.setVisibility(View.VISIBLE);
-        titleTV.setVisibility(View.VISIBLE);
-        joinBtn.setVisibility(View.VISIBLE);
-        createBtn.setVisibility(View.VISIBLE);
+//        finish();
     }
-
-//    private void isValueAvailable(DataSnapshot dataSnapshot, String code){
-//
-//    }
 }

@@ -5,4 +5,5 @@
     <string name="join">Join</string>
     <string name="create">Create</string>
     <string name="enter_code">Enter Code</string>
+    <string name="enter_name">Enter Name</string>
 </resources>

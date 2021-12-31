@@ -74,6 +74,6 @@ public class MapLayout {
     }
 
     public boolean getRandomBoolean(float p) {
-        return Utils.RANDOM.nextFloat() < p;
+        return Utils.generator.nextFloat() < p;
     }
 }

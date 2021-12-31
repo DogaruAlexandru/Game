@@ -1,7 +1,5 @@
 package com.example.game;
 
-import com.example.game.map.MapLayout;
-
 import java.util.Random;
 
 public class Utils {
@@ -10,7 +8,7 @@ public class Utils {
     public static int spriteSizeOnScreen = 0;
     public static int mapOffsetX = 0;
     public static int mapOffsetY = 0;
-    public static final Random RANDOM = new Random();
+    public static Random generator;
 
     public static double getDistanceBetweenPoints(double p1x, double p1y, double p2x, double p2y) {
         return Math.sqrt(Math.pow(p1x - p2x, 2) + Math.pow(p1y - p2y, 2));
