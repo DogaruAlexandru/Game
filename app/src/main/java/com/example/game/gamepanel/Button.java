@@ -9,7 +9,6 @@ import androidx.core.content.ContextCompat;
 
 import com.example.game.R;
 import com.example.game.graphics.Sprite;
-import com.example.game.graphics.SpriteSheet;
 
 public class Button {
     private final Paint circlePaint;
@@ -84,6 +83,6 @@ public class Button {
                 circleRadius,
                 usedPaint);
 
-        bombSprite.draw(canvas, bombRect, bombPaint);
+//        bombSprite.draw(canvas, bombRect, bombPaint);//todo
     }
 }

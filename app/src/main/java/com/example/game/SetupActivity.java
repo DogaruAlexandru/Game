@@ -77,13 +77,13 @@ public class SetupActivity extends AppCompatActivity {
     private void signInAnonymously() {
         auth.signInAnonymously().addOnCompleteListener(this, task -> {
             if (task.isSuccessful()) {
-                // Sign in success, update UI with the signed-in user's information
+                // Sign in success
                 Log.d("AnonymousAuth", "signInAnonymously:success");
                 user = auth.getCurrentUser();
-//                Toast.makeText(SetupActivity.this, "Authentication sign up succeeded.",
-//                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(SetupActivity.this, "Authentication sign up succeeded.",
+                        Toast.LENGTH_SHORT).show();
             } else {
-                // If sign in fails, display a message to the user.
+                // If sign in fails
                 Log.w("AnonymousAuth", "signInAnonymously:failure", task.getException());
                 Toast.makeText(SetupActivity.this, "Authentication failed.",
                         Toast.LENGTH_SHORT).show();
@@ -120,8 +120,14 @@ public class SetupActivity extends AppCompatActivity {
                     return;
                 }
                 DataSnapshot gameInstance = snapshot.child(codeEdt.getText().toString());
-                if (gameInstance.getChildrenCount() > 4) {
+                if (gameInstance.getChildrenCount() > 5) {
                     Toast.makeText(SetupActivity.this, "All spots taken.",
+                            Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                if (!gameInstance.child("gameState").getValue(String.class).
+                        equals("waiting players")) {
+                    Toast.makeText(SetupActivity.this, "Game already started.",
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -155,7 +161,7 @@ public class SetupActivity extends AppCompatActivity {
                     bundle.putString("playerId", "player4");
                 }
 
-                goToNextActivity();
+                goToNextActivity(false);
             }
 
             @Override
@@ -185,11 +191,10 @@ public class SetupActivity extends AppCompatActivity {
                 if (bundle != null)
                     playerData.playerName = bundle.getString("playerName");
 
-                ServerData data = new ServerData(seed, playerData, null,
-                        null, null);
+                ServerData data = new ServerData(seed, "waiting players",
+                        playerData, null, null, null);
                 reference.child(codeEdt.getText().toString()).setValue(data);
-
-                goToNextActivity();
+                goToNextActivity(true);
             }
 
             @Override
@@ -199,8 +204,12 @@ public class SetupActivity extends AppCompatActivity {
         });
     }
 
-    private void goToNextActivity() {
-        Intent intent = new Intent(this, PlayersDisplayActivity.class);
+    private void goToNextActivity(boolean withStart) {
+        Intent intent;
+        if (withStart)
+            intent = new Intent(this, PlayersDisplayWithStartActivity.class);
+        else
+            intent = new Intent(this, PlayersDisplayActivity.class);
         bundle.putString("code", codeEdt.getText().toString());
         intent.putExtras(bundle);
         startActivity(intent);

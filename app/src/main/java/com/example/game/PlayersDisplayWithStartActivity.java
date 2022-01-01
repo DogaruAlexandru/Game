@@ -15,27 +15,25 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class PlayersDisplayActivity extends AppCompatActivity {
+public class PlayersDisplayWithStartActivity extends AppCompatActivity {
 
     private Button backButton;
+    private Button startButton;
     private ListView listView;
     private ArrayList<String> list;
 
     private Bundle bundle;
     private DatabaseReference reference;
 
-    ValueEventListener gameInstanceValueEventListener;
-    ChildEventListener childEventListener;
-    ValueEventListener gameStateValueEventListener;
+    private ChildEventListener childEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_players_display);
+        setContentView(R.layout.activity_players_display_with_start);
 
         list = new ArrayList<>();
         bundle = getIntent().getExtras();
@@ -50,22 +48,6 @@ public class PlayersDisplayActivity extends AppCompatActivity {
                 android.R.layout.simple_dropdown_item_1line, list);
         listView.setAdapter(adapter);
 
-        // Listener for game deleted
-        gameInstanceValueEventListener = reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    return;
-                }
-                onBackPressed();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-            }
-        });
-
-        // Listener for players in list
         childEventListener = reference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
@@ -102,47 +84,36 @@ public class PlayersDisplayActivity extends AppCompatActivity {
             }
         });
 
-        // Listener for gameState changing
-        gameStateValueEventListener = reference.child("gameState").
-                addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (!"starting game".equals(dataSnapshot.getValue(String.class))) {
-                            return;
-                        }
-                        startGameplayActivity();
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                    }
-                });
-
         backButton = findViewById(R.id.backButton);
-        backButton.setOnClickListener(v -> onBackPressed());
+        backButton.setOnClickListener(v -> goBack());
+
+        startButton = findViewById(R.id.startButton);
+        startButton.setOnClickListener(v -> startGame());
     }
 
-    @Override
-    public void onBackPressed() {
-        reference.child(bundle.getString("playerId")).removeValue();
-
-        reference.removeEventListener(gameInstanceValueEventListener);
+    private void startGame() {
         reference.removeEventListener(childEventListener);
-        reference.child("gameState").removeEventListener(gameStateValueEventListener);
 
-        super.onBackPressed();
-
-        finish();
-    }
-
-    private void startGameplayActivity() {
-        reference.removeEventListener(gameInstanceValueEventListener);
-        reference.removeEventListener(childEventListener);
-        reference.child("gameState").removeEventListener(gameStateValueEventListener);
+        reference.child("gameState").setValue("starting game");
 
         Intent intent = new Intent(this, GameplayActivity.class);
         intent.putExtras(bundle);
         startActivity(intent);
+        finish();
+    }
+
+    private void goBack() {
+        onBackPressed();
+    }
+
+    @Override
+    public void onBackPressed() {
+        reference.removeValue();
+
+        reference.removeEventListener(childEventListener);
+
+        super.onBackPressed();
+
         finish();
     }
 }

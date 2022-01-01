@@ -6,4 +6,7 @@
     <string name="create">Create</string>
     <string name="enter_code">Enter Code</string>
     <string name="enter_name">Enter Name</string>
+    <string name="back">Back</string>
+    <string name="PlayersListHeader">Players</string>
+    <string name="start">Start</string>
 </resources>

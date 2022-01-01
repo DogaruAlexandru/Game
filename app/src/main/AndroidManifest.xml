@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppFullScreenTheme">
         <activity
+            android:name=".PlayersDisplayWithStartActivity"
+            android:exported="false" />
+        <activity
             android:name=".StartActivity"
             android:exported="true"
             android:screenOrientation="sensorLandscape">
