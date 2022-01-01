@@ -92,6 +92,10 @@ public class PlayersDisplayWithStartActivity extends AppCompatActivity {
     }
 
     private void startGame() {
+        if (list.size() < 2) {
+            return;
+        }
+
         reference.removeEventListener(childEventListener);
 
         reference.child("gameState").setValue("starting game");
