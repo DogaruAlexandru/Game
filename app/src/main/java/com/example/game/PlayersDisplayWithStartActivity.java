@@ -4,8 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,10 +22,14 @@ import java.util.ArrayList;
 
 public class PlayersDisplayWithStartActivity extends AppCompatActivity {
 
-    private Button backButton;
-    private Button startButton;
-    private ListView listView;
+    EditText mapHeightEdt;
+    EditText mapWidthEdt;
+    EditText crateSpawnProbabilityEdt;
+
     private ArrayList<String> list;
+    private int mapHeight;
+    private int mapWidth;
+    private int crateSpawnProbability;
 
     private Bundle bundle;
     private DatabaseReference reference;
@@ -39,7 +45,12 @@ public class PlayersDisplayWithStartActivity extends AppCompatActivity {
         bundle = getIntent().getExtras();
         reference = FirebaseDatabase.getInstance().getReference(bundle.getString("code"));
 
-        listView = findViewById(R.id.listView);
+        mapHeightEdt = findViewById(R.id.mapHeight);
+        mapWidthEdt = findViewById(R.id.mapWidth);
+        crateSpawnProbabilityEdt = findViewById(R.id.crateSpawnProbability);
+
+
+        ListView listView = findViewById(R.id.listView);
         TextView textView = new TextView(this);
         textView.setText(R.string.PlayersListHeader);
         listView.addHeaderView(textView);
@@ -84,21 +95,57 @@ public class PlayersDisplayWithStartActivity extends AppCompatActivity {
             }
         });
 
-        backButton = findViewById(R.id.backButton);
-        backButton.setOnClickListener(v -> goBack());
 
-        startButton = findViewById(R.id.startButton);
+        Button backButton = findViewById(R.id.backButton);
+        backButton.setOnClickListener(v -> onBackPressed());
+
+        Button startButton = findViewById(R.id.startButton);
         startButton.setOnClickListener(v -> startGame());
+    }
+
+    private void verifyInputs() {
+        if (mapHeight > 31) {
+            mapHeight = 31;
+            Toast.makeText(PlayersDisplayWithStartActivity.this,
+                    "Using maximum height.", Toast.LENGTH_SHORT).show();
+        } else if (mapHeight < 11) {
+            mapHeight = 11;
+            Toast.makeText(PlayersDisplayWithStartActivity.this,
+                    "Using minimum height.", Toast.LENGTH_SHORT).show();
+        }
+
+        if (mapWidth > 41) {
+            mapWidth = 41;
+            Toast.makeText(PlayersDisplayWithStartActivity.this,
+                    "Using maximum width.", Toast.LENGTH_SHORT).show();
+        } else if (mapWidth < 11) {
+            mapWidth = 11;
+            Toast.makeText(PlayersDisplayWithStartActivity.this,
+                    "Using minimum width.", Toast.LENGTH_SHORT).show();
+        }
+
+        if (crateSpawnProbability > 100) {
+            crateSpawnProbability = 100;
+            Toast.makeText(PlayersDisplayWithStartActivity.this,
+                    "Using maximum crate spawn probability.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void startGame() {
         if (list.size() < 2) {
+            Toast.makeText(PlayersDisplayWithStartActivity.this,
+                    "You can not start with one player.", Toast.LENGTH_SHORT).show();
             return;
         }
+
+        getInputs();
 
         reference.removeEventListener(childEventListener);
 
         reference.child("gameState").setValue("starting game");
+        reference.child("mapHeight").setValue(mapHeight);
+        reference.child("mapWidth").setValue(mapWidth);
+        reference.child("crateSpawnProbability").setValue(crateSpawnProbability);
 
         Intent intent = new Intent(this, GameplayActivity.class);
         intent.putExtras(bundle);
@@ -106,8 +153,54 @@ public class PlayersDisplayWithStartActivity extends AppCompatActivity {
         finish();
     }
 
-    private void goBack() {
-        onBackPressed();
+    private void getInputs() {
+        try {
+            String s = mapHeightEdt.getText().toString();
+            if (s.equals(""))
+                mapHeight = 11;
+            else
+                mapHeight = Integer.parseInt(s);
+
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
+            Toast.makeText(PlayersDisplayWithStartActivity.this,
+                    "Invalid height. Using default.", Toast.LENGTH_SHORT).show();
+
+            mapHeight = 11;
+        }
+
+        try {
+            String s = mapWidthEdt.getText().toString();
+            if (s.equals(""))
+                mapWidth = 11;
+            else
+                mapWidth = Integer.parseInt(s);
+
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
+            Toast.makeText(PlayersDisplayWithStartActivity.this,
+                    "Invalid width. Using default.", Toast.LENGTH_SHORT).show();
+
+            mapWidth = 11;
+        }
+
+        try {
+            String s = crateSpawnProbabilityEdt.getText().toString();
+            if (s.equals(""))
+                crateSpawnProbability = 20;
+            else
+                crateSpawnProbability = Integer.parseInt(s);
+
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
+            Toast.makeText(PlayersDisplayWithStartActivity.this,
+                    "Invalid crate spawn probability. Using default.",
+                    Toast.LENGTH_SHORT).show();
+
+            crateSpawnProbability = 20;
+        }
+
+        verifyInputs();
     }
 
     @Override
