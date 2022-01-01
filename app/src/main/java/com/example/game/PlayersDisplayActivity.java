@@ -6,6 +6,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -57,6 +58,8 @@ public class PlayersDisplayActivity extends AppCompatActivity {
                 if (dataSnapshot.exists()) {
                     return;
                 }
+                Toast.makeText(PlayersDisplayActivity.this,
+                        "The creator closed the server.", Toast.LENGTH_SHORT).show();
                 onBackPressed();
             }
 
