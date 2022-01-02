@@ -9,7 +9,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.game.model.PlayerData;
@@ -17,10 +16,8 @@ import com.example.game.model.ServerData;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.Random;
 
@@ -111,15 +108,21 @@ public class SetupActivity extends AppCompatActivity {
     }
 
     private void getGameData() {
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (!snapshot.hasChild(codeEdt.getText().toString())) {
+        reference.get().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                Log.e("firebase", "Error getting data", task.getException());
+            } else {
+                Log.d("firebase", String.valueOf(task.getResult().getValue()));
+
+                DataSnapshot dataSnapshot = task.getResult();
+
+
+                if (!dataSnapshot.hasChild(codeEdt.getText().toString())) {
                     Toast.makeText(SetupActivity.this, "Code not found.",
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
-                DataSnapshot gameInstance = snapshot.child(codeEdt.getText().toString());
+                DataSnapshot gameInstance = dataSnapshot.child(codeEdt.getText().toString());
                 if (gameInstance.getChildrenCount() > 5) {
                     Toast.makeText(SetupActivity.this, "All spots taken.",
                             Toast.LENGTH_SHORT).show();
@@ -163,19 +166,19 @@ public class SetupActivity extends AppCompatActivity {
 
                 goToNextActivity(false);
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.d("firebase", "Error getting data");
-            }
         });
     }
 
     private void createGameData() {
-        reference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.hasChild(codeEdt.getText().toString())) {
+        reference.get().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                Log.e("firebase", "Error getting data", task.getException());
+            } else {
+                Log.d("firebase", String.valueOf(task.getResult().getValue()));
+
+                DataSnapshot dataSnapshot = task.getResult();
+
+                if (dataSnapshot.hasChild(codeEdt.getText().toString())) {
                     Toast.makeText(SetupActivity.this, "Code already in use.",
                             Toast.LENGTH_SHORT).show();
                     return;
@@ -195,11 +198,6 @@ public class SetupActivity extends AppCompatActivity {
                         playerData, null, null, null);
                 reference.child(codeEdt.getText().toString()).setValue(data);
                 goToNextActivity(true);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.d("firebase", "Error getting data");
             }
         });
     }

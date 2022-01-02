@@ -46,8 +46,8 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         super(context);
 
 //        setBackground(AppCompatResources.getDrawable(context, R.drawable.background));todo
-        
-        this.playerId=playerId;
+
+        this.playerId = playerId;
 
         SurfaceHolder surfaceHolder = getHolder();
         surfaceHolder.addCallback(this);
