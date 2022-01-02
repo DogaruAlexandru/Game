@@ -4,15 +4,16 @@ import com.example.game.Utils;
 
 public class MapLayout {
     //    private static final float CRATE_SPAWN_PROBABILITY = 0.85f;todo
-    private static final float CRATE_SPAWN_PROBABILITY = 0.5f;
-    public int numberOfRowTiles;
-    public int numberOfColumnTiles;
+    private final float crateSpawnProbability;
+    private final int numberOfRowTiles;
+    private final int numberOfColumnTiles;
 
     private int[][] layout;
 
-    public MapLayout(int numberOfRowTiles, int numberOfColumnTiles) {
+    public MapLayout(int numberOfRowTiles, int numberOfColumnTiles, int crateSpawnProbability) {
         this.numberOfRowTiles = numberOfRowTiles;
         this.numberOfColumnTiles = numberOfColumnTiles;
+        this.crateSpawnProbability = crateSpawnProbability * 0.01f;
         initializeLayout();
     }
 
@@ -46,7 +47,7 @@ public class MapLayout {
                     layout[idx1][idx2] = 2;
                     //add crates
                 else {
-                    if (getRandomBoolean(CRATE_SPAWN_PROBABILITY)) {
+                    if (getRandomBoolean(crateSpawnProbability)) {
                         layout[idx1][idx2] = 3;
                         continue;
                     }

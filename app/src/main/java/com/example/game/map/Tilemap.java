@@ -26,7 +26,8 @@ public class Tilemap {
     private int numberOfRowTiles;
     private int numberOfColumnTiles;
 
-    public Tilemap(SpriteSheet spriteSheet, int numberOfRowTiles, int numberOfColumnTiles) {
+    public Tilemap(SpriteSheet spriteSheet, int numberOfRowTiles, int numberOfColumnTiles,
+                   int crateSpawnProbability) {
 
         this.spriteSheet = spriteSheet;
         this.numberOfRowTiles = numberOfRowTiles;
@@ -35,7 +36,7 @@ public class Tilemap {
 
         spriteSizeOnScreen = Utils.screenHeight / numberOfRowTiles;
 
-        mapLayout = new MapLayout(numberOfRowTiles, numberOfColumnTiles);
+        mapLayout = new MapLayout(numberOfRowTiles, numberOfColumnTiles, crateSpawnProbability);
 
         mapHeightOffset = (spriteSizeOnScreen * numberOfRowTiles) >> 1;
         mapWidthOffset = (spriteSizeOnScreen * numberOfColumnTiles) >> 1;

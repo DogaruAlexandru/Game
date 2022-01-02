@@ -5,17 +5,55 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 public class GameplayActivity extends AppCompatActivity {
 
     private Game game;
+    private Bundle bundle;
+
+    int mapHeight;
+    int mapWidth;
+    int crateSpawnProbability;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d("MainActivity.java", "onCreate()");
         super.onCreate(savedInstanceState);
 
-        game = new Game(this);
-        setContentView(game);
+        bundle = getIntent().getExtras();
+        DatabaseReference reference = FirebaseDatabase.getInstance().
+                getReference(bundle.getString("code"));
+
+        reference.get().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                Log.e("firebase", "Error getting data", task.getException());
+            } else {
+                Log.d("firebase", String.valueOf(task.getResult().getValue()));
+
+                DataSnapshot dataSnapshot = task.getResult();
+                try {
+                    mapHeight = dataSnapshot.child("mapHeight").getValue(int.class);
+                    mapWidth = dataSnapshot.child("mapWidth").getValue(int.class);
+                    crateSpawnProbability = dataSnapshot.child("crateSpawnProbability").
+                            getValue(int.class);
+
+                    // bundle playerId, playerName, code
+
+                    game = new Game(this, mapHeight, mapWidth, crateSpawnProbability,
+                            bundle.getString("playerId"));
+                    setContentView(game);
+
+                } catch (Exception e) {
+                    Log.e("firebase", "Game parameters not found", e);
+                    mapHeight = 11;
+                    mapWidth = 11;
+                    crateSpawnProbability = 25;
+                }
+            }
+        });
     }
 
     @Override

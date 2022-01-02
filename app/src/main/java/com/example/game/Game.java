@@ -26,6 +26,7 @@ import java.util.List;
 public class Game extends SurfaceView implements SurfaceHolder.Callback {
     private final Player player;
     private final Joystick joystick;
+    private final String playerId;
 
     private final Tilemap tilemap;
     private List<Bomb> bombList;
@@ -40,10 +41,13 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
     private SpriteSheet spriteSheet;
     private Background background;
 
-    public Game(Context context) {
+    public Game(Context context, int mapHeight, int mapWidth, int crateSpawnProbability,
+                String playerId) {
         super(context);
 
 //        setBackground(AppCompatResources.getDrawable(context, R.drawable.background));todo
+        
+        this.playerId=playerId;
 
         SurfaceHolder surfaceHolder = getHolder();
         surfaceHolder.addCallback(this);
@@ -64,7 +68,7 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         bombList = new ArrayList<>();
         explosionList = new ArrayList<>();
 
-        tilemap = new Tilemap(spriteSheet, 11, 15);
+        tilemap = new Tilemap(spriteSheet, mapHeight, mapWidth, crateSpawnProbability);
 
         joystick = new Joystick(
                 getContext(),
