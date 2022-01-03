@@ -40,10 +40,7 @@ public class GameplayActivity extends AppCompatActivity {
                     crateSpawnProbability = dataSnapshot.child("crateSpawnProbability").
                             getValue(int.class);
 
-                    // bundle playerId, playerName, code
-
-                    game = new Game(this, mapHeight, mapWidth, crateSpawnProbability,
-                            bundle.getString("playerId"));
+                    game = new Game(this, mapHeight, mapWidth, crateSpawnProbability, bundle);
                     setContentView(game);
 
                 } catch (Exception e) {
@@ -89,8 +86,8 @@ public class GameplayActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-
-        finish();
+//        super.onBackPressed();
+//
+//        finish();
     }
 }

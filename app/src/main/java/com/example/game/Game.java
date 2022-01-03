@@ -3,6 +3,7 @@ package com.example.game;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
+import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -10,6 +11,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.example.game.gameobject.Bomb;
+import com.example.game.gameobject.Enemy;
 import com.example.game.gameobject.Explosion;
 import com.example.game.gameobject.Player;
 import com.example.game.gamepanel.Background;
@@ -19,18 +21,26 @@ import com.example.game.gamepanel.Performance;
 import com.example.game.graphics.Animator;
 import com.example.game.graphics.SpriteSheet;
 import com.example.game.map.Tilemap;
+import com.example.game.model.PlayerData;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Game extends SurfaceView implements SurfaceHolder.Callback {
     private final Player player;
     private final Joystick joystick;
+    private final Tilemap tilemap;
     private final String playerId;
 
-    private final Tilemap tilemap;
-    private List<Bomb> bombList;
-    private List<Explosion> explosionList;
+    private ArrayList<Bomb> bombList;
+    private ArrayList<Explosion> explosionList;
+    private ArrayList<Enemy> enemies;
 
     private int joystickPointerId = -1;
     private int buttonPointerId = -1;
@@ -41,13 +51,19 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
     private SpriteSheet spriteSheet;
     private Background background;
 
+    DatabaseReference reference;
+
     public Game(Context context, int mapHeight, int mapWidth, int crateSpawnProbability,
-                String playerId) {
+                Bundle bundle) {
         super(context);
 
 //        setBackground(AppCompatResources.getDrawable(context, R.drawable.background));todo
 
-        this.playerId = playerId;
+        this.playerId = bundle.getString("playerId");
+        enemies = new ArrayList<>();
+        reference = FirebaseDatabase.getInstance().getReference(bundle.getString("code"));
+
+        addEnemiesListeners();
 
         SurfaceHolder surfaceHolder = getHolder();
         surfaceHolder.addCallback(this);
@@ -68,7 +84,11 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         bombList = new ArrayList<>();
         explosionList = new ArrayList<>();
 
-        tilemap = new Tilemap(spriteSheet, mapHeight, mapWidth, crateSpawnProbability);
+        tilemap = new Tilemap(
+                spriteSheet,
+                mapHeight,
+                mapWidth,
+                crateSpawnProbability);
 
         joystick = new Joystick(
                 getContext(),
@@ -84,11 +104,123 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
                 Utils.getControllersOuterCircleRadius(),
                 spriteSheet.getBombSprite());
 
-        player = new Player(getContext(), joystick, button, 1, 1, tilemap,
-                new Animator(spriteSheet.getGreenPlayerSpriteArray()), bombList, explosionList,
-                2, 4, 4, 1);
+        int rowTile = 0;
+        int columnTile = 0;
+        switch (playerId) {
+            case "player1":
+                rowTile = 1;
+                columnTile = 1;
+                break;
+            case "player2":
+                rowTile = tilemap.getNumberOfRowTiles() - 2;
+                columnTile = tilemap.getNumberOfColumnTiles() - 2;
+                break;
+            case "player3":
+                rowTile = 1;
+                columnTile = tilemap.getNumberOfColumnTiles() - 2;
+                break;
+            case "player4":
+                rowTile = tilemap.getNumberOfRowTiles() - 2;
+                columnTile = 1;
+                break;
+        }
+
+        Animator animator = null;
+        switch (playerId) {
+            case "player1":
+                animator = new Animator(spriteSheet.getBluePlayerSpriteArray());
+                break;
+            case "player2":
+                animator = new Animator(spriteSheet.getRedPlayerSpriteArray());
+                break;
+            case "player3":
+                animator = new Animator(spriteSheet.getGreenPlayerSpriteArray());
+                break;
+            case "player4":
+                animator = new Animator(spriteSheet.getYellowPlayerSpriteArray());
+                break;
+        }
+        player = new Player(
+                getContext(),
+                joystick,
+                button,
+                rowTile,
+                columnTile,
+                tilemap,
+                animator,
+                bombList,
+                explosionList,
+                2,
+                4,
+                4,
+                1,
+                bundle);
 
         setFocusable(true);
+    }
+
+    private void addEnemiesListeners() {
+        reference.get().addOnCompleteListener(task -> {
+            if (!task.isSuccessful()) {
+                Log.e("firebase", "Error getting data", task.getException());
+            } else {
+                Log.d("firebase", String.valueOf(task.getResult().getValue()));
+
+                DataSnapshot dataSnapshot = task.getResult();
+
+                ArrayList<String> enemiesIdList = new ArrayList<>(Arrays.
+                        asList("player1", "player2", "player3", "player4"));
+                enemiesIdList.remove(playerId);
+                for (String id : enemiesIdList) {
+                    if (dataSnapshot.child(id).exists()) {
+                        createEnemy(id);
+                    }
+                }
+            }
+        });
+    }
+
+    private void createEnemy(String id) {
+        Enemy enemy = new Enemy();
+        enemy.setPlayerId(id);
+        enemy.setTilemap(tilemap);
+        switch (id) {
+            case "player1":
+                enemy.setAnimator(new Animator(spriteSheet.
+                        getBluePlayerSpriteArray()));
+                break;
+            case "player2":
+                enemy.setAnimator(new Animator(spriteSheet.
+                        getRedPlayerSpriteArray()));
+                break;
+            case "player3":
+                enemy.setAnimator(new Animator(spriteSheet.
+                        getGreenPlayerSpriteArray()));
+                break;
+            case "player4":
+                enemy.setAnimator(new Animator(spriteSheet.
+                        getYellowPlayerSpriteArray()));
+                break;
+        }
+        createListener(enemy);
+        enemy.setBombList(bombList);
+        enemy.setExplosionList(explosionList);
+        enemies.add(enemy);
+    }
+
+    private void createListener(Enemy enemy) {
+        enemy.setListener(reference.child(enemy.getPlayerId()).
+                addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        enemy.setPlayerData(dataSnapshot.getValue(PlayerData.class));
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.w("onCancelled", "failed", databaseError.toException());
+                    }
+                }));
     }
 
     @Override
@@ -175,6 +307,10 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         button.draw(canvas);
 
         player.draw(canvas);
+
+        for (Enemy enemy : enemies) {
+            enemy.draw(canvas);
+        }
     }
 
     public void update() {
@@ -193,9 +329,14 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
         joystick.update();
         button.update();
         player.update();
+
+        for (Enemy enemy : enemies) {
+            enemy.update();
+        }
     }
 
     public void pause() {
         gameLoop.stopLoop();
     }
+//todo make end and delete enemy listeners
 }

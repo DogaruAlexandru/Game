@@ -3,14 +3,13 @@ package com.example.game.gameobject;
 import static com.example.game.GameLoop.MAX_UPS;
 
 import com.example.game.map.BombTile;
-import com.example.game.map.Tile;
 import com.example.game.map.Tilemap;
 
 import java.util.List;
 
 public class Bomb {
     private final int TIME_TILL_EXPLOSION = (int) (MAX_UPS * 2);
-    private final Player player;
+    private final String playerId;
     private final int range;
     private final int row;
     private final int column;
@@ -20,7 +19,7 @@ public class Bomb {
 
     private int updatesBeforeExplosion;
 
-    public Bomb(int range, int row, int column, Player player, List<Bomb> bombList,
+    public Bomb(int range, int row, int column, String playerId, List<Bomb> bombList,
                 List<Explosion> explosionList, Tilemap tilemap) {
         this.range = range;
         this.row = row;
@@ -28,7 +27,7 @@ public class Bomb {
         this.bombList = bombList;
         this.explosionList = explosionList;
         this.tilemap = tilemap;
-        this.player = player;
+        this.playerId = playerId;
 
         updatesBeforeExplosion = TIME_TILL_EXPLOSION;
 
@@ -85,7 +84,7 @@ public class Bomb {
         }
     }
 
-    public Player getPlayer() {
-        return player;
+    public String getPlayerId() {
+        return playerId;
     }
 }

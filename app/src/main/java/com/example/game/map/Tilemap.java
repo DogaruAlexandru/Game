@@ -150,4 +150,12 @@ public class Tilemap {
     public void setTilemapChanged(boolean tilemapChanged) {
         this.tilemapChanged = tilemapChanged;
     }
+
+    public int getNumberOfRowTiles() {
+        return numberOfRowTiles;
+    }
+
+    public int getNumberOfColumnTiles() {
+        return numberOfColumnTiles;
+    }
 }

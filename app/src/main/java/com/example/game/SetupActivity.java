@@ -139,8 +139,10 @@ public class SetupActivity extends AppCompatActivity {
 
                 PlayerData playerData = new PlayerData();
                 playerData.playerName = "";
-                if (bundle != null)
-                    playerData.playerName = bundle.getString("playerName");
+                if (bundle == null)
+                    return;
+
+                playerData.playerName = bundle.getString("playerName");
 
                 if (!gameInstance.hasChild("player1")) {
                     reference.child(codeEdt.getText().toString()).
@@ -193,6 +195,9 @@ public class SetupActivity extends AppCompatActivity {
                 playerData.playerName = "";
                 if (bundle != null)
                     playerData.playerName = bundle.getString("playerName");
+
+                if (bundle != null)
+                    bundle.putString("playerId", "player1");
 
                 ServerData data = new ServerData(seed, "waiting players",
                         playerData, null, null, null);

@@ -37,4 +37,29 @@ public class PlayerState {
                 break;
         }
     }
+
+    public static State getStringToEnum(String s) {
+        if (s == null)
+            return PlayerState.State.NOT_MOVING;
+        switch (s) {
+            case "STARTED_MOVING":
+                return PlayerState.State.STARTED_MOVING;
+            case "IS_MOVING":
+                return PlayerState.State.IS_MOVING;
+            default:
+                return PlayerState.State.NOT_MOVING;
+        }
+    }
+
+    public static String getEnumToString(State s) {
+        switch (s) {
+            case NOT_MOVING:
+                return "NOT_MOVING";
+            case IS_MOVING:
+                return "IS_MOVING";
+            case STARTED_MOVING:
+                return "STARTED_MOVING";
+        }
+        return null;
+    }
 }

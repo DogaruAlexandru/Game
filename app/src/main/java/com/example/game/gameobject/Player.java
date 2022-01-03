@@ -7,6 +7,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.os.Bundle;
 
 import com.example.game.Utils;
 import com.example.game.gamepanel.Button;
@@ -14,6 +15,9 @@ import com.example.game.gamepanel.Joystick;
 import com.example.game.graphics.Animator;
 import com.example.game.map.Tile;
 import com.example.game.map.Tilemap;
+import com.example.game.model.PlayerData;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.List;
 
@@ -27,6 +31,9 @@ public class Player {
     private final Joystick joystick;
     private final Button button;
     private final Tilemap tilemap;
+    private final String playerId;
+
+    private PlayerData playerData;
 
     private double velocityX, velocityY;
     private double directionX, directionY;
@@ -50,10 +57,12 @@ public class Player {
     //    private boolean canThrow;
     //    private boolean canKick;
 
+    private DatabaseReference reference;
+
     public Player(Context context, Joystick joystick, Button button, int rowTile, int columnTile,
                   Tilemap tilemap, Animator animator, List<Bomb> bombList,
                   List<Explosion> explosionList, int speedUps, int bombRange, int bombsNumber,
-                  int livesCount) {
+                  int livesCount, Bundle bundle) {
 
         this.joystick = joystick;
         this.button = button;
@@ -68,6 +77,10 @@ public class Player {
         this.speedUps = speedUps;
         this.bombRange = bombRange;
         this.bombsNumber = bombsNumber;
+
+        reference = FirebaseDatabase.getInstance().getReference(bundle.getString("code"));
+        playerId = bundle.getString("playerId");
+
         defaultMaxSpeed = Utils.getPlayerDefaultMaxSpeed();
 
         Rect tileRect = tilemap.getTilemap()[rowTile][columnTile].getMapLocationRect();
@@ -83,6 +96,11 @@ public class Player {
         INVINCIBILITY_PAINT = new Paint();
         INVINCIBILITY_PAINT.setAlpha(80);
         usedPaint = null;
+
+        playerData = new PlayerData(getRelativePoxX(), getRelativePoxY(), rotationAngle, livesCount,
+                bombRange, false, false, bundle.getString("playerName"),
+                PlayerState.getEnumToString(PlayerState.State.NOT_MOVING));
+        reference.child(playerId).setValue(playerData);
     }
 
     public void draw(Canvas canvas) {
@@ -102,23 +120,29 @@ public class Player {
 
             // Update player orientation
             rotationAngle = (int) ((Math.atan2(directionY, directionX) * 180) / Math.PI) - 90;
+            playerData.rotationData = rotationAngle;
         }
 
         // Update player state for animation
         playerState.update();
+        playerData.movingState = PlayerState.getEnumToString(playerState.getState());
 
         // Use bomb
         if (button.getIsPressed()) {
             useBomb();
-        }
+            playerData.bombUsed = true;
+        } else
+            playerData.bombUsed = false;
 
         // Player death handler
         handleDeath();
+
+        reference.child(playerId).setValue(playerData);
     }
 
     private void handleDeath() {
         if (time == 0) {
-            int safe = spriteSizeOnScreen / 5;//todo
+            int safe = spriteSizeOnScreen / 6;//todo
             int bottom = (playerRect.bottom - 1 - safe) / spriteSizeOnScreen;
             int left = (playerRect.left + safe) / spriteSizeOnScreen;
             int right = (playerRect.right - 1 - safe) / spriteSizeOnScreen;
@@ -129,11 +153,14 @@ public class Player {
                     tileIsLayoutType(top, left, Tile.LayoutType.EXPLOSION) ||
                     tileIsLayoutType(top, right, Tile.LayoutType.EXPLOSION)) {
                 --livesCount;
+                --playerData.livesCount;
+                playerData.died = true;
                 time = INVINCIBILITY_TIME;
                 usedPaint = INVINCIBILITY_PAINT;
             }
         } else {
             --time;
+            playerData.died = false;
             int aux = time % 4;
             switch (aux) {
                 case 0:
@@ -156,11 +183,11 @@ public class Player {
         if (tileIsLayoutType(rowIdx, columnIdx, Tile.LayoutType.WALK)) {
             int count = 0;
             for (int i = 0; i < bombList.size(); i++) {
-                if (bombList.get(i).getPlayer() == this)
+                if (bombList.get(i).getPlayerId().equals(playerId))
                     ++count;
             }
             if (count != bombsNumber)
-                bombList.add(new Bomb(bombRange, rowIdx, columnIdx, this,
+                bombList.add(new Bomb(bombRange, rowIdx, columnIdx, playerId,
                         bombList, explosionList, tilemap));
         }
     }
@@ -176,6 +203,8 @@ public class Player {
     private void movePlayer() {
         positionX += velocityX;
         positionY += velocityY;
+        playerData.posX = getRelativePoxX();
+        playerData.posY = getRelativePoxY();
         playerRect.offsetTo((int) positionX, (int) positionY);
     }
 
@@ -360,5 +389,13 @@ public class Player {
 
     public double getVelocityY() {
         return velocityY;
+    }
+
+    private double getRelativePoxX() {
+        return positionX / tilemap.getMapRect().width();
+    }
+
+    private double getRelativePoxY() {
+        return positionY / tilemap.getMapRect().height();
     }
 }
