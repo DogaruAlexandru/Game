@@ -30,6 +30,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public class Game extends SurfaceView implements SurfaceHolder.Callback {
@@ -51,13 +52,16 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
     private SpriteSheet spriteSheet;
     private Background background;
 
-    DatabaseReference reference;
+    private DatabaseReference reference;
+    private GameplayActivity gameplayActivity;
 
     public Game(Context context, int mapHeight, int mapWidth, int crateSpawnProbability,
-                Bundle bundle) {
+                Bundle bundle, GameplayActivity gameplayActivity) {
         super(context);
 
 //        setBackground(AppCompatResources.getDrawable(context, R.drawable.background));todo
+
+        this.gameplayActivity = gameplayActivity;
 
         this.playerId = bundle.getString("playerId");
         enemies = new ArrayList<>();
@@ -141,7 +145,6 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
                 break;
         }
         player = new Player(
-                getContext(),
                 joystick,
                 button,
                 rowTile,
@@ -301,12 +304,13 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
 
         tilemap.draw(canvas);
 
-        performance.draw(canvas);
+//        performance.draw(canvas);
 
         joystick.draw(canvas);
         button.draw(canvas);
 
-        player.draw(canvas);
+        if (player.getPlayerData().livesCount > 0)
+            player.draw(canvas);
 
         for (Enemy enemy : enemies) {
             enemy.draw(canvas);
@@ -328,15 +332,71 @@ public class Game extends SurfaceView implements SurfaceHolder.Callback {
 
         joystick.update();
         button.update();
-        player.update();
 
-        for (Enemy enemy : enemies) {
+        if (player.getPlayerData().livesCount > 0 && !enemies.isEmpty())
+            player.update();
+
+        for (Iterator iterator = enemies.iterator(); iterator.hasNext(); ) {
+            Enemy enemy = (Enemy) iterator.next();
             enemy.update();
+            if (enemy.getPlayerData().livesCount != 0)
+                continue;
+            reference.removeEventListener(enemy.getListener());
+            reference.child(enemy.getPlayerId()).removeValue();
+            iterator.remove();
         }
+
+//        handleGameEnded();todo
     }
 
     public void pause() {
         gameLoop.stopLoop();
     }
-//todo make end and delete enemy listeners
+
+    public boolean canLeave() {
+        return player.getLivesCount() == 0 || enemies.isEmpty();//todo bug you can leave if ypu are fast
+    }
+
+    public void handleGameEnded() {
+        if (player.getPlayerData().livesCount > 0) {
+            if (enemies.isEmpty()) {
+                gameplayActivity.makeShortToast("You Won.");
+            }
+        } else {
+            switch (enemies.size()) {
+                case 0:
+                    gameplayActivity.makeShortToast("Tie");
+                    break;
+                case 1:
+                    String color = null;
+                    switch (enemies.get(0).getPlayerId()) {
+                        case "player1":
+                            color = "[blue]";
+                            break;
+                        case "player2":
+                            color = "[red]";
+                            break;
+                        case "player3":
+                            color = "[green]";
+                            break;
+                        case "player4":
+                            color = "[yellow]";
+                            break;
+                    }
+                    gameplayActivity.makeShortToast(enemies.get(0).
+                            getPlayerData().playerName + " " + color + " Won.");
+                    reference.removeEventListener(enemies.get(0).getListener());
+                    reference.child(enemies.get(0).getPlayerId()).removeValue();
+                    enemies.remove(0);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    public void removeServer() {
+        if (enemies.size() == 0)
+            reference.removeValue();
+    }
 }

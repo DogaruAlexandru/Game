@@ -40,7 +40,8 @@ public class GameplayActivity extends AppCompatActivity {
                     crateSpawnProbability = dataSnapshot.child("crateSpawnProbability").
                             getValue(int.class);
 
-                    game = new Game(this, mapHeight, mapWidth, crateSpawnProbability, bundle);
+                    game = new Game(this, mapHeight, mapWidth, crateSpawnProbability,
+                            bundle, this);//todo
                     setContentView(game);
 
                 } catch (Exception e) {
@@ -86,8 +87,15 @@ public class GameplayActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-//        super.onBackPressed();
-//
-//        finish();
+        if (game.canLeave()) {
+            super.onBackPressed();
+            game.removeServer();
+            finish();
+        }
+    }
+
+    public void makeShortToast(String s) {
+        //todo
+//        Toast.makeText(GameplayActivity.this, s, Toast.LENGTH_SHORT).show();
     }
 }

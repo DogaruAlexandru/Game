@@ -1,17 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="deploymentTargetDropDown">
-    <multipleDevicesSelectedInDropDown value="true" />
-    <runningDeviceTargetsSelectedWithDialog>
-      <Target>
-        <type value="RUNNING_DEVICE_TARGET" />
-        <deviceKey>
-          <Key>
-            <type value="VIRTUAL_DEVICE_PATH" />
-            <value value="C:\Users\dogar\.android\avd\Pixel_2_API_29.avd" />
-          </Key>
-        </deviceKey>
-      </Target>
+    <runningDeviceTargetSelectedWithDropDown>
       <Target>
         <type value="RUNNING_DEVICE_TARGET" />
         <deviceKey>
@@ -21,7 +11,9 @@
           </Key>
         </deviceKey>
       </Target>
-    </runningDeviceTargetsSelectedWithDialog>
+    </runningDeviceTargetSelectedWithDropDown>
+    <timeTargetWasSelectedWithDropDown value="2022-01-03T14:30:54.734279800Z" />
+    <multipleDevicesSelectedInDropDown value="true" />
     <targetsSelectedWithDialog>
       <Target>
         <type value="QUICK_BOOT_TARGET" />

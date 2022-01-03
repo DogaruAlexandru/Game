@@ -14,7 +14,8 @@ public class ServerData {
     public ServerData() {
     }
 
-    public ServerData(Long seed, String gameState, PlayerData player1, PlayerData player2, PlayerData player3, PlayerData player4) {
+    public ServerData(Long seed, String gameState, PlayerData player1, PlayerData player2,
+                      PlayerData player3, PlayerData player4) {
         this.seed = seed;
         this.gameState = gameState;
         this.player1 = player1;

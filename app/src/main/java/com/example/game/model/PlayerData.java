@@ -15,6 +15,7 @@ public class PlayerData {
     public String movingState;
 
     public PlayerData() {
+        livesCount = -1;
     }
 
     public PlayerData(double posX, double posY, int rotationData, int livesCount, int bombRange,
