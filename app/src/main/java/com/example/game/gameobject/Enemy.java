@@ -24,21 +24,15 @@ public class Enemy {
     private ValueEventListener listener;
     private PlayerData playerData;
     private Animator animator;
+
     private Paint usedPaint;
     private Tilemap tilemap;
-
     private int time;
     private PlayerState.State state;
     private Rect enemyRect;
 
     public Enemy() {
-        enemyRect = new Rect(
-                0, 0, Utils.spriteSizeOnScreen, Utils.spriteSizeOnScreen);
-//        enemyRect = new Rect(
-//                (int) playerData.posX,
-//                (int) playerData.posY,
-//                (int) playerData.posX + Utils.spriteSizeOnScreen,
-//                (int) playerData.posY + Utils.spriteSizeOnScreen);
+        enemyRect = new Rect(0, 0, Utils.spriteSizeOnScreen, Utils.spriteSizeOnScreen);
 
         state = PlayerState.State.NOT_MOVING;
 

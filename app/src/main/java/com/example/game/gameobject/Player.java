@@ -3,7 +3,6 @@ package com.example.game.gameobject;
 import static com.example.game.GameLoop.MAX_UPS;
 import static com.example.game.Utils.spriteSizeOnScreen;
 
-import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
@@ -33,21 +32,21 @@ public class Player {
     private final Tilemap tilemap;
     private final String playerId;
 
-    private PlayerData playerData;
+    private final PlayerData playerData;
 
     private double velocityX, velocityY;
     private double directionX, directionY;
     private double positionX, positionY;
     private Paint usedPaint;
 
-    private Rect playerRect;
-    private double defaultMaxSpeed;
-    private Animator animator;
-    private PlayerState playerState;
+    private final Rect playerRect;
+    private final double defaultMaxSpeed;
+    private final Animator animator;
+    private final PlayerState playerState;
     private int rotationAngle;
 
-    private List<Bomb> bombList;
-    private List<Explosion> explosionList;
+    private final List<Bomb> bombList;
+    private final List<Explosion> explosionList;
 
     private int livesCount;
     private int bombRange;
@@ -57,9 +56,9 @@ public class Player {
     //    private boolean canThrow;
     //    private boolean canKick;
 
-    private DatabaseReference reference;
+    private final DatabaseReference reference;
 
-    public Player(Context context, Joystick joystick, Button button, int rowTile, int columnTile,
+    public Player(Joystick joystick, Button button, int rowTile, int columnTile,
                   Tilemap tilemap, Animator animator, List<Bomb> bombList,
                   List<Explosion> explosionList, int speedUps, int bombRange, int bombsNumber,
                   int livesCount, Bundle bundle) {
@@ -379,10 +378,6 @@ public class Player {
         return playerRect;
     }
 
-    public void setPlayerRect(Rect playerRect) {
-        this.playerRect = playerRect;
-    }
-
     public double getVelocityX() {
         return velocityX;
     }
@@ -397,5 +392,13 @@ public class Player {
 
     private double getRelativePoxY() {
         return positionY / tilemap.getMapRect().height();
+    }
+
+    public PlayerData getPlayerData() {
+        return playerData;
+    }
+
+    public int getLivesCount() {
+        return livesCount;
     }
 }
