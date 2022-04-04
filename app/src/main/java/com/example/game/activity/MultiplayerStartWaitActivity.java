@@ -1,4 +1,4 @@
-package com.example.game;
+package com.example.game.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.game.R;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -20,7 +21,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class PlayersDisplayActivity extends AppCompatActivity {
+public class MultiplayerStartWaitActivity extends AppCompatActivity {
 
     private Button backButton;
     private ListView listView;
@@ -29,14 +30,14 @@ public class PlayersDisplayActivity extends AppCompatActivity {
     private Bundle bundle;
     private DatabaseReference reference;
 
-    ValueEventListener gameInstanceValueEventListener;
-    ChildEventListener childEventListener;
-    ValueEventListener gameStateValueEventListener;
+    private ValueEventListener gameInstanceValueEventListener;
+    private ChildEventListener childEventListener;
+    private ValueEventListener gameStateValueEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_players_display);
+        setContentView(R.layout.activity_multiplayer_start_wait);
 
         list = new ArrayList<>();
         bundle = getIntent().getExtras();
@@ -58,7 +59,7 @@ public class PlayersDisplayActivity extends AppCompatActivity {
                 if (dataSnapshot.exists()) {
                     return;
                 }
-                Toast.makeText(PlayersDisplayActivity.this,
+                Toast.makeText(MultiplayerStartWaitActivity.this,
                         "The creator closed the server.", Toast.LENGTH_SHORT).show();
                 onBackPressed();
             }

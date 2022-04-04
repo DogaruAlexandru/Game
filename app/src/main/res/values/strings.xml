@@ -1,7 +1,8 @@
 <resources>
-    <string name="app_name">Game</string>
+    <string name="app_name">Bomb it</string>
     <string name="title">Bomb it</string>
-    <string name="play">Play</string>
+    <string name="singleplayer">Singleplayer</string>
+    <string name="multiplayer">Multiplayer</string>
     <string name="join">Join</string>
     <string name="create">Create</string>
     <string name="enter_code">Enter Code</string>

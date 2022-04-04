@@ -15,7 +15,7 @@
         android:theme="@style/AppFullScreenTheme">
 
         <activity
-            android:name=".StartActivity"
+            android:name=".activity.StartMenuActivity"
             android:exported="true"
             android:screenOrientation="sensorLandscape">
             <intent-filter>
@@ -25,19 +25,23 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PlayersDisplayWithStartActivity"
+            android:name=".activity.MultiplayerStartSetupActivity"
             android:exported="false"
             android:screenOrientation="sensorLandscape" />
         <activity
-            android:name=".PlayersDisplayActivity"
+            android:name=".activity.MultiplayerStartWaitActivity"
             android:exported="false"
             android:screenOrientation="sensorLandscape" />
         <activity
-            android:name=".SetupActivity"
+            android:name=".activity.MultiplayerCodeSetupActivity"
             android:exported="false"
             android:screenOrientation="sensorLandscape" />
         <activity
-            android:name=".GameplayActivity"
+            android:name=".activity.GameplayActivity"
+            android:exported="false"
+            android:screenOrientation="sensorLandscape" />
+        <activity
+            android:name=".activity.SingleplayerStartSetupActivity"
             android:exported="false"
             android:screenOrientation="sensorLandscape" />
     </application>

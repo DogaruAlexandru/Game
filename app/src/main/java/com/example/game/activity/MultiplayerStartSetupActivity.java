@@ -1,4 +1,4 @@
-package com.example.game;
+package com.example.game.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.game.R;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -20,11 +21,11 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 
-public class PlayersDisplayWithStartActivity extends AppCompatActivity {
+public class MultiplayerStartSetupActivity extends AppCompatActivity {
 
-    EditText mapHeightEdt;
-    EditText mapWidthEdt;
-    EditText crateSpawnProbabilityEdt;
+    private EditText mapHeightEdt;
+    private EditText mapWidthEdt;
+    private EditText crateSpawnProbabilityEdt;
 
     private ArrayList<String> list;
     private int mapHeight;
@@ -39,7 +40,7 @@ public class PlayersDisplayWithStartActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_players_display_with_start);
+        setContentView(R.layout.activity_multiplayer_start_setup);
 
         list = new ArrayList<>();
         bundle = getIntent().getExtras();
@@ -106,34 +107,34 @@ public class PlayersDisplayWithStartActivity extends AppCompatActivity {
     private void verifyInputs() {
         if (mapHeight > 31) {
             mapHeight = 31;
-            Toast.makeText(PlayersDisplayWithStartActivity.this,
+            Toast.makeText(MultiplayerStartSetupActivity.this,
                     "Using maximum height.", Toast.LENGTH_SHORT).show();
         } else if (mapHeight < 11) {
             mapHeight = 11;
-            Toast.makeText(PlayersDisplayWithStartActivity.this,
+            Toast.makeText(MultiplayerStartSetupActivity.this,
                     "Using minimum height.", Toast.LENGTH_SHORT).show();
         }
 
         if (mapWidth > 41) {
             mapWidth = 41;
-            Toast.makeText(PlayersDisplayWithStartActivity.this,
+            Toast.makeText(MultiplayerStartSetupActivity.this,
                     "Using maximum width.", Toast.LENGTH_SHORT).show();
         } else if (mapWidth < 11) {
             mapWidth = 11;
-            Toast.makeText(PlayersDisplayWithStartActivity.this,
+            Toast.makeText(MultiplayerStartSetupActivity.this,
                     "Using minimum width.", Toast.LENGTH_SHORT).show();
         }
 
         if (crateSpawnProbability > 100) {
             crateSpawnProbability = 100;
-            Toast.makeText(PlayersDisplayWithStartActivity.this,
+            Toast.makeText(MultiplayerStartSetupActivity.this,
                     "Using maximum crate spawn probability.", Toast.LENGTH_SHORT).show();
         }
     }
 
     private void startGame() {
         if (list.size() < 2) {
-            Toast.makeText(PlayersDisplayWithStartActivity.this,
+            Toast.makeText(MultiplayerStartSetupActivity.this,
                     "You can not start with one player.", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -142,7 +143,7 @@ public class PlayersDisplayWithStartActivity extends AppCompatActivity {
 
         reference.removeEventListener(childEventListener);
 
-        reference.child("gameState").setValue("starting game");
+        reference.child("gameState").setValue("starting game");//todo put them in ServerData
         reference.child("mapHeight").setValue(mapHeight);
         reference.child("mapWidth").setValue(mapWidth);
         reference.child("crateSpawnProbability").setValue(crateSpawnProbability);
@@ -163,7 +164,7 @@ public class PlayersDisplayWithStartActivity extends AppCompatActivity {
 
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
-            Toast.makeText(PlayersDisplayWithStartActivity.this,
+            Toast.makeText(MultiplayerStartSetupActivity.this,
                     "Invalid height. Using default.", Toast.LENGTH_SHORT).show();
 
             mapHeight = 11;
@@ -178,7 +179,7 @@ public class PlayersDisplayWithStartActivity extends AppCompatActivity {
 
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
-            Toast.makeText(PlayersDisplayWithStartActivity.this,
+            Toast.makeText(MultiplayerStartSetupActivity.this,
                     "Invalid width. Using default.", Toast.LENGTH_SHORT).show();
 
             mapWidth = 11;
@@ -193,7 +194,7 @@ public class PlayersDisplayWithStartActivity extends AppCompatActivity {
 
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
-            Toast.makeText(PlayersDisplayWithStartActivity.this,
+            Toast.makeText(MultiplayerStartSetupActivity.this,
                     "Invalid crate spawn probability. Using default.",
                     Toast.LENGTH_SHORT).show();
 

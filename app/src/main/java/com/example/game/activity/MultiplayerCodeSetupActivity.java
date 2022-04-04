@@ -1,16 +1,17 @@
-package com.example.game;
+package com.example.game.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.game.R;
+import com.example.game.Utils;
 import com.example.game.model.PlayerData;
 import com.example.game.model.ServerData;
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,11 +22,10 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Random;
 
-public class SetupActivity extends AppCompatActivity {
+public class MultiplayerCodeSetupActivity extends AppCompatActivity {
 
     private Button joinBtn;
     private Button createBtn;
-    private ProgressBar loadingPB;
     private EditText codeEdt;
     private TextView titleTV;
 
@@ -38,11 +38,10 @@ public class SetupActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_setup);
+        setContentView(R.layout.activity_multiplayer_code_setup);
 
         auth = FirebaseAuth.getInstance();
 
-        loadingPB = findViewById(R.id.loadingPB);
         codeEdt = findViewById(R.id.codeEdt);
         titleTV = findViewById(R.id.titleTV);
 
@@ -77,12 +76,12 @@ public class SetupActivity extends AppCompatActivity {
                 // Sign in success
                 Log.d("AnonymousAuth", "signInAnonymously:success");
                 user = auth.getCurrentUser();
-                Toast.makeText(SetupActivity.this, "Authentication sign up succeeded.",
+                Toast.makeText(MultiplayerCodeSetupActivity.this, "Authentication sign up succeeded.",
                         Toast.LENGTH_SHORT).show();
             } else {
                 // If sign in fails
                 Log.w("AnonymousAuth", "signInAnonymously:failure", task.getException());
-                Toast.makeText(SetupActivity.this, "Authentication failed.",
+                Toast.makeText(MultiplayerCodeSetupActivity.this, "Authentication failed.",
                         Toast.LENGTH_SHORT).show();
                 super.onBackPressed();
             }
@@ -94,7 +93,7 @@ public class SetupActivity extends AppCompatActivity {
             createGameData();
             return;
         }
-        Toast.makeText(SetupActivity.this, "Code needs to have at least 4 characters.",
+        Toast.makeText(MultiplayerCodeSetupActivity.this, "Code needs to have at least 4 characters.",
                 Toast.LENGTH_SHORT).show();
     }
 
@@ -103,7 +102,7 @@ public class SetupActivity extends AppCompatActivity {
             getGameData();
             return;
         }
-        Toast.makeText(SetupActivity.this, "Code needs to have at least 4 characters.",
+        Toast.makeText(MultiplayerCodeSetupActivity.this, "Code needs to have at least 4 characters.",
                 Toast.LENGTH_SHORT).show();
     }
 
@@ -118,19 +117,19 @@ public class SetupActivity extends AppCompatActivity {
 
 
                 if (!dataSnapshot.hasChild(codeEdt.getText().toString())) {
-                    Toast.makeText(SetupActivity.this, "Code not found.",
+                    Toast.makeText(MultiplayerCodeSetupActivity.this, "Code not found.",
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
                 DataSnapshot gameInstance = dataSnapshot.child(codeEdt.getText().toString());
                 if (gameInstance.getChildrenCount() > 5) {
-                    Toast.makeText(SetupActivity.this, "All spots taken.",
+                    Toast.makeText(MultiplayerCodeSetupActivity.this, "All spots taken.",
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (!gameInstance.child("gameState").getValue(String.class).
                         equals("waiting players")) {
-                    Toast.makeText(SetupActivity.this, "Game already started.",
+                    Toast.makeText(MultiplayerCodeSetupActivity.this, "Game already started.",
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -181,7 +180,7 @@ public class SetupActivity extends AppCompatActivity {
                 DataSnapshot dataSnapshot = task.getResult();
 
                 if (dataSnapshot.hasChild(codeEdt.getText().toString())) {
-                    Toast.makeText(SetupActivity.this, "Code already in use.",
+                    Toast.makeText(MultiplayerCodeSetupActivity.this, "Code already in use.",
                             Toast.LENGTH_SHORT).show();
                     return;
                 }
@@ -210,9 +209,9 @@ public class SetupActivity extends AppCompatActivity {
     private void goToNextActivity(boolean withStart) {
         Intent intent;
         if (withStart)
-            intent = new Intent(this, PlayersDisplayWithStartActivity.class);
+            intent = new Intent(this, MultiplayerStartSetupActivity.class);
         else
-            intent = new Intent(this, PlayersDisplayActivity.class);
+            intent = new Intent(this, MultiplayerStartWaitActivity.class);
         bundle.putString("code", codeEdt.getText().toString());
         intent.putExtras(bundle);
         startActivity(intent);

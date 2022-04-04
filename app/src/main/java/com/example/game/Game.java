@@ -10,6 +10,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.example.game.activity.GameplayActivity;
 import com.example.game.gameobject.Bomb;
 import com.example.game.gameobject.Enemy;
 import com.example.game.gameobject.Explosion;
