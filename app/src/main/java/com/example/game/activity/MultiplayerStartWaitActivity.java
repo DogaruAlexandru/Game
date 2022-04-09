@@ -144,7 +144,7 @@ public class MultiplayerStartWaitActivity extends AppCompatActivity {
         reference.removeEventListener(childEventListener);
         reference.child("gameState").removeEventListener(gameStateValueEventListener);
 
-        Intent intent = new Intent(this, GameplayActivity.class);
+        Intent intent = new Intent(this, MultiplayerGameplayActivity.class);
         intent.putExtras(bundle);
         startActivity(intent);
         finish();

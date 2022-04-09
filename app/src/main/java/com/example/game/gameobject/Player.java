@@ -15,48 +15,44 @@ import com.example.game.graphics.Animator;
 import com.example.game.map.Tile;
 import com.example.game.map.Tilemap;
 import com.example.game.model.PlayerData;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.List;
 
 public class Player {
 
-    private final float INCREASE_IN_SPEED_BY_POWER_UP = .4f;
-    private final float SPEED_MINIMIZING = .8f;
-    private final int INVINCIBILITY_TIME = (int) MAX_UPS * 2;
-    private final Paint INVINCIBILITY_PAINT;
+    protected final float INCREASE_IN_SPEED_BY_POWER_UP = .4f;
+    protected final float SPEED_MINIMIZING = .8f;
+    protected final int INVINCIBILITY_TIME = (int) MAX_UPS * 2;
+    protected final Paint INVINCIBILITY_PAINT;
 
-    private final Joystick joystick;
-    private final Button button;
-    private final Tilemap tilemap;
-    private final String playerId;
+    protected final Joystick joystick;
+    protected final Button button;
+    protected final Tilemap tilemap;
+    protected final String playerId;
 
-    private final PlayerData playerData;
+    protected final PlayerData playerData;
 
-    private double velocityX, velocityY;
-    private double directionX, directionY;
-    private double positionX, positionY;
-    private Paint usedPaint;
+    protected double velocityX, velocityY;
+    protected double directionX, directionY;
+    protected double positionX, positionY;
+    protected Paint usedPaint;
 
-    private final Rect playerRect;
-    private final double defaultMaxSpeed;
-    private final Animator animator;
-    private final PlayerState playerState;
-    private int rotationAngle;
+    protected final Rect playerRect;
+    protected final double defaultMaxSpeed;
+    protected final Animator animator;
+    protected final PlayerState playerState;
+    protected int rotationAngle;
 
-    private final List<Bomb> bombList;
-    private final List<Explosion> explosionList;
+    protected final List<Bomb> bombList;
+    protected final List<Explosion> explosionList;
 
-    private int livesCount;
-    private int bombRange;
-    private int speedUps;
-    private int bombsNumber;
-    private int time = 0;
+    protected int livesCount;
+    protected int bombRange;
+    protected int speedUps;
+    protected int bombsNumber;
+    protected int time = 0;
     //    private boolean canThrow;
     //    private boolean canKick;
-
-    private final DatabaseReference reference;
 
     public Player(Joystick joystick, Button button, int rowTile, int columnTile,
                   Tilemap tilemap, Animator animator, List<Bomb> bombList,
@@ -77,7 +73,6 @@ public class Player {
         this.bombRange = bombRange;
         this.bombsNumber = bombsNumber;
 
-        reference = FirebaseDatabase.getInstance().getReference(bundle.getString("code"));
         playerId = bundle.getString("playerId");
 
         defaultMaxSpeed = Utils.getPlayerDefaultMaxSpeed();
@@ -99,7 +94,6 @@ public class Player {
         playerData = new PlayerData(getRelativePoxX(), getRelativePoxY(), rotationAngle, livesCount,
                 bombRange, false, false, bundle.getString("playerName"),
                 PlayerState.getEnumToString(PlayerState.State.NOT_MOVING));
-        reference.child(playerId).setValue(playerData);
     }
 
     public void draw(Canvas canvas) {
@@ -135,8 +129,6 @@ public class Player {
 
         // Player death handler
         handleDeath();
-
-        reference.child(playerId).setValue(playerData);
     }
 
     private void handleDeath() {
