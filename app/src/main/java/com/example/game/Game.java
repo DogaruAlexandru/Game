@@ -177,7 +177,7 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
         joystick.draw(canvas);
         button.draw(canvas);
 
-        if (player.getPlayerData().livesCount > 0)
+        if (player.getLivesCount() > 0)
             player.draw(canvas);
     }
 

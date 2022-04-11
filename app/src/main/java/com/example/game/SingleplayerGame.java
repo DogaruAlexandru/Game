@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 
 import com.example.game.activity.GameplayActivity;
-import com.example.game.gameobject.Player;
+import com.example.game.gameobject.OfflinePlayer;
 import com.example.game.graphics.Animator;
 
 public class SingleplayerGame extends Game {
@@ -12,7 +12,7 @@ public class SingleplayerGame extends Game {
     public SingleplayerGame(Context context, Bundle bundle, GameplayActivity gameplayActivity) {
         super(context, bundle, gameplayActivity);
 
-        player = new Player(
+        player = new OfflinePlayer(
                 joystick,
                 button,
                 1,

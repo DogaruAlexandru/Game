@@ -6,31 +6,23 @@ import static com.example.game.Utils.spriteSizeOnScreen;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.os.Bundle;
 
 import com.example.game.Utils;
-import com.example.game.gamepanel.Button;
-import com.example.game.gamepanel.Joystick;
 import com.example.game.graphics.Animator;
 import com.example.game.map.Tile;
 import com.example.game.map.Tilemap;
-import com.example.game.model.PlayerData;
 
 import java.util.List;
 
-public class Player {
+public abstract class Player {
 
     protected final float INCREASE_IN_SPEED_BY_POWER_UP = .4f;
     protected final float SPEED_MINIMIZING = .8f;
     protected final int INVINCIBILITY_TIME = (int) MAX_UPS * 2;
     protected final Paint INVINCIBILITY_PAINT;
 
-    protected final Joystick joystick;
-    protected final Button button;
     protected final Tilemap tilemap;
-    protected final String playerId;
-
-    protected final PlayerData playerData;
+    protected String playerId;
 
     protected double velocityX, velocityY;
     protected double directionX, directionY;
@@ -54,13 +46,11 @@ public class Player {
     //    private boolean canThrow;
     //    private boolean canKick;
 
-    public Player(Joystick joystick, Button button, int rowTile, int columnTile,
+    public Player(int rowTile, int columnTile,
                   Tilemap tilemap, Animator animator, List<Bomb> bombList,
                   List<Explosion> explosionList, int speedUps, int bombRange, int bombsNumber,
-                  int livesCount, Bundle bundle) {
+                  int livesCount) {
 
-        this.joystick = joystick;
-        this.button = button;
         this.tilemap = tilemap;
         this.bombList = bombList;
         this.explosionList = explosionList;
@@ -72,8 +62,6 @@ public class Player {
         this.speedUps = speedUps;
         this.bombRange = bombRange;
         this.bombsNumber = bombsNumber;
-
-        playerId = bundle.getString("playerId");
 
         defaultMaxSpeed = Utils.getPlayerDefaultMaxSpeed();
 
@@ -90,48 +78,9 @@ public class Player {
         INVINCIBILITY_PAINT = new Paint();
         INVINCIBILITY_PAINT.setAlpha(80);
         usedPaint = null;
-
-        playerData = new PlayerData(getRelativePoxX(), getRelativePoxY(), rotationAngle, livesCount,
-                bombRange, false, false, bundle.getString("playerName"),
-                PlayerState.getEnumToString(PlayerState.State.NOT_MOVING));
     }
 
-    public void draw(Canvas canvas) {
-        animator.draw(canvas, this, usedPaint);
-    }
-
-    public void update() {
-
-        selectDirectionFromActuator();
-
-        detectCollisions();
-
-        if (velocityX != 0 || velocityY != 0) {
-            movePlayer();
-
-            getOrientation();
-
-            // Update player orientation
-            rotationAngle = (int) ((Math.atan2(directionY, directionX) * 180) / Math.PI) - 90;
-            playerData.rotationData = rotationAngle;
-        }
-
-        // Update player state for animation
-        playerState.update();
-        playerData.movingState = PlayerState.getEnumToString(playerState.getState());
-
-        // Use bomb
-        if (button.getIsPressed()) {
-            useBomb();
-            playerData.bombUsed = true;
-        } else
-            playerData.bombUsed = false;
-
-        // Player death handler
-        handleDeath();
-    }
-
-    private void handleDeath() {
+    protected void handleDeath() {
         if (time == 0) {
             int safe = spriteSizeOnScreen / 6;//todo
             int bottom = (playerRect.bottom - 1 - safe) / spriteSizeOnScreen;
@@ -144,14 +93,11 @@ public class Player {
                     tileIsLayoutType(top, left, Tile.LayoutType.EXPLOSION) ||
                     tileIsLayoutType(top, right, Tile.LayoutType.EXPLOSION)) {
                 --livesCount;
-                --playerData.livesCount;
-                playerData.died = true;
                 time = INVINCIBILITY_TIME;
                 usedPaint = INVINCIBILITY_PAINT;
             }
         } else {
             --time;
-            playerData.died = false;
             int aux = time % 4;
             switch (aux) {
                 case 0:
@@ -164,11 +110,11 @@ public class Player {
         }
     }
 
-    private boolean tileIsLayoutType(int row, int column, Tile.LayoutType explosion) {
+    protected boolean tileIsLayoutType(int row, int column, Tile.LayoutType explosion) {
         return tilemap.getTilemap()[row][column].getLayoutType() == explosion;
     }
 
-    private void useBomb() {
+    protected void useBomb() {
         int rowIdx = playerRect.centerY() / playerRect.width();
         int columnIdx = playerRect.centerX() / playerRect.height();
         if (tileIsLayoutType(rowIdx, columnIdx, Tile.LayoutType.WALK)) {
@@ -183,7 +129,7 @@ public class Player {
         }
     }
 
-    private void getOrientation() {
+    protected void getOrientation() {
         // Update direction
         // Normalize velocity to get direction (unit vector of velocity)
         double distance = Utils.getDistanceBetweenPoints(0, 0, velocityX, velocityY);
@@ -191,15 +137,13 @@ public class Player {
         directionY = velocityY / distance;
     }
 
-    private void movePlayer() {
+    protected void movePlayer() {
         positionX += velocityX;
         positionY += velocityY;
-        playerData.posX = getRelativePoxX();
-        playerData.posY = getRelativePoxY();
         playerRect.offsetTo((int) positionX, (int) positionY);
     }
 
-    private void detectCollisions() {
+    protected void detectCollisions() {
         if (velocityX == 0 && velocityY == 0)
             return;
 
@@ -219,115 +163,7 @@ public class Player {
         }
     }
 
-    private void goesDown(Rect newRect) {
-        int newRow = (newRect.bottom - 1) / spriteSizeOnScreen;
-        int newLeftColumn = newRect.left / spriteSizeOnScreen;
-        int newRightColumn = (newRect.right - 1) / spriteSizeOnScreen;
-
-        boolean leftBool = velocityChanging(newRow, newLeftColumn);
-        boolean rightBool = velocityChanging(newRow, newRightColumn);
-
-        if (leftBool) {
-            if (rightBool) {
-                int aux = (spriteSizeOnScreen - playerRect.bottom
-                        % spriteSizeOnScreen) % spriteSizeOnScreen;
-                velocityY = aux < velocityY ? aux : velocityY;
-            } else {
-                velocityX = velocityY * SPEED_MINIMIZING;
-                velocityY = 0;
-                int aux = (spriteSizeOnScreen - playerRect.right %
-                        spriteSizeOnScreen) % spriteSizeOnScreen;
-                velocityX = aux < velocityX ? aux : velocityX;
-            }
-        } else if (rightBool) {
-            velocityX = -velocityY * SPEED_MINIMIZING;
-            velocityY = 0;
-            int aux = -playerRect.left % spriteSizeOnScreen;
-            velocityX = aux > velocityX ? aux : velocityX;
-        }
-    }
-
-    private void goesUp(Rect newRect) {
-        int newRow = newRect.top / spriteSizeOnScreen;
-        int newLeftColumn = newRect.left / spriteSizeOnScreen;
-        int newRightColumn = (newRect.right - 1) / spriteSizeOnScreen;
-
-        boolean leftBool = velocityChanging(newRow, newLeftColumn);
-        boolean rightBool = velocityChanging(newRow, newRightColumn);
-
-        if (leftBool) {
-            if (rightBool) {
-                int aux = -playerRect.top % spriteSizeOnScreen;
-                velocityY = aux > velocityY ? aux : velocityY;
-            } else {
-                velocityX = -velocityY * SPEED_MINIMIZING;
-                velocityY = 0;
-                int aux = playerRect.left % spriteSizeOnScreen;
-                velocityX = aux < velocityX ? aux : velocityX;
-            }
-        } else if (rightBool) {
-            velocityX = velocityY * SPEED_MINIMIZING;
-            velocityY = 0;
-            int aux = -playerRect.right % spriteSizeOnScreen;
-            velocityX = aux > velocityX ? aux : velocityX;
-        }
-    }
-
-    private void goesRight(Rect newRect) {
-        int newColumn = (newRect.right - 1) / spriteSizeOnScreen;
-        int newTopRow = newRect.top / spriteSizeOnScreen;
-        int newBottomRow = (newRect.bottom - 1) / spriteSizeOnScreen;
-
-        boolean topBool = velocityChanging(newTopRow, newColumn);
-        boolean bottomBool = velocityChanging(newBottomRow, newColumn);
-
-        if (topBool) {
-            if (bottomBool) {
-                int aux = (spriteSizeOnScreen - playerRect.right %
-                        spriteSizeOnScreen) % spriteSizeOnScreen;
-                velocityX = aux < velocityX ? aux : velocityX;
-            } else {
-                velocityY = velocityX * SPEED_MINIMIZING;
-                velocityX = 0;
-                int aux = (spriteSizeOnScreen - playerRect.bottom
-                        % spriteSizeOnScreen) % spriteSizeOnScreen;
-                velocityY = aux < velocityY ? aux : velocityY;
-            }
-        } else if (bottomBool) {
-            velocityY = -velocityX * SPEED_MINIMIZING;
-            velocityX = 0;
-            int aux = -playerRect.top % spriteSizeOnScreen;
-            velocityY = aux > velocityY ? aux : velocityY;
-        }
-    }
-
-    private void goesLeft(Rect newRect) {
-        int newColumn = newRect.left / spriteSizeOnScreen;
-        int newTopRow = newRect.top / spriteSizeOnScreen;
-        int newBottomRow = (newRect.bottom - 1) / spriteSizeOnScreen;
-
-        boolean topBool = velocityChanging(newTopRow, newColumn);
-        boolean bottomBool = velocityChanging(newBottomRow, newColumn);
-
-        if (topBool) {
-            if (bottomBool) {
-                int aux = -playerRect.left % spriteSizeOnScreen;
-                velocityX = aux > velocityX ? aux : velocityX;
-            } else {
-                velocityY = -velocityX * SPEED_MINIMIZING;
-                velocityX = 0;
-                int aux = spriteSizeOnScreen - playerRect.top % spriteSizeOnScreen;
-                velocityY = aux < velocityY ? aux : velocityY;
-            }
-        } else if (bottomBool) {
-            velocityY = velocityX * SPEED_MINIMIZING;
-            velocityX = 0;
-            int aux = -playerRect.bottom % spriteSizeOnScreen;
-            velocityY = aux > velocityY ? aux : velocityY;
-        }
-    }
-
-    private boolean velocityChanging(int row, int column) {
+    protected boolean velocityChanging(int row, int column) {
         switch (tilemap.getTilemap()[row][column].getLayoutType()) {
             case WALL:
             case CRATE:
@@ -336,26 +172,6 @@ public class Player {
             default:
                 return false;
         }
-    }
-
-    private void selectDirectionFromActuator() {
-        // Get the joystick orientation
-        double actuatorX = joystick.getActuatorX();
-        double actuatorY = joystick.getActuatorY();
-
-        // Select direction by actuator value
-        if (Math.abs(actuatorX) > Math.abs(actuatorY)) {
-            velocityX = actuatorX * defaultMaxSpeed * (1 + INCREASE_IN_SPEED_BY_POWER_UP * speedUps);
-            velocityY = 0;
-            return;
-        }
-        if (Math.abs(actuatorX) < Math.abs(actuatorY)) {
-            velocityY = actuatorY * defaultMaxSpeed * (1 + INCREASE_IN_SPEED_BY_POWER_UP * speedUps);
-            velocityX = 0;
-            return;
-        }
-        velocityX = 0;
-        velocityY = 0;
     }
 
     public PlayerState getPlayerState() {
@@ -378,19 +194,19 @@ public class Player {
         return velocityY;
     }
 
-    private double getRelativePoxX() {
-        return positionX / tilemap.getMapRect().width();
-    }
-
-    private double getRelativePoxY() {
-        return positionY / tilemap.getMapRect().height();
-    }
-
-    public PlayerData getPlayerData() {
-        return playerData;
-    }
-
     public int getLivesCount() {
         return livesCount;
     }
+
+    public abstract void draw(Canvas canvas);
+
+    public abstract void update();
+
+    protected abstract void goesDown(Rect newRect);
+
+    protected abstract void goesUp(Rect newRect);
+
+    protected abstract void goesLeft(Rect newRect);
+
+    protected abstract void goesRight(Rect newRect);
 }

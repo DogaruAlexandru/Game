@@ -164,7 +164,7 @@ public class MultiplayerGame extends Game {
     public void update() {
         super.update();
 
-        if (player.getPlayerData().livesCount > 0 && !enemies.isEmpty())
+        if (((OnlinePlayer) player).getPlayerData().livesCount > 0 && !enemies.isEmpty())
             player.update();
 
         for (Iterator<Enemy> iterator = enemies.iterator(); iterator.hasNext(); ) {
@@ -183,7 +183,7 @@ public class MultiplayerGame extends Game {
     }
 
     public void handleGameEnded() {
-        if (player.getPlayerData().livesCount > 0) {
+        if (((OnlinePlayer) player).getPlayerData().livesCount > 0) {
             if (enemies.isEmpty()) {
                 gameplayActivity.makeShortToast("You Won.");
             }
