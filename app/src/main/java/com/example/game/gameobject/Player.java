@@ -174,6 +174,114 @@ public abstract class Player {
         }
     }
 
+    protected void goesDown(Rect newRect) {
+        int newRow = (newRect.bottom - 1) / spriteSizeOnScreen;
+        int newLeftColumn = newRect.left / spriteSizeOnScreen;
+        int newRightColumn = (newRect.right - 1) / spriteSizeOnScreen;
+
+        boolean leftBool = velocityChanging(newRow, newLeftColumn);
+        boolean rightBool = velocityChanging(newRow, newRightColumn);
+
+        if (leftBool) {
+            if (rightBool) {
+                int aux = (spriteSizeOnScreen - playerRect.bottom
+                        % spriteSizeOnScreen) % spriteSizeOnScreen;
+                velocityY = aux < velocityY ? aux : velocityY;
+            } else {
+                velocityX = velocityY * SPEED_MINIMIZING;
+                velocityY = 0;
+                int aux = (spriteSizeOnScreen - playerRect.right %
+                        spriteSizeOnScreen) % spriteSizeOnScreen;
+                velocityX = aux < velocityX ? aux : velocityX;
+            }
+        } else if (rightBool) {
+            velocityX = -velocityY * SPEED_MINIMIZING;
+            velocityY = 0;
+            int aux = -playerRect.left % spriteSizeOnScreen;
+            velocityX = aux > velocityX ? aux : velocityX;
+        }
+    }
+
+    protected void goesUp(Rect newRect) {
+        int newRow = newRect.top / spriteSizeOnScreen;
+        int newLeftColumn = newRect.left / spriteSizeOnScreen;
+        int newRightColumn = (newRect.right - 1) / spriteSizeOnScreen;
+
+        boolean leftBool = velocityChanging(newRow, newLeftColumn);
+        boolean rightBool = velocityChanging(newRow, newRightColumn);
+
+        if (leftBool) {
+            if (rightBool) {
+                int aux = -playerRect.top % spriteSizeOnScreen;
+                velocityY = aux > velocityY ? aux : velocityY;
+            } else {
+                velocityX = -velocityY * SPEED_MINIMIZING;
+                velocityY = 0;
+                int aux = playerRect.left % spriteSizeOnScreen;
+                velocityX = aux < velocityX ? aux : velocityX;
+            }
+        } else if (rightBool) {
+            velocityX = velocityY * SPEED_MINIMIZING;
+            velocityY = 0;
+            int aux = -playerRect.right % spriteSizeOnScreen;
+            velocityX = aux > velocityX ? aux : velocityX;
+        }
+    }
+
+    protected void goesRight(Rect newRect) {
+        int newColumn = (newRect.right - 1) / spriteSizeOnScreen;
+        int newTopRow = newRect.top / spriteSizeOnScreen;
+        int newBottomRow = (newRect.bottom - 1) / spriteSizeOnScreen;
+
+        boolean topBool = velocityChanging(newTopRow, newColumn);
+        boolean bottomBool = velocityChanging(newBottomRow, newColumn);
+
+        if (topBool) {
+            if (bottomBool) {
+                int aux = (spriteSizeOnScreen - playerRect.right %
+                        spriteSizeOnScreen) % spriteSizeOnScreen;
+                velocityX = aux < velocityX ? aux : velocityX;
+            } else {
+                velocityY = velocityX * SPEED_MINIMIZING;
+                velocityX = 0;
+                int aux = (spriteSizeOnScreen - playerRect.bottom
+                        % spriteSizeOnScreen) % spriteSizeOnScreen;
+                velocityY = aux < velocityY ? aux : velocityY;
+            }
+        } else if (bottomBool) {
+            velocityY = -velocityX * SPEED_MINIMIZING;
+            velocityX = 0;
+            int aux = -playerRect.top % spriteSizeOnScreen;
+            velocityY = aux > velocityY ? aux : velocityY;
+        }
+    }
+
+    protected void goesLeft(Rect newRect) {
+        int newColumn = newRect.left / spriteSizeOnScreen;
+        int newTopRow = newRect.top / spriteSizeOnScreen;
+        int newBottomRow = (newRect.bottom - 1) / spriteSizeOnScreen;
+
+        boolean topBool = velocityChanging(newTopRow, newColumn);
+        boolean bottomBool = velocityChanging(newBottomRow, newColumn);
+
+        if (topBool) {
+            if (bottomBool) {
+                int aux = -playerRect.left % spriteSizeOnScreen;
+                velocityX = aux > velocityX ? aux : velocityX;
+            } else {
+                velocityY = -velocityX * SPEED_MINIMIZING;
+                velocityX = 0;
+                int aux = spriteSizeOnScreen - playerRect.top % spriteSizeOnScreen;
+                velocityY = aux < velocityY ? aux : velocityY;
+            }
+        } else if (bottomBool) {
+            velocityY = velocityX * SPEED_MINIMIZING;
+            velocityX = 0;
+            int aux = -playerRect.bottom % spriteSizeOnScreen;
+            velocityY = aux > velocityY ? aux : velocityY;
+        }
+    }
+
     public PlayerState getPlayerState() {
         return playerState;
     }
@@ -198,15 +306,9 @@ public abstract class Player {
         return livesCount;
     }
 
-    public abstract void draw(Canvas canvas);
+    public void draw(Canvas canvas) {
+        animator.draw(canvas, this, usedPaint);
+    }
 
     public abstract void update();
-
-    protected abstract void goesDown(Rect newRect);
-
-    protected abstract void goesUp(Rect newRect);
-
-    protected abstract void goesLeft(Rect newRect);
-
-    protected abstract void goesRight(Rect newRect);
 }

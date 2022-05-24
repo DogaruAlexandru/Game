@@ -43,6 +43,7 @@ public class Enemy {
         usedPaint = null;
 
         playerData = new PlayerData();
+        playerData.livesCount = 1;
     }
 
     public String getPlayerId() {

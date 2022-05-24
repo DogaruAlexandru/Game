@@ -4,6 +4,9 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 
 import com.example.game.activity.GameplayActivity;
 import com.example.game.gameobject.Enemy;
@@ -19,11 +22,13 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
 
 public class MultiplayerGame extends Game {
     private final ArrayList<Enemy> enemies;
 
     private final DatabaseReference reference;
+    private boolean deleteServer;
 
     public MultiplayerGame(Context context, Bundle bundle, GameplayActivity gameplayActivity) {
         super(context, bundle, gameplayActivity);
@@ -83,8 +88,15 @@ public class MultiplayerGame extends Game {
         enemies = new ArrayList<>();
         reference = FirebaseDatabase.getInstance().getReference(bundle.getString("code"));
 
-        addEnemiesListeners();
+        new Thread(this::addEnemiesListeners).start();
 
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        deleteServer = false;
     }
 
     private void addEnemiesListeners() {
@@ -140,12 +152,12 @@ public class MultiplayerGame extends Game {
         enemy.setListener(reference.child(enemy.getPlayerId()).
                 addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         enemy.setPlayerData(dataSnapshot.getValue(PlayerData.class));
                     }
 
                     @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
                         Log.w("onCancelled", "failed", databaseError.toException());
                     }
                 }));
@@ -164,36 +176,43 @@ public class MultiplayerGame extends Game {
     public void update() {
         super.update();
 
-        if (((OnlinePlayer) player).getPlayerData().livesCount > 0 && !enemies.isEmpty())
+        if (!enemies.isEmpty() && player.getLivesCount() > 0) {
             player.update();
+            if (player.getLivesCount() < 1)
+                playerCountChanged = true;
+        }
 
         for (Iterator<Enemy> iterator = enemies.iterator(); iterator.hasNext(); ) {
             Enemy enemy = (Enemy) iterator.next();
             enemy.update();
-            if (enemy.getPlayerData().livesCount != 0)
+            if (enemy.getPlayerData().livesCount > 0)
                 continue;
+            playerCountChanged = true;
             reference.removeEventListener(enemy.getListener());
-            reference.child(enemy.getPlayerId()).removeValue();
             iterator.remove();
         }
     }
 
     public boolean canLeave() {
-        return player.getLivesCount() == 0 || enemies.isEmpty();//todo bug you can leave if ypu are fast
+        return player.getLivesCount() == 0 || enemies.isEmpty();
     }
 
     public void handleGameEnded() {
         if (((OnlinePlayer) player).getPlayerData().livesCount > 0) {
             if (enemies.isEmpty()) {
-                gameplayActivity.makeShortToast("You Won.");
+                endgameMessage("You Won");
+                playerCountChanged = false;
             }
         } else {
             switch (enemies.size()) {
                 case 0:
-                    gameplayActivity.makeShortToast("Tie");
+                    endgameMessage("Tie");
+                    removeListeners();
+                    playerCountChanged = false;
                     break;
                 case 1:
-                    String color = null;
+                    String color;
+                    deleteServer = true;
                     switch (enemies.get(0).getPlayerId()) {
                         case "player1":
                             color = "[blue]";
@@ -207,21 +226,33 @@ public class MultiplayerGame extends Game {
                         case "player4":
                             color = "[yellow]";
                             break;
+                        default:
+                            color = "";
+                            break;
                     }
-                    gameplayActivity.makeShortToast(enemies.get(0).
-                            getPlayerData().playerName + " " + color + " Won.");
-                    reference.removeEventListener(enemies.get(0).getListener());
-                    reference.child(enemies.get(0).getPlayerId()).removeValue();
-                    enemies.remove(0);
+                    endgameMessage(enemies.get(0).getPlayerData().playerName + " " + color + " Won");
+                    removeListeners();
+                    playerCountChanged = false;
                     break;
                 default:
+                    playerCountChanged = false;
                     break;
             }
         }
     }
 
+    private void endgameMessage(String msg) {
+        handler.post(() -> Toast.makeText(context, msg, Toast.LENGTH_LONG).show());
+    }
+
+    private void removeListeners() {
+        for (Enemy e : enemies) {
+            reference.removeEventListener(e.getListener());
+        }
+    }
+
     public void removeServer() {
-        if (enemies.size() == 0)
+        if (deleteServer)
             reference.removeValue();
     }
 }

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -26,6 +27,7 @@ import java.util.List;
 
 public abstract class Game extends SurfaceView implements SurfaceHolder.Callback {
 
+    protected Context context;
     protected Player player;
     protected final Joystick joystick;
     protected final Tilemap tilemap;
@@ -45,8 +47,19 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
     protected GameplayActivity gameplayActivity;
 
+    protected Handler handler;
+    protected boolean playerCountChanged;
+
+    private void initMe() {
+        handler = new Handler();
+    }
+
     public Game(Context context, Bundle bundle, GameplayActivity gameplayActivity) {
         super(context);
+        initMe();
+        this.context = context;
+
+        playerCountChanged = false;
 
         this.gameplayActivity = gameplayActivity;
 
@@ -197,7 +210,8 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
         joystick.update();
         button.update();
 
-//        handleGameEnded();todo
+        if (playerCountChanged)
+            handleGameEnded();
     }
 
     public void pause() {

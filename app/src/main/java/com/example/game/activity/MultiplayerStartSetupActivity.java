@@ -3,6 +3,7 @@ package com.example.game.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,6 +25,8 @@ public class MultiplayerStartSetupActivity extends StartSetupActivity {
     private ArrayList<String> list;
     private DatabaseReference reference;
     private ChildEventListener childEventListener;
+
+    private Button shareButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +81,18 @@ public class MultiplayerStartSetupActivity extends StartSetupActivity {
             public void onCancelled(@NonNull DatabaseError databaseError) {
             }
         });
+
+        shareButton = findViewById(R.id.shareButton);
+        shareButton.setOnClickListener(v -> share());
+    }
+
+    private void share() {
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, bundle.getString("code"));
+        shareIntent.setType("text/plain");
+        shareIntent = Intent.createChooser(shareIntent, "Share via: ");
+        startActivity(shareIntent);
     }
 
     protected void startGame() {

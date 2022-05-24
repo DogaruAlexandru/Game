@@ -1,9 +1,5 @@
 package com.example.game.gameobject;
 
-import static com.example.game.Utils.spriteSizeOnScreen;
-
-import android.graphics.Canvas;
-import android.graphics.Rect;
 import android.os.Bundle;
 
 import com.example.game.gamepanel.Button;
@@ -22,6 +18,7 @@ public class OfflinePlayer extends Player {
                          Tilemap tilemap, Animator animator, List<Bomb> bombList,
                          List<Explosion> explosionList, int speedUps, int bombRange, int bombsNumber,
                          int livesCount, Bundle bundle) {
+
         super(rowTile, columnTile, tilemap, animator, bombList, explosionList, speedUps, bombRange,
                 bombsNumber, livesCount);
 
@@ -32,12 +29,9 @@ public class OfflinePlayer extends Player {
     }
 
     @Override
-    public void draw(Canvas canvas) {
-        animator.draw(canvas, this, usedPaint);
-    }
-
-    @Override
     public void update() {
+        if (livesCount < 1)
+            return;
 
         selectDirectionFromActuator();
 
@@ -61,118 +55,6 @@ public class OfflinePlayer extends Player {
 
         // Player death handler
         handleDeath();
-    }
-
-    @Override
-    protected void goesDown(Rect newRect) {
-        int newRow = (newRect.bottom - 1) / spriteSizeOnScreen;
-        int newLeftColumn = newRect.left / spriteSizeOnScreen;
-        int newRightColumn = (newRect.right - 1) / spriteSizeOnScreen;
-
-        boolean leftBool = velocityChanging(newRow, newLeftColumn);
-        boolean rightBool = velocityChanging(newRow, newRightColumn);
-
-        if (leftBool) {
-            if (rightBool) {
-                int aux = (spriteSizeOnScreen - playerRect.bottom
-                        % spriteSizeOnScreen) % spriteSizeOnScreen;
-                velocityY = aux < velocityY ? aux : velocityY;
-            } else {
-                velocityX = velocityY * SPEED_MINIMIZING;
-                velocityY = 0;
-                int aux = (spriteSizeOnScreen - playerRect.right %
-                        spriteSizeOnScreen) % spriteSizeOnScreen;
-                velocityX = aux < velocityX ? aux : velocityX;
-            }
-        } else if (rightBool) {
-            velocityX = -velocityY * SPEED_MINIMIZING;
-            velocityY = 0;
-            int aux = -playerRect.left % spriteSizeOnScreen;
-            velocityX = aux > velocityX ? aux : velocityX;
-        }
-    }
-
-    @Override
-    protected void goesUp(Rect newRect) {
-        int newRow = newRect.top / spriteSizeOnScreen;
-        int newLeftColumn = newRect.left / spriteSizeOnScreen;
-        int newRightColumn = (newRect.right - 1) / spriteSizeOnScreen;
-
-        boolean leftBool = velocityChanging(newRow, newLeftColumn);
-        boolean rightBool = velocityChanging(newRow, newRightColumn);
-
-        if (leftBool) {
-            if (rightBool) {
-                int aux = -playerRect.top % spriteSizeOnScreen;
-                velocityY = aux > velocityY ? aux : velocityY;
-            } else {
-                velocityX = -velocityY * SPEED_MINIMIZING;
-                velocityY = 0;
-                int aux = playerRect.left % spriteSizeOnScreen;
-                velocityX = aux < velocityX ? aux : velocityX;
-            }
-        } else if (rightBool) {
-            velocityX = velocityY * SPEED_MINIMIZING;
-            velocityY = 0;
-            int aux = -playerRect.right % spriteSizeOnScreen;
-            velocityX = aux > velocityX ? aux : velocityX;
-        }
-    }
-
-    @Override
-    protected void goesRight(Rect newRect) {
-        int newColumn = (newRect.right - 1) / spriteSizeOnScreen;
-        int newTopRow = newRect.top / spriteSizeOnScreen;
-        int newBottomRow = (newRect.bottom - 1) / spriteSizeOnScreen;
-
-        boolean topBool = velocityChanging(newTopRow, newColumn);
-        boolean bottomBool = velocityChanging(newBottomRow, newColumn);
-
-        if (topBool) {
-            if (bottomBool) {
-                int aux = (spriteSizeOnScreen - playerRect.right %
-                        spriteSizeOnScreen) % spriteSizeOnScreen;
-                velocityX = aux < velocityX ? aux : velocityX;
-            } else {
-                velocityY = velocityX * SPEED_MINIMIZING;
-                velocityX = 0;
-                int aux = (spriteSizeOnScreen - playerRect.bottom
-                        % spriteSizeOnScreen) % spriteSizeOnScreen;
-                velocityY = aux < velocityY ? aux : velocityY;
-            }
-        } else if (bottomBool) {
-            velocityY = -velocityX * SPEED_MINIMIZING;
-            velocityX = 0;
-            int aux = -playerRect.top % spriteSizeOnScreen;
-            velocityY = aux > velocityY ? aux : velocityY;
-        }
-    }
-
-    @Override
-    protected void goesLeft(Rect newRect) {
-        int newColumn = newRect.left / spriteSizeOnScreen;
-        int newTopRow = newRect.top / spriteSizeOnScreen;
-        int newBottomRow = (newRect.bottom - 1) / spriteSizeOnScreen;
-
-        boolean topBool = velocityChanging(newTopRow, newColumn);
-        boolean bottomBool = velocityChanging(newBottomRow, newColumn);
-
-        if (topBool) {
-            if (bottomBool) {
-                int aux = -playerRect.left % spriteSizeOnScreen;
-                velocityX = aux > velocityX ? aux : velocityX;
-            } else {
-                velocityY = -velocityX * SPEED_MINIMIZING;
-                velocityX = 0;
-                int aux = spriteSizeOnScreen - playerRect.top % spriteSizeOnScreen;
-                velocityY = aux < velocityY ? aux : velocityY;
-            }
-        } else if (bottomBool) {
-            velocityY = velocityX * SPEED_MINIMIZING;
-            velocityX = 0;
-            int aux = -playerRect.bottom % spriteSizeOnScreen;
-            velocityY = aux > velocityY ? aux : velocityY;
-        }
     }
 
     protected void selectDirectionFromActuator() {

@@ -35,7 +35,6 @@ public class OnlinePlayer extends OfflinePlayer {
 
     @Override
     public void update() {
-
         selectDirectionFromActuator();
 
         detectCollisions();

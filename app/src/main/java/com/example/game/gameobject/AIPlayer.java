@@ -1,14 +1,17 @@
 package com.example.game.gameobject;
 
-import android.graphics.Canvas;
-import android.graphics.Rect;
-
 import com.example.game.graphics.Animator;
 import com.example.game.map.Tilemap;
 
 import java.util.List;
 
-public class AIPlayer extends Player{
+public class AIPlayer extends Player {
+
+    private boolean goesLeft;
+    private boolean goesRight;
+    private boolean goesUp;
+    private boolean goesDown;
+    private boolean usesBomb;
 
     public AIPlayer(int rowTile, int columnTile, Tilemap tilemap, Animator animator,
                     List<Bomb> bombList, List<Explosion> explosionList, int speedUps,
@@ -18,32 +21,29 @@ public class AIPlayer extends Player{
     }
 
     @Override
-    public void draw(Canvas canvas) {
-
-    }
-
-    @Override
     public void update() {
 
+        getModelOutputs();
+
+        detectCollisions();
+
+        if (velocityX != 0 || velocityY != 0) {
+            movePlayer();
+
+            getOrientation();
+
+            // Update player orientation
+            rotationAngle = (int) ((Math.atan2(directionY, directionX) * 180) / Math.PI) - 90;
+        }
+
+        // Update player state for animation
+        playerState.update();
+
+        // Player death handler
+        handleDeath();
     }
 
-    @Override
-    protected void goesDown(Rect newRect) {
-
-    }
-
-    @Override
-    protected void goesUp(Rect newRect) {
-
-    }
-
-    @Override
-    protected void goesLeft(Rect newRect) {
-
-    }
-
-    @Override
-    protected void goesRight(Rect newRect) {
-
+    private void getModelOutputs() {
+        //todo from the model gets the velocities and boolean for bomb uses
     }
 }

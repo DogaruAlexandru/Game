@@ -37,7 +37,7 @@ public class SingleplayerGame extends Game {
     public void update() {
         super.update();
 
-//        if (player.getPlayerData().livesCount > 0 && !enemies.isEmpty())
-        player.update();
+//        if (player.getLivesCount() > 0 /*&& !enemies.isEmpty()*/)
+            player.update();
     }
 }
