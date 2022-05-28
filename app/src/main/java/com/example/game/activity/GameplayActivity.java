@@ -5,7 +5,7 @@ import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.game.Game;
+import com.example.game.game.Game;
 
 public abstract class GameplayActivity extends AppCompatActivity {
 

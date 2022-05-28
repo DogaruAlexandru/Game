@@ -2,7 +2,7 @@ package com.example.game.activity;
 
 import android.util.Log;
 
-import com.example.game.MultiplayerGame;
+import com.example.game.game.MultiplayerGame;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;

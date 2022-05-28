@@ -1,6 +1,6 @@
 package com.example.game.gameobject;
 
-import static com.example.game.GameLoop.MAX_UPS;
+import static com.example.game.game.GameLoop.MAX_UPS;
 
 import com.example.game.map.BombTile;
 import com.example.game.map.Tilemap;

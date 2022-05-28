@@ -5,17 +5,11 @@ import com.example.game.map.Tilemap;
 
 import java.util.List;
 
-public class AIPlayer extends Player {
+public class OfflineEnemy extends Player {
 
-    private boolean goesLeft;
-    private boolean goesRight;
-    private boolean goesUp;
-    private boolean goesDown;
-    private boolean usesBomb;
-
-    public AIPlayer(int rowTile, int columnTile, Tilemap tilemap, Animator animator,
-                    List<Bomb> bombList, List<Explosion> explosionList, int speedUps,
-                    int bombRange, int bombsNumber, int livesCount) {
+    public OfflineEnemy(int rowTile, int columnTile, Tilemap tilemap, Animator animator,
+                        List<Bomb> bombList, List<Explosion> explosionList, int speedUps,
+                        int bombRange, int bombsNumber, int livesCount) {
         super(rowTile, columnTile, tilemap, animator, bombList, explosionList,
                 speedUps, bombRange, bombsNumber, livesCount);
     }
@@ -41,6 +35,9 @@ public class AIPlayer extends Player {
 
         // Player death handler
         handleDeath();
+
+        // Player picks power up handler
+        handlePowerUpCollision();
     }
 
     private void getModelOutputs() {

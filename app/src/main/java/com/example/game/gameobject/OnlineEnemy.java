@@ -1,6 +1,6 @@
 package com.example.game.gameobject;
 
-import static com.example.game.GameLoop.MAX_UPS;
+import static com.example.game.game.GameLoop.MAX_UPS;
 import static com.example.game.Utils.spriteSizeOnScreen;
 
 import android.graphics.Canvas;
@@ -16,10 +16,11 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class Enemy {
+public class OnlineEnemy {
     private final Paint INVINCIBILITY_PAINT;
     private final int INVINCIBILITY_TIME;
     private final ArrayList<Tile.LayoutType> powerUpsLayoutTypes;
+    private final Rect enemyRect;
     private ArrayList<Bomb> bombList;
     private ArrayList<Explosion> explosionList;
 
@@ -32,9 +33,8 @@ public class Enemy {
     private Tilemap tilemap;
     private int time;
     private PlayerState.State state;
-    private Rect enemyRect;
 
-    public Enemy() {
+    public OnlineEnemy() {
         enemyRect = new Rect(0, 0, Utils.spriteSizeOnScreen, Utils.spriteSizeOnScreen);
 
         state = PlayerState.State.NOT_MOVING;

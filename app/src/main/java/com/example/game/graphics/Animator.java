@@ -1,13 +1,13 @@
 package com.example.game.graphics;
 
-import static com.example.game.GameLoop.MAX_UPS;
+import static com.example.game.game.GameLoop.MAX_UPS;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
 import com.example.game.Utils;
-import com.example.game.gameobject.Enemy;
+import com.example.game.gameobject.OnlineEnemy;
 import com.example.game.gameobject.Player;
 
 public class Animator {
@@ -51,7 +51,7 @@ public class Animator {
         }
     }
 
-    public void draw(Canvas canvas, Enemy enemy, Paint paint) {
+    public void draw(Canvas canvas, OnlineEnemy enemy, Paint paint) {
         int idxNotMovingFrame = 0;
         Rect drawnRect = new Rect(enemy.getEnemyRect());
         drawnRect.offset(Utils.mapOffsetX, Utils.mapOffsetY);

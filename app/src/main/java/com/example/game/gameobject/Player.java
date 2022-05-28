@@ -1,6 +1,6 @@
 package com.example.game.gameobject;
 
-import static com.example.game.GameLoop.MAX_UPS;
+import static com.example.game.game.GameLoop.MAX_UPS;
 import static com.example.game.Utils.spriteSizeOnScreen;
 
 import android.graphics.Canvas;
@@ -373,6 +373,14 @@ public abstract class Player {
 
     public int getLivesCount() {
         return livesCount;
+    }
+
+    public String getPlayerId() {
+        return playerId;
+    }
+
+    public void setPlayerId(String playerId) {
+        this.playerId = playerId;
     }
 
     public void draw(Canvas canvas) {

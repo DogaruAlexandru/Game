@@ -6,7 +6,7 @@ import android.graphics.Paint;
 
 import androidx.core.content.ContextCompat;
 
-import com.example.game.GameLoop;
+import com.example.game.game.GameLoop;
 import com.example.game.R;
 
 public class Performance {

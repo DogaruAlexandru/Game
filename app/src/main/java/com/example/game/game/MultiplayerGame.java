@@ -1,15 +1,14 @@
-package com.example.game;
+package com.example.game.game;
 
 import android.content.Context;
 import android.graphics.Canvas;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.example.game.activity.GameplayActivity;
-import com.example.game.gameobject.Enemy;
+import com.example.game.gameobject.OnlineEnemy;
 import com.example.game.gameobject.OnlinePlayer;
 import com.example.game.graphics.Animator;
 import com.example.game.model.PlayerData;
@@ -25,7 +24,7 @@ import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 public class MultiplayerGame extends Game {
-    private final ArrayList<Enemy> enemies;
+    private final ArrayList<OnlineEnemy> enemies;
 
     private final DatabaseReference reference;
     private boolean deleteServer;
@@ -110,7 +109,7 @@ public class MultiplayerGame extends Game {
     }
 
     private void createEnemy(String id) {
-        Enemy enemy = new Enemy();
+        OnlineEnemy enemy = new OnlineEnemy();
         enemy.setPlayerId(id);
         enemy.setTilemap(tilemap);
         switch (id) {
@@ -137,7 +136,7 @@ public class MultiplayerGame extends Game {
         enemies.add(enemy);
     }
 
-    private void createListener(Enemy enemy) {
+    private void createListener(OnlineEnemy enemy) {
         enemy.setListener(reference.child(enemy.getPlayerId()).
                 addValueEventListener(new ValueEventListener() {
                     @Override
@@ -156,7 +155,7 @@ public class MultiplayerGame extends Game {
     public void draw(Canvas canvas) {
         super.draw(canvas);
 
-        for (Enemy enemy : enemies) {
+        for (OnlineEnemy enemy : enemies) {
             enemy.draw(canvas);
         }
     }
@@ -171,8 +170,8 @@ public class MultiplayerGame extends Game {
                 playerCountChanged = true;
         }
 
-        for (Iterator<Enemy> iterator = enemies.iterator(); iterator.hasNext(); ) {
-            Enemy enemy = (Enemy) iterator.next();
+        for (Iterator<OnlineEnemy> iterator = enemies.iterator(); iterator.hasNext(); ) {
+            OnlineEnemy enemy = (OnlineEnemy) iterator.next();
             enemy.update();
             if (enemy.getPlayerData().livesCount > 0)
                 continue;
@@ -188,16 +187,14 @@ public class MultiplayerGame extends Game {
 
     public void handleGameEnded() {
         if (((OnlinePlayer) player).getPlayerData().livesCount > 0) {
-            if (enemies.isEmpty()) {
+            if (enemies.isEmpty())
                 endgameMessage("You Won");
-                playerCountChanged = false;
-            }
+
         } else {
             switch (enemies.size()) {
                 case 0:
                     endgameMessage("Tie");
                     removeListeners();
-                    playerCountChanged = false;
                     break;
                 case 1:
                     String color;
@@ -221,21 +218,16 @@ public class MultiplayerGame extends Game {
                     }
                     endgameMessage(enemies.get(0).getPlayerData().playerName + " " + color + " Won");
                     removeListeners();
-                    playerCountChanged = false;
                     break;
                 default:
-                    playerCountChanged = false;
                     break;
             }
         }
-    }
-
-    private void endgameMessage(String msg) {
-        handler.post(() -> Toast.makeText(context, msg, Toast.LENGTH_LONG).show());
+        playerCountChanged = false;
     }
 
     private void removeListeners() {
-        for (Enemy e : enemies) {
+        for (OnlineEnemy e : enemies) {
             reference.removeEventListener(e.getListener());
         }
     }

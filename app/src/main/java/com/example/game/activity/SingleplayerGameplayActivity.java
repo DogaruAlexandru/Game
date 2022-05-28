@@ -1,6 +1,6 @@
 package com.example.game.activity;
 
-import com.example.game.SingleplayerGame;
+import com.example.game.game.SingleplayerGame;
 import com.example.game.Utils;
 
 import java.util.Random;

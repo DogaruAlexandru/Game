@@ -1,5 +1,7 @@
 package com.example.game;
 
+import com.example.game.game.GameLoop;
+
 import java.util.Random;
 
 public class Utils {

@@ -1,4 +1,4 @@
-package com.example.game;
+package com.example.game.game;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,7 +10,9 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.Toast;
 
+import com.example.game.Utils;
 import com.example.game.activity.GameplayActivity;
 import com.example.game.gameobject.Bomb;
 import com.example.game.gameobject.Explosion;
@@ -129,7 +131,6 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
                 if (button.isPressed(x, y)) {
                     buttonPointerId = pointerId;
                     button.setIsPressed(true);
-//                    numberOfBombsToCast ++;
                 }
                 break;
             case MotionEvent.ACTION_UP:
@@ -216,6 +217,10 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
     public void pause() {
         gameLoop.stopLoop();
+    }
+
+    protected void endgameMessage(String msg) {
+        handler.post(() -> Toast.makeText(context, msg, Toast.LENGTH_LONG).show());
     }
 
     protected abstract void handleGameEnded();
