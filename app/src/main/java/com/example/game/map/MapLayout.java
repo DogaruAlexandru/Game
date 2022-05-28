@@ -3,7 +3,6 @@ package com.example.game.map;
 import com.example.game.Utils;
 
 public class MapLayout {
-    //    private static final float CRATE_SPAWN_PROBABILITY = 0.85f;todo
     private final float crateSpawnProbability;
     private final int numberOfRowTiles;
     private final int numberOfColumnTiles;

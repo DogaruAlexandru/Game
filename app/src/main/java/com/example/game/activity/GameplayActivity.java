@@ -54,8 +54,4 @@ public abstract class GameplayActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-//    public void makeShortToast(String s) {
-//        //todo
-////        Toast.makeText(GameplayActivity.this, s, Toast.LENGTH_SHORT).show();
-//    }
 }

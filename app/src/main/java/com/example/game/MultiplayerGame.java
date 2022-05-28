@@ -35,37 +35,26 @@ public class MultiplayerGame extends Game {
 
         int rowTile = 0;
         int columnTile = 0;
-        switch (playerId) {
-            case "player1":
-                rowTile = 1;
-                columnTile = 1;
-                break;
-            case "player2":
-                rowTile = tilemap.getNumberOfRowTiles() - 2;
-                columnTile = tilemap.getNumberOfColumnTiles() - 2;
-                break;
-            case "player3":
-                rowTile = 1;
-                columnTile = tilemap.getNumberOfColumnTiles() - 2;
-                break;
-            case "player4":
-                rowTile = tilemap.getNumberOfRowTiles() - 2;
-                columnTile = 1;
-                break;
-        }
-
         Animator animator = null;
         switch (playerId) {
             case "player1":
+                rowTile = 1;
+                columnTile = 1;
                 animator = new Animator(spriteSheet.getBluePlayerSpriteArray());
                 break;
             case "player2":
+                rowTile = tilemap.getNumberOfRowTiles() - 2;
+                columnTile = tilemap.getNumberOfColumnTiles() - 2;
                 animator = new Animator(spriteSheet.getRedPlayerSpriteArray());
                 break;
             case "player3":
+                rowTile = 1;
+                columnTile = tilemap.getNumberOfColumnTiles() - 2;
                 animator = new Animator(spriteSheet.getGreenPlayerSpriteArray());
                 break;
             case "player4":
+                rowTile = tilemap.getNumberOfRowTiles() - 2;
+                columnTile = 1;
                 animator = new Animator(spriteSheet.getYellowPlayerSpriteArray());
                 break;
         }
@@ -79,10 +68,10 @@ public class MultiplayerGame extends Game {
                 animator,
                 bombList,
                 explosionList,
-                2,
-                4,
-                4,
                 1,
+                3,
+                2,
+                3,
                 bundle);
 
         enemies = new ArrayList<>();

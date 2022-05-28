@@ -21,11 +21,13 @@ public class SingleplayerGame extends Game {
                 new Animator(spriteSheet.getBluePlayerSpriteArray()),
                 bombList,
                 explosionList,
-                2,
-                4,
-                4,
                 1,
+                3,
+                2,
+                3,
                 bundle);
+
+        //todo create enemies by the bundle info
     }
 
     @Override

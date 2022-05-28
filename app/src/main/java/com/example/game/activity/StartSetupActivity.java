@@ -85,7 +85,7 @@ public abstract class StartSetupActivity extends AppCompatActivity {
         try {
             String s = crateSpawnProbabilityEdt.getText().toString();
             if (s.equals(""))
-                crateSpawnProbability = 20;
+                crateSpawnProbability = 50;
             else
                 crateSpawnProbability = Integer.parseInt(s);
 
@@ -95,7 +95,7 @@ public abstract class StartSetupActivity extends AppCompatActivity {
                     "Invalid crate spawn probability. Using default.",
                     Toast.LENGTH_SHORT).show();
 
-            crateSpawnProbability = 20;
+            crateSpawnProbability = 50;
         }
 
         verifyInputs();

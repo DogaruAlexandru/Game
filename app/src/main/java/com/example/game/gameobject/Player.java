@@ -12,6 +12,7 @@ import com.example.game.graphics.Animator;
 import com.example.game.map.Tile;
 import com.example.game.map.Tilemap;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Player {
@@ -46,6 +47,8 @@ public abstract class Player {
     //    private boolean canThrow;
     //    private boolean canKick;
 
+    protected final ArrayList<Tile.LayoutType> powerUpsLayoutTypes;
+
     public Player(int rowTile, int columnTile,
                   Tilemap tilemap, Animator animator, List<Bomb> bombList,
                   List<Explosion> explosionList, int speedUps, int bombRange, int bombsNumber,
@@ -78,11 +81,24 @@ public abstract class Player {
         INVINCIBILITY_PAINT = new Paint();
         INVINCIBILITY_PAINT.setAlpha(80);
         usedPaint = null;
+
+        powerUpsLayoutTypes = new ArrayList<>();
+        powerUpsLayoutTypes.add(Tile.LayoutType.BOMB_POWER_UP);
+        powerUpsLayoutTypes.add(Tile.LayoutType.RANGE_POWER_UP);
+        powerUpsLayoutTypes.add(Tile.LayoutType.SPEED_POWER_UP);
     }
+
+//    protected void getRectangle(Integer bottom, Integer left, Integer right, Integer top) {
+//        int safe = spriteSizeOnScreen / 6;
+//        bottom = (playerRect.bottom - 1 - safe) / spriteSizeOnScreen;
+//        left = (playerRect.left + safe) / spriteSizeOnScreen;
+//        right = (playerRect.right - 1 - safe) / spriteSizeOnScreen;
+//        top = (playerRect.top + safe) / spriteSizeOnScreen;
+//    }
 
     protected void handleDeath() {
         if (time == 0) {
-            int safe = spriteSizeOnScreen / 6;//todo
+            int safe = spriteSizeOnScreen / 6;
             int bottom = (playerRect.bottom - 1 - safe) / spriteSizeOnScreen;
             int left = (playerRect.left + safe) / spriteSizeOnScreen;
             int right = (playerRect.right - 1 - safe) / spriteSizeOnScreen;
@@ -110,23 +126,76 @@ public abstract class Player {
         }
     }
 
-    protected boolean tileIsLayoutType(int row, int column, Tile.LayoutType explosion) {
-        return tilemap.getTilemap()[row][column].getLayoutType() == explosion;
+    protected void handlePowerUpCollision() {
+
+        int walkTileIdx = 1;
+        int safe = spriteSizeOnScreen / 6;
+        int bottom = (playerRect.bottom - 1 - safe) / spriteSizeOnScreen;
+        int left = (playerRect.left + safe) / spriteSizeOnScreen;
+        int right = (playerRect.right - 1 - safe) / spriteSizeOnScreen;
+        int top = (playerRect.top + safe) / spriteSizeOnScreen;
+
+        for (Tile.LayoutType layoutType : powerUpsLayoutTypes) {
+            if (tileIsLayoutType(bottom, left, layoutType)) {
+                usePowerUp(layoutType);
+                tilemap.changeTile(bottom, left, walkTileIdx);
+                tilemap.setTilemapChanged(true);
+
+            } else if (tileIsLayoutType(bottom, right, layoutType)) {
+                usePowerUp(layoutType);
+                tilemap.changeTile(bottom, right, walkTileIdx);
+                tilemap.setTilemapChanged(true);
+
+            } else if (tileIsLayoutType(top, left, layoutType)) {
+                usePowerUp(layoutType);
+                tilemap.changeTile(top, left, walkTileIdx);
+                tilemap.setTilemapChanged(true);
+
+            } else if (tileIsLayoutType(top, right, layoutType)) {
+                usePowerUp(layoutType);
+                tilemap.changeTile(top, right, walkTileIdx);
+                tilemap.setTilemapChanged(true);
+            }
+        }
     }
 
-    protected void useBomb() {
+    protected void usePowerUp(Tile.LayoutType layoutType) {
+        switch (layoutType) {
+            case BOMB_POWER_UP:
+                ++bombsNumber;
+                break;
+            case RANGE_POWER_UP:
+                ++bombRange;
+                break;
+            case SPEED_POWER_UP:
+                ++speedUps;
+                break;
+            default:
+                break;
+        }
+    }
+
+    protected boolean tileIsLayoutType(int row, int column, Tile.LayoutType layoutType) {
+        return tilemap.getTilemap()[row][column].getLayoutType() == layoutType;
+    }
+
+    protected boolean useBomb() {
         int rowIdx = playerRect.centerY() / playerRect.width();
         int columnIdx = playerRect.centerX() / playerRect.height();
-        if (tileIsLayoutType(rowIdx, columnIdx, Tile.LayoutType.WALK)) {
-            int count = 0;
-            for (int i = 0; i < bombList.size(); i++) {
-                if (bombList.get(i).getPlayerId().equals(playerId))
-                    ++count;
-            }
-            if (count != bombsNumber)
-                bombList.add(new Bomb(bombRange, rowIdx, columnIdx, playerId,
-                        bombList, explosionList, tilemap));
+        if (!tileIsLayoutType(rowIdx, columnIdx, Tile.LayoutType.WALK))
+            return false;
+
+        int count = 0;
+        for (int i = 0; i < bombList.size(); i++) {
+            if (bombList.get(i).getPlayerId().equals(playerId))
+                ++count;
         }
+        if (count >= bombsNumber)
+            return false;
+
+        bombList.add(new Bomb(bombRange, rowIdx, columnIdx, playerId,
+                bombList, explosionList, tilemap));
+        return true;
     }
 
     protected void getOrientation() {

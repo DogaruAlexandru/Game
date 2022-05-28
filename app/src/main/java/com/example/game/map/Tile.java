@@ -14,10 +14,10 @@ public abstract class Tile {
         CRATE,
         BOMB,
         EXPLOSION,
+        BOMB_POWER_UP,
+        RANGE_POWER_UP,
+        SPEED_POWER_UP,
 //        KIC_POWER_UPK,
-//        BOMB_POWER_UP,
-//        RANGE_POWER_UP,
-//        SPEED_POWER_UP,
 //        HAND_POWER_UP
     }
 
@@ -41,6 +41,12 @@ public abstract class Tile {
                 return new BombTile(spriteSheet, mapLocationRect);
             case EXPLOSION:
                 return new ExplosionTile(spriteSheet, mapLocationRect);
+            case BOMB_POWER_UP:
+                return new BombCountPowerUpTile(spriteSheet, mapLocationRect);
+            case RANGE_POWER_UP:
+                return new ExplosionRangePowerUpTile(spriteSheet, mapLocationRect);
+            case SPEED_POWER_UP:
+                return new SpeedPowerUpTile(spriteSheet, mapLocationRect);
             case EMPTY:
             default:
                 return null;

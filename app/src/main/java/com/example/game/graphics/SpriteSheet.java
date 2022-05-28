@@ -71,11 +71,11 @@ public class SpriteSheet {
         return getSpriteByIndex(3, 4);
     }
 
-    public Sprite getBombPowerUpSprite() {
+    public Sprite getBombCountPowerUpSprite() {
         return getSpriteByIndex(4, 0);
     }
 
-    public Sprite getExplosionPowerUpSprite() {
+    public Sprite getExplosionRangePowerUpSprite() {
         return getSpriteByIndex(4, 1);
     }
 

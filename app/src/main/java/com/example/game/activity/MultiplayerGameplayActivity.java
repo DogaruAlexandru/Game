@@ -42,7 +42,7 @@ public class MultiplayerGameplayActivity extends GameplayActivity {
                     Log.e("firebase", "Game parameters not found", e);
                     mapHeight = 11;
                     mapWidth = 11;
-                    crateSpawnProbability = 25;
+                    crateSpawnProbability = 50;
                 }
             }
         });

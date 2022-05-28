@@ -55,6 +55,9 @@ public class OfflinePlayer extends Player {
 
         // Player death handler
         handleDeath();
+
+        // Player picks power up handler
+        handlePowerUpCollision();
     }
 
     protected void selectDirectionFromActuator() {

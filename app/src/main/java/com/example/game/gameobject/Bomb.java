@@ -8,7 +8,7 @@ import com.example.game.map.Tilemap;
 import java.util.List;
 
 public class Bomb {
-    private final int TIME_TILL_EXPLOSION = (int) (MAX_UPS * 2);
+    private final int TIME_TILL_EXPLOSION = (int) (MAX_UPS * 2.5);
     private final String playerId;
     private final int range;
     private final int row;
@@ -75,6 +75,9 @@ public class Bomb {
                             column + idxColumn * idx, explosionList, tilemap));
                     return;
                 case WALK:
+                case BOMB_POWER_UP:
+                case RANGE_POWER_UP:
+                case SPEED_POWER_UP:
                     explosionList.add(new Explosion(row + idxRow * idx,
                             column + idxColumn * idx, explosionList, tilemap));
                     break;

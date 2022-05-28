@@ -1,6 +1,7 @@
 package com.example.game.gameobject;
 
 import static com.example.game.GameLoop.MAX_UPS;
+import static com.example.game.Utils.spriteSizeOnScreen;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -8,6 +9,7 @@ import android.graphics.Rect;
 
 import com.example.game.Utils;
 import com.example.game.graphics.Animator;
+import com.example.game.map.Tile;
 import com.example.game.map.Tilemap;
 import com.example.game.model.PlayerData;
 import com.google.firebase.database.ValueEventListener;
@@ -17,6 +19,7 @@ import java.util.ArrayList;
 public class Enemy {
     private final Paint INVINCIBILITY_PAINT;
     private final int INVINCIBILITY_TIME;
+    private final ArrayList<Tile.LayoutType> powerUpsLayoutTypes;
     private ArrayList<Bomb> bombList;
     private ArrayList<Explosion> explosionList;
 
@@ -44,6 +47,11 @@ public class Enemy {
 
         playerData = new PlayerData();
         playerData.livesCount = 1;
+
+        powerUpsLayoutTypes = new ArrayList<>();
+        powerUpsLayoutTypes.add(Tile.LayoutType.BOMB_POWER_UP);
+        powerUpsLayoutTypes.add(Tile.LayoutType.RANGE_POWER_UP);
+        powerUpsLayoutTypes.add(Tile.LayoutType.SPEED_POWER_UP);
     }
 
     public String getPlayerId() {
@@ -118,6 +126,7 @@ public class Enemy {
         return state;
     }
 
+
     public void update() {
         enemyRect.offsetTo((int) (playerData.posX * tilemap.getMapRect().width()),
                 (int) (playerData.posY * tilemap.getMapRect().height()));
@@ -125,13 +134,48 @@ public class Enemy {
 
         if (playerData.bombUsed) {
             int rowIdx = enemyRect.centerY() / enemyRect.width();
-            int columnIdx = enemyRect.centerX() / enemyRect.height();//todo
+            int columnIdx = enemyRect.centerX() / enemyRect.height();
 
             bombList.add(new Bomb(playerData.bombRange, rowIdx, columnIdx, playerId,
                     bombList, explosionList, tilemap));
         }
 
         handleDeath();
+
+        handlePowerUpCollision();
+    }
+
+    protected void handlePowerUpCollision() {
+
+        int walkTileIdx = 1;
+        int safe = spriteSizeOnScreen / 6;
+        int bottom = (enemyRect.bottom - 1 - safe) / spriteSizeOnScreen;
+        int left = (enemyRect.left + safe) / spriteSizeOnScreen;
+        int right = (enemyRect.right - 1 - safe) / spriteSizeOnScreen;
+        int top = (enemyRect.top + safe) / spriteSizeOnScreen;
+
+        for (Tile.LayoutType layoutType : powerUpsLayoutTypes) {
+            if (tileIsLayoutType(bottom, left, layoutType)) {
+                tilemap.changeTile(bottom, left, walkTileIdx);
+                tilemap.setTilemapChanged(true);
+
+            } else if (tileIsLayoutType(bottom, right, layoutType)) {
+                tilemap.changeTile(bottom, right, walkTileIdx);
+                tilemap.setTilemapChanged(true);
+
+            } else if (tileIsLayoutType(top, left, layoutType)) {
+                tilemap.changeTile(top, left, walkTileIdx);
+                tilemap.setTilemapChanged(true);
+
+            } else if (tileIsLayoutType(top, right, layoutType)) {
+                tilemap.changeTile(top, right, walkTileIdx);
+                tilemap.setTilemapChanged(true);
+            }
+        }
+    }
+
+    protected boolean tileIsLayoutType(int row, int column, Tile.LayoutType layoutType) {
+        return tilemap.getTilemap()[row][column].getLayoutType() == layoutType;
     }
 
     private void handleDeath() {

@@ -25,7 +25,7 @@ public class OnlinePlayer extends OfflinePlayer {
                 speedUps, bombRange, bombsNumber, livesCount, bundle);
 
         playerData = new PlayerData(getRelativePoxX(), getRelativePoxY(), rotationAngle, livesCount,
-                bombRange, false, false, bundle.getString("playerName"),
+                bombRange, bombsNumber, false, false, bundle.getString("playerName"),
                 PlayerState.getEnumToString(PlayerState.State.NOT_MOVING));
 
         reference = FirebaseDatabase.getInstance().getReference(bundle.getString("code"));
@@ -54,23 +54,37 @@ public class OnlinePlayer extends OfflinePlayer {
         playerData.movingState = PlayerState.getEnumToString(playerState.getState());
 
         // Use bomb
-        if (button.getIsPressed()) {
-            useBomb();
-            playerData.bombUsed = true;
-        } else
-            playerData.bombUsed = false;
+        if (button.getIsPressed())
+            playerData.bombUsed = useBomb();
 
         // Player death handler
         handleDeath();
 
-        reference.child(playerId).setValue(playerData);
+        // Player picks power up handler
+        handlePowerUpCollision();
 
+        reference.child(playerId).setValue(playerData);
+    }
+
+    @Override
+    protected void usePowerUp(Tile.LayoutType layoutType) {
+        super.usePowerUp(layoutType);
+        switch (layoutType) {
+            case RANGE_POWER_UP:
+                ++playerData.bombRange;
+                break;
+            case BOMB_POWER_UP:
+                ++playerData.bombCount;
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
     protected void handleDeath() {
         if (time == 0) {
-            int safe = spriteSizeOnScreen / 6;//todo
+            int safe = spriteSizeOnScreen / 6;
             int bottom = (playerRect.bottom - 1 - safe) / spriteSizeOnScreen;
             int left = (playerRect.left + safe) / spriteSizeOnScreen;
             int right = (playerRect.right - 1 - safe) / spriteSizeOnScreen;
