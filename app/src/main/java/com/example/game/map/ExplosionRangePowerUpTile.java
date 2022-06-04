@@ -14,11 +14,20 @@ public class ExplosionRangePowerUpTile extends Tile {
 
     public ExplosionRangePowerUpTile(SpriteSheet spriteSheet, Rect mapLocationRect) {
         super(mapLocationRect, LayoutType.RANGE_POWER_UP);
+
         explosionRangePowerUpSprite = spriteSheet.getExplosionRangePowerUpSprite();
         walkSprite = spriteSheet.getLightWalkSprite();
 
         paint = new Paint();
         paint.setAlpha(180);
+    }
+
+    public ExplosionRangePowerUpTile() {
+        super(null, LayoutType.RANGE_POWER_UP);
+
+        explosionRangePowerUpSprite = null;
+        walkSprite = null;
+        paint = null;
     }
 
     @Override

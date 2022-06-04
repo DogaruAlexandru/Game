@@ -12,10 +12,9 @@ import com.example.game.graphics.SpriteSheet;
 public class Tilemap {
 
     private final SpriteSheet spriteSheet;
-    private final int mapHeightOffset;
-    private final int mapWidthOffset;
-
-    private MapLayout mapLayout;
+    private final MapLayout mapLayout;
+    private final int numberOfRowTiles;
+    private final int numberOfColumnTiles;
 
     private Tile[][] tilemap;
 
@@ -23,8 +22,6 @@ public class Tilemap {
     private Bitmap mapBitmap;
 
     Rect mapRect;
-    private int numberOfRowTiles;
-    private int numberOfColumnTiles;
 
     public Tilemap(SpriteSheet spriteSheet, int numberOfRowTiles, int numberOfColumnTiles,
                    int crateSpawnProbability) {
@@ -38,8 +35,8 @@ public class Tilemap {
 
         mapLayout = new MapLayout(numberOfRowTiles, numberOfColumnTiles, crateSpawnProbability);
 
-        mapHeightOffset = (spriteSizeOnScreen * numberOfRowTiles) >> 1;
-        mapWidthOffset = (spriteSizeOnScreen * numberOfColumnTiles) >> 1;
+        int mapHeightOffset = (spriteSizeOnScreen * numberOfRowTiles) >> 1;
+        int mapWidthOffset = (spriteSizeOnScreen * numberOfColumnTiles) >> 1;
         int screenCenterX = Utils.getScreenCenterX();
         int screenCenterY = Utils.getScreenCenterY();
         mapRect = new Rect(
@@ -74,8 +71,8 @@ public class Tilemap {
         Bitmap.Config config = Bitmap.Config.ARGB_8888;
 
         mapBitmap = Bitmap.createBitmap(
-                numberOfColumnTiles * (int) spriteSizeOnScreen,
-                numberOfRowTiles * (int) spriteSizeOnScreen,
+                numberOfColumnTiles * spriteSizeOnScreen,
+                numberOfRowTiles * spriteSizeOnScreen,
                 config
         );
 
@@ -105,7 +102,7 @@ public class Tilemap {
         );
     }
 
-    public void draw(Canvas canvas) {//todo
+    public void draw(Canvas canvas) {
         if (tilemapChanged) {
             drawTilemapInBitmap();
             tilemapChanged = false;
@@ -121,30 +118,8 @@ public class Tilemap {
         return mapRect;
     }
 
-    public int insideMapLeft() {
-        return tilemap[1][1].getMapLocationRect().left;
-    }
-
-    public int insideMapRight() {
-        return tilemap[numberOfRowTiles - 2][numberOfColumnTiles - 2].
-                getMapLocationRect().right;
-    }
-
-    public int insideMapTop() {
-        return tilemap[1][1].getMapLocationRect().top;
-    }
-
-    public int insideMapBottom() {
-        return tilemap[numberOfRowTiles - 2][numberOfColumnTiles - 2].
-                getMapLocationRect().bottom;
-    }
-
     public SpriteSheet getSpriteSheet() {
         return spriteSheet;
-    }
-
-    public boolean isTilemapChanged() {
-        return tilemapChanged;
     }
 
     public void setTilemapChanged(boolean tilemapChanged) {

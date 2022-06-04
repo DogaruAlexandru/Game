@@ -1,20 +1,18 @@
 package com.example.game.gamepanel;
 
+import static com.example.game.Utils.getDistanceBetweenPoints;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.graphics.Rect;
 
 import androidx.core.content.ContextCompat;
 
 import com.example.game.R;
-import com.example.game.graphics.Sprite;
 
 public class Button {
     private final Paint circlePaint;
     private final Paint pressedCirclePaint;
-    private final Paint bombPaint;
-    private final Rect bombRect;
 
     private boolean isPressed;
     private Paint usedPaint;
@@ -22,18 +20,14 @@ public class Button {
     private final int circleRadius;
     private final int circleCenterPositionX;
     private final int circleCenterPositionY;
-    private final Sprite bombSprite;
 
-    public Button(Context context, int centerPositionX, int centerPositionY, int circleRadius,
-                  Sprite sprite) {
+    public Button(Context context, int centerPositionX, int centerPositionY, int circleRadius) {
         circleCenterPositionX = centerPositionX;
         circleCenterPositionY = centerPositionY;
 
         this.circleRadius = circleRadius;
-        bombRect = new Rect(centerPositionX - circleRadius, centerPositionY - circleRadius,
-                centerPositionX + circleRadius, centerPositionY + circleRadius);
 
-        bombPaint = new Paint();
+        Paint bombPaint = new Paint();
         bombPaint.setAlpha(150);
 
         circlePaint = new Paint();
@@ -45,8 +39,6 @@ public class Button {
         pressedCirclePaint.setStyle(Paint.Style.FILL_AND_STROKE);
 
         usedPaint = circlePaint;
-
-        bombSprite = sprite;
     }
 
     public void update() {
@@ -54,17 +46,17 @@ public class Button {
     }
 
     private void updateColor() {
-        if (isPressed)
+        if (isPressed) {
             usedPaint = pressedCirclePaint;
-        else
+        } else {
             usedPaint = circlePaint;
+        }
     }
 
     public boolean isPressed(double touchPositionX, double touchPositionY) {
-        double buttonCenterToTouchDistance = Math.sqrt(
-                Math.pow(circleCenterPositionX - touchPositionX, 2) +
-                        Math.pow(circleCenterPositionY - touchPositionY, 2)
-        );
+        double buttonCenterToTouchDistance = getDistanceBetweenPoints(
+                circleCenterPositionX, circleCenterPositionY, touchPositionX, touchPositionY);
+
         return buttonCenterToTouchDistance < circleRadius;
     }
 
@@ -82,7 +74,5 @@ public class Button {
                 circleCenterPositionY,
                 circleRadius,
                 usedPaint);
-
-//        bombSprite.draw(canvas, bombRect, bombPaint);//todo
     }
 }

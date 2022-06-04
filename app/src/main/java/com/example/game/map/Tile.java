@@ -16,9 +16,7 @@ public abstract class Tile {
         EXPLOSION,
         BOMB_POWER_UP,
         RANGE_POWER_UP,
-        SPEED_POWER_UP,
-//        KIC_POWER_UPK,
-//        HAND_POWER_UP
+        SPEED_POWER_UP
     }
 
     protected final Rect mapLocationRect;

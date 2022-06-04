@@ -1,5 +1,10 @@
 package com.example.game.game;
 
+import static com.example.game.Utils.CRATE_SPAWN_PROBABILITY;
+import static com.example.game.Utils.MAP_HEIGHT;
+import static com.example.game.Utils.MAP_WIDTH;
+import static com.example.game.Utils.PLAYER_ID;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -28,6 +33,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Game extends SurfaceView implements SurfaceHolder.Callback {
+
+    protected final static int SPEED_UPS = 1;
+    protected final static int RANGE_UPS = 3;
+    protected final static int BOMB_UPS = 2;
+    protected final static int LIVES = 3;
+
+    private final static String GAME_CLASS_TAG = "Game.java";
+    private final static String SURF_CREATED = "surfaceCreated()";
+    private final static String SURF_CHANGED = "surfaceChanged()";
+    private final static String SURF_DESTROYED = "surfaceDestroyed()";
 
     protected Context context;
     protected Player player;
@@ -65,7 +80,7 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
         this.gameplayActivity = gameplayActivity;
 
-        this.playerId = bundle.getString("playerId");
+        this.playerId = bundle.getString(PLAYER_ID);
 
         SurfaceHolder surfaceHolder = getHolder();
         surfaceHolder.addCallback(this);
@@ -88,9 +103,9 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
         tilemap = new Tilemap(
                 spriteSheet,
-                bundle.getInt("mapHeight"),
-                bundle.getInt("mapWidth"),
-                bundle.getInt("crateSpawnProbability"));
+                bundle.getInt(MAP_HEIGHT),
+                bundle.getInt(MAP_WIDTH),
+                bundle.getInt(CRATE_SPAWN_PROBABILITY));
 
         joystick = new Joystick(
                 getContext(),
@@ -103,8 +118,7 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
                 getContext(),
                 Utils.getButtonCenterX(),
                 Utils.getControllersCenterY(),
-                Utils.getControllersOuterCircleRadius(),
-                spriteSheet.getBombSprite());
+                Utils.getControllersOuterCircleRadius());
 
         setFocusable(true);
     }
@@ -159,7 +173,7 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
-        Log.d("Game.java", "surfaceCreated()");
+        Log.d(GAME_CLASS_TAG, SURF_CREATED);
         if (gameLoop.getState().equals(Thread.State.TERMINATED)) {
             SurfaceHolder surfaceHolder = getHolder();
             surfaceHolder.addCallback(this);
@@ -170,12 +184,12 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        Log.d("Game.java", "surfaceChanged()");
+        Log.d(GAME_CLASS_TAG, SURF_CHANGED);
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
-        Log.d("Game.java", "surfaceDestroyed()");
+        Log.d(GAME_CLASS_TAG, SURF_DESTROYED);
     }
 
     @Override
@@ -186,24 +200,26 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
         tilemap.draw(canvas);
 
-//        performance.draw(canvas);
+        // Draw fps and ups on screed
+        // performance.draw(canvas);
 
         joystick.draw(canvas);
         button.draw(canvas);
 
-        if (player.getLivesCount() > 0)
+        if (player.getLivesCount() > 0) {
             player.draw(canvas);
+        }
     }
 
     public void update() {
         List<Bomb> bombRemoveList = new ArrayList<>();
-        for (int idx = 0; idx < bombList.size(); ++idx) {
+        for (int idx = 0; idx < bombList.size(); idx++) {
             bombList.get(idx).update(bombRemoveList);
         }
         bombList.removeAll(bombRemoveList);
 
         List<Explosion> explosionRemoveList = new ArrayList<>();
-        for (int idx = 0; idx < explosionList.size(); ++idx) {
+        for (int idx = 0; idx < explosionList.size(); idx++) {
             explosionList.get(idx).update(explosionRemoveList);
         }
         explosionList.removeAll(explosionRemoveList);
@@ -211,8 +227,9 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
         joystick.update();
         button.update();
 
-        if (playerCountChanged)
+        if (playerCountChanged) {
             handleGameEnded();
+        }
     }
 
     public void pause() {

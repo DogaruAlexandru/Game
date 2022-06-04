@@ -1,9 +1,11 @@
 package com.example.game.model;
 
+import com.example.game.gameobject.PlayerState;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 @IgnoreExtraProperties
 public class PlayerData {
+
     public double posX;
     public double posY;
     public int rotationData;
@@ -17,10 +19,20 @@ public class PlayerData {
 
     public PlayerData() {
         livesCount = -1;
+        movingState = PlayerState.State.NOT_MOVING.toString();
     }
 
-    public PlayerData(double posX, double posY, int rotationData, int livesCount, int bombRange,
-                      int bombCount, boolean bombUsed, boolean died, String playerName, String movingState) {
+    public PlayerData(double posX,
+                      double posY,
+                      int rotationData,
+                      int livesCount,
+                      int bombRange,
+                      int bombCount,
+                      boolean bombUsed,
+                      boolean died,
+                      String playerName,
+                      String movingState) {
+
         this.posX = posX;
         this.posY = posY;
         this.rotationData = rotationData;

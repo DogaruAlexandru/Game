@@ -8,10 +8,12 @@ import android.graphics.Rect;
 import com.example.game.R;
 
 public class SpriteSheet {
-    private final Bitmap bitmap;
+
     public static final int PLAYER_FRAMES = 3;
     public static final int SPRITE_WIDTH_PIXELS = 32;
     public static final int SPRITE_HEIGHT_PIXELS = 32;
+
+    private final Bitmap bitmap;
 
     public SpriteSheet(Context context) {
         BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
@@ -26,17 +28,14 @@ public class SpriteSheet {
 
     public Sprite[] getRedPlayerSpriteArray() {
         return getPlayerSpriteArray(1);
-
     }
 
     public Sprite[] getGreenPlayerSpriteArray() {
         return getPlayerSpriteArray(2);
-
     }
 
     public Sprite[] getYellowPlayerSpriteArray() {
         return getPlayerSpriteArray(3);
-
     }
 
     public Sprite getLightWallSprite() {

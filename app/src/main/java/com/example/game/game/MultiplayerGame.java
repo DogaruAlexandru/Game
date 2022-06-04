@@ -1,5 +1,18 @@
 package com.example.game.game;
 
+import static com.example.game.Utils.BLUE_MSG;
+import static com.example.game.Utils.CODE;
+import static com.example.game.Utils.FIREBASE_TAG;
+import static com.example.game.Utils.GREEN_MSG;
+import static com.example.game.Utils.NIL;
+import static com.example.game.Utils.Players;
+import static com.example.game.Utils.RED_MSG;
+import static com.example.game.Utils.RETRIEVE_DATA_ERROR;
+import static com.example.game.Utils.TIE_END_MSG;
+import static com.example.game.Utils.WIN_END_MSG;
+import static com.example.game.Utils.YELLOW_MSG;
+
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.os.Bundle;
@@ -23,7 +36,13 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
+@SuppressLint("ViewConstructor")
 public class MultiplayerGame extends Game {
+
+    private final static String[] PLAYERS = {"PLAYER1", "PLAYER2", "PLAYER3", "PLAYER4"};
+    private final static String CANCELLED_TAG = "onCancelled";
+    private final static String FAIL = "Failed.";
+
     private final ArrayList<OnlineEnemy> enemies;
 
     private final DatabaseReference reference;
@@ -35,23 +54,23 @@ public class MultiplayerGame extends Game {
         int rowTile = 0;
         int columnTile = 0;
         Animator animator = null;
-        switch (playerId) {
-            case "player1":
+        switch (Players.valueOf(playerId)) {
+            case PLAYER1:
                 rowTile = 1;
                 columnTile = 1;
                 animator = new Animator(spriteSheet.getBluePlayerSpriteArray());
                 break;
-            case "player2":
+            case PLAYER2:
                 rowTile = tilemap.getNumberOfRowTiles() - 2;
                 columnTile = tilemap.getNumberOfColumnTiles() - 2;
                 animator = new Animator(spriteSheet.getRedPlayerSpriteArray());
                 break;
-            case "player3":
+            case PLAYER3:
                 rowTile = 1;
                 columnTile = tilemap.getNumberOfColumnTiles() - 2;
                 animator = new Animator(spriteSheet.getGreenPlayerSpriteArray());
                 break;
-            case "player4":
+            case PLAYER4:
                 rowTile = tilemap.getNumberOfRowTiles() - 2;
                 columnTile = 1;
                 animator = new Animator(spriteSheet.getYellowPlayerSpriteArray());
@@ -67,14 +86,14 @@ public class MultiplayerGame extends Game {
                 animator,
                 bombList,
                 explosionList,
-                1,
-                3,
-                2,
-                3,
+                SPEED_UPS,
+                RANGE_UPS,
+                BOMB_UPS,
+                LIVES,
                 bundle);
 
         enemies = new ArrayList<>();
-        reference = FirebaseDatabase.getInstance().getReference(bundle.getString("code"));
+        reference = FirebaseDatabase.getInstance().getReference(bundle.getString(CODE));
 
         new Thread(this::addEnemiesListeners).start();
 
@@ -90,14 +109,13 @@ public class MultiplayerGame extends Game {
     private void addEnemiesListeners() {
         reference.get().addOnCompleteListener(task -> {
             if (!task.isSuccessful()) {
-                Log.e("firebase", "Error getting data", task.getException());
+                Log.e(FIREBASE_TAG, RETRIEVE_DATA_ERROR, task.getException());
             } else {
-                Log.d("firebase", String.valueOf(task.getResult().getValue()));
+                Log.d(FIREBASE_TAG, String.valueOf(task.getResult().getValue()));
 
                 DataSnapshot dataSnapshot = task.getResult();
 
-                ArrayList<String> enemiesIdList = new ArrayList<>(Arrays.
-                        asList("player1", "player2", "player3", "player4"));
+                ArrayList<String> enemiesIdList = new ArrayList<>(Arrays.asList(PLAYERS));
                 enemiesIdList.remove(playerId);
                 for (String id : enemiesIdList) {
                     if (dataSnapshot.child(id).exists()) {
@@ -112,22 +130,18 @@ public class MultiplayerGame extends Game {
         OnlineEnemy enemy = new OnlineEnemy();
         enemy.setPlayerId(id);
         enemy.setTilemap(tilemap);
-        switch (id) {
-            case "player1":
-                enemy.setAnimator(new Animator(spriteSheet.
-                        getBluePlayerSpriteArray()));
+        switch (Players.valueOf(id)) {
+            case PLAYER1:
+                enemy.setAnimator(new Animator(spriteSheet.getBluePlayerSpriteArray()));
                 break;
-            case "player2":
-                enemy.setAnimator(new Animator(spriteSheet.
-                        getRedPlayerSpriteArray()));
+            case PLAYER2:
+                enemy.setAnimator(new Animator(spriteSheet.getRedPlayerSpriteArray()));
                 break;
-            case "player3":
-                enemy.setAnimator(new Animator(spriteSheet.
-                        getGreenPlayerSpriteArray()));
+            case PLAYER3:
+                enemy.setAnimator(new Animator(spriteSheet.getGreenPlayerSpriteArray()));
                 break;
-            case "player4":
-                enemy.setAnimator(new Animator(spriteSheet.
-                        getYellowPlayerSpriteArray()));
+            case PLAYER4:
+                enemy.setAnimator(new Animator(spriteSheet.getYellowPlayerSpriteArray()));
                 break;
         }
         createListener(enemy);
@@ -146,7 +160,7 @@ public class MultiplayerGame extends Game {
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Log.w("onCancelled", "failed", databaseError.toException());
+                        Log.w(CANCELLED_TAG, FAIL, databaseError.toException());
                     }
                 }));
     }
@@ -166,15 +180,17 @@ public class MultiplayerGame extends Game {
 
         if (!enemies.isEmpty() && player.getLivesCount() > 0) {
             player.update();
-            if (player.getLivesCount() < 1)
+            if (player.getLivesCount() < 1) {
                 playerCountChanged = true;
+            }
         }
 
         for (Iterator<OnlineEnemy> iterator = enemies.iterator(); iterator.hasNext(); ) {
-            OnlineEnemy enemy = (OnlineEnemy) iterator.next();
+            OnlineEnemy enemy = iterator.next();
             enemy.update();
-            if (enemy.getPlayerData().livesCount > 0)
+            if (enemy.getPlayerData().livesCount > 0) {
                 continue;
+            }
             playerCountChanged = true;
             reference.removeEventListener(enemy.getListener());
             iterator.remove();
@@ -187,33 +203,33 @@ public class MultiplayerGame extends Game {
 
     public void handleGameEnded() {
         if (((OnlinePlayer) player).getPlayerData().livesCount > 0) {
-            if (enemies.isEmpty())
-                endgameMessage("You Won");
-
+            if (enemies.isEmpty()) {
+                endgameMessage(WIN_END_MSG);
+            }
         } else {
             switch (enemies.size()) {
                 case 0:
-                    endgameMessage("Tie");
+                    endgameMessage(TIE_END_MSG);
                     removeListeners();
                     break;
                 case 1:
                     String color;
                     deleteServer = true;
-                    switch (enemies.get(0).getPlayerId()) {
-                        case "player1":
-                            color = "[blue]";
+                    switch (Players.valueOf(enemies.get(0).getPlayerId())) {
+                        case PLAYER1:
+                            color = BLUE_MSG;
                             break;
-                        case "player2":
-                            color = "[red]";
+                        case PLAYER2:
+                            color = RED_MSG;
                             break;
-                        case "player3":
-                            color = "[green]";
+                        case PLAYER3:
+                            color = GREEN_MSG;
                             break;
-                        case "player4":
-                            color = "[yellow]";
+                        case PLAYER4:
+                            color = YELLOW_MSG;
                             break;
                         default:
-                            color = "";
+                            color = NIL;
                             break;
                     }
                     endgameMessage(enemies.get(0).getPlayerData().playerName + " " + color + " Won");
@@ -233,7 +249,8 @@ public class MultiplayerGame extends Game {
     }
 
     public void removeServer() {
-        if (deleteServer)
+        if (deleteServer) {
             reference.removeValue();
+        }
     }
 }

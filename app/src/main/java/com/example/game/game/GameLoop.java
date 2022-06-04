@@ -4,11 +4,19 @@ import android.graphics.Canvas;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
+import java.util.concurrent.TimeUnit;
+
 public class GameLoop extends Thread {
+
+    private final static String GAME_LOOP_CLASS_TAG = "GameLoop.java";
+    private final static String START_LOOP = "startLoop()";
+    private final static String STOP_LOOP = "stopLoop()";
+    private final static String RUN = "run()";
+
     public static final double MAX_UPS = 30.0;
     private static final double UPS_PERIOD = 1E+3 / MAX_UPS;
-    private Game game;
-    private SurfaceHolder surfaceHolder;
+    private final Game game;
+    private final SurfaceHolder surfaceHolder;
 
     private boolean isRunning = false;
     private double averageUPS;
@@ -28,14 +36,14 @@ public class GameLoop extends Thread {
     }
 
     public void startLoop() {
-        Log.d("GameLoop.java", "startLoop()");
+        Log.d(GAME_LOOP_CLASS_TAG, START_LOOP);
         isRunning = true;
         start();
     }
 
     @Override
     public void run() {
-        Log.d("GameLoop.java", "run()");
+        Log.d(GAME_LOOP_CLASS_TAG, RUN);
         super.run();
 
         int updateCount = 0;
@@ -54,7 +62,7 @@ public class GameLoop extends Thread {
                 canvas = surfaceHolder.lockCanvas();
                 synchronized (surfaceHolder) {
                     game.update();
-                    ++updateCount;
+                    updateCount++;
 
                     game.draw(canvas);
                 }
@@ -64,7 +72,8 @@ public class GameLoop extends Thread {
                 if (canvas != null) {
                     try {
                         surfaceHolder.unlockCanvasAndPost(canvas);
-                        ++frameCount;
+                        frameCount++;
+
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -75,7 +84,7 @@ public class GameLoop extends Thread {
             sleepTime = (long) (updateCount * UPS_PERIOD - elapsedTime);
             if (sleepTime > 0) {
                 try {
-                    sleep(sleepTime);
+                    TimeUnit.MILLISECONDS.sleep(sleepTime);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -83,7 +92,7 @@ public class GameLoop extends Thread {
 
             while (sleepTime < 0 && updateCount < MAX_UPS - 1) {
                 game.update();
-                ++updateCount;
+                updateCount++;
                 elapsedTime = System.currentTimeMillis() - startTime;
                 sleepTime = (long) (updateCount * UPS_PERIOD - elapsedTime);
             }
@@ -100,7 +109,7 @@ public class GameLoop extends Thread {
     }
 
     public void stopLoop() {
-        Log.d("GameLoop.java", "stopLoop()");
+        Log.d(GAME_LOOP_CLASS_TAG, STOP_LOOP);
         isRunning = false;
         try {
             join();

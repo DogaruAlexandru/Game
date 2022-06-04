@@ -10,8 +10,8 @@ import com.example.game.game.GameLoop;
 import com.example.game.R;
 
 public class Performance {
-    private GameLoop gameLoop;
-    private Context context;
+    private final GameLoop gameLoop;
+    private final Context context;
 
     public Performance(Context context, GameLoop gameLoop) {
         this.context = context;

@@ -8,17 +8,27 @@ import com.example.game.graphics.Sprite;
 import com.example.game.graphics.SpriteSheet;
 
 public class BombCountPowerUpTile extends Tile {
+
     private final Sprite walkSprite;
     private final Sprite bombCountPowerUpSprite;
     private final Paint paint;
 
     public BombCountPowerUpTile(SpriteSheet spriteSheet, Rect mapLocationRect) {
         super(mapLocationRect, LayoutType.BOMB_POWER_UP);
+
         bombCountPowerUpSprite = spriteSheet.getBombCountPowerUpSprite();
         walkSprite = spriteSheet.getLightWalkSprite();
 
         paint = new Paint();
         paint.setAlpha(180);
+    }
+
+    public BombCountPowerUpTile() {
+        super(null, LayoutType.BOMB_POWER_UP);
+
+        bombCountPowerUpSprite = null;
+        walkSprite = null;
+        paint = null;
     }
 
     @Override

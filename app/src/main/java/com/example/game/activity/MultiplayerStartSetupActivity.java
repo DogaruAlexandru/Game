@@ -1,5 +1,14 @@
 package com.example.game.activity;
 
+import static com.example.game.Utils.CODE;
+import static com.example.game.Utils.CRATE_SPAWN_PROBABILITY;
+import static com.example.game.Utils.GAME_STATE;
+import static com.example.game.Utils.MAP_HEIGHT;
+import static com.example.game.Utils.MAP_WIDTH;
+import static com.example.game.Utils.PLAYER_NAME;
+import static com.example.game.Utils.SEED;
+import static com.example.game.Utils.STARTING;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
@@ -22,11 +31,13 @@ import java.util.Objects;
 
 public class MultiplayerStartSetupActivity extends StartSetupActivity {
 
+    private final static String TEXT_TYPE = "text/plain";
+    private final static String CHOOSER_TITLE = "Share via: ";
+    private final static String START_PLAYER_COUNT_ERROR = "You can not start with one player.";
+
     private ArrayList<String> list;
     private DatabaseReference reference;
     private ChildEventListener childEventListener;
-
-    private Button shareButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +46,7 @@ public class MultiplayerStartSetupActivity extends StartSetupActivity {
         super.onCreate(savedInstanceState);
 
         list = new ArrayList<>();
-        reference = FirebaseDatabase.getInstance().getReference(bundle.getString("code"));
+        reference = FirebaseDatabase.getInstance().getReference(bundle.getString(CODE));
 
         ListView listView = findViewById(R.id.listView);
         TextView textView = new TextView(this);
@@ -50,11 +61,12 @@ public class MultiplayerStartSetupActivity extends StartSetupActivity {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
                 switch (Objects.requireNonNull(dataSnapshot.getKey())) {
-                    case "gameState":
-                    case "seed":
+                    case GAME_STATE:
+                    case SEED:
                         return;
                 }
-                list.add(dataSnapshot.child("playerName").getValue(String.class));
+
+                list.add(dataSnapshot.child(PLAYER_NAME).getValue(String.class));
                 adapter.notifyDataSetChanged();
             }
 
@@ -65,11 +77,12 @@ public class MultiplayerStartSetupActivity extends StartSetupActivity {
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
                 switch (Objects.requireNonNull(dataSnapshot.getKey())) {
-                    case "gameState":
-                    case "seed":
+                    case GAME_STATE:
+                    case SEED:
                         return;
                 }
-                list.remove(dataSnapshot.child("playerName").getValue(String.class));
+
+                list.remove(dataSnapshot.child(PLAYER_NAME).getValue(String.class));
                 adapter.notifyDataSetChanged();
             }
 
@@ -82,23 +95,23 @@ public class MultiplayerStartSetupActivity extends StartSetupActivity {
             }
         });
 
-        shareButton = findViewById(R.id.shareButton);
+        Button shareButton = findViewById(R.id.shareButton);
         shareButton.setOnClickListener(v -> share());
     }
 
     private void share() {
         Intent shareIntent = new Intent();
         shareIntent.setAction(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_TEXT, bundle.getString("code"));
-        shareIntent.setType("text/plain");
-        shareIntent = Intent.createChooser(shareIntent, "Share via: ");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, bundle.getString(CODE));
+        shareIntent.setType(TEXT_TYPE);
+        shareIntent = Intent.createChooser(shareIntent, CHOOSER_TITLE);
         startActivity(shareIntent);
     }
 
     protected void startGame() {
         if (list.size() < 2) {
             Toast.makeText(MultiplayerStartSetupActivity.this,
-                    "You can not start with one player.", Toast.LENGTH_SHORT).show();
+                    START_PLAYER_COUNT_ERROR, Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -106,10 +119,10 @@ public class MultiplayerStartSetupActivity extends StartSetupActivity {
 
         reference.removeEventListener(childEventListener);
 
-        reference.child("gameState").setValue("starting game");//todo put them in ServerData
-        reference.child("mapHeight").setValue(mapHeight);
-        reference.child("mapWidth").setValue(mapWidth);
-        reference.child("crateSpawnProbability").setValue(crateSpawnProbability);
+        reference.child(GAME_STATE).setValue(STARTING);
+        reference.child(MAP_HEIGHT).setValue(mapHeight);
+        reference.child(MAP_WIDTH).setValue(mapWidth);
+        reference.child(CRATE_SPAWN_PROBABILITY).setValue(crateSpawnProbability);
 
         Intent intent = new Intent(this, MultiplayerGameplayActivity.class);
         intent.putExtras(bundle);

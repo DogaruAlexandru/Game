@@ -14,8 +14,17 @@ public class ExplosionTile extends Tile {
 
     public ExplosionTile(SpriteSheet spriteSheet, Rect mapLocationRect) {
         super(mapLocationRect, LayoutType.EXPLOSION);
+
         explosionSprite = spriteSheet.getExplosionSprite();
         walkSprite = spriteSheet.getLightWalkSprite();
+        explosion = null;
+    }
+
+    public ExplosionTile() {
+        super(null, LayoutType.EXPLOSION);
+
+        explosionSprite = null;
+        walkSprite = null;
         explosion = null;
     }
 

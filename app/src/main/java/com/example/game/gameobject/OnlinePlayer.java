@@ -1,5 +1,7 @@
 package com.example.game.gameobject;
 
+import static com.example.game.Utils.CODE;
+import static com.example.game.Utils.PLAYER_NAME;
 import static com.example.game.Utils.spriteSizeOnScreen;
 
 import com.example.game.gamepanel.Joystick;
@@ -17,18 +19,46 @@ public class OnlinePlayer extends OfflinePlayer {
 
     protected final PlayerData playerData;
 
-    public OnlinePlayer(Joystick joystick, com.example.game.gamepanel.Button button, int rowTile,
-                        int columnTile, Tilemap tilemap, com.example.game.graphics.Animator animator,
-                        List<Bomb> bombList, List<Explosion> explosionList, int speedUps, int bombRange,
-                        int bombsNumber, int livesCount, android.os.Bundle bundle) {
-        super(joystick, button, rowTile, columnTile, tilemap, animator, bombList, explosionList,
-                speedUps, bombRange, bombsNumber, livesCount, bundle);
+    public OnlinePlayer(Joystick joystick,
+                        com.example.game.gamepanel.Button button,
+                        int rowTile,
+                        int columnTile,
+                        Tilemap tilemap,
+                        com.example.game.graphics.Animator animator,
+                        List<Bomb> bombList,
+                        List<Explosion> explosionList,
+                        int speedUps,
+                        int bombRange,
+                        int bombsNumber,
+                        int livesCount,
+                        android.os.Bundle bundle) {
 
-        playerData = new PlayerData(getRelativePoxX(), getRelativePoxY(), rotationAngle, livesCount,
-                bombRange, bombsNumber, false, false, bundle.getString("playerName"),
-                PlayerState.getEnumToString(PlayerState.State.NOT_MOVING));
+        super(joystick,
+                button,
+                rowTile,
+                columnTile,
+                tilemap,
+                animator,
+                bombList,
+                explosionList,
+                speedUps,
+                bombRange,
+                bombsNumber,
+                livesCount,
+                bundle);
 
-        reference = FirebaseDatabase.getInstance().getReference(bundle.getString("code"));
+        playerData = new PlayerData(getRelativePoxX(),
+                getRelativePoxY(),
+                rotationAngle,
+                livesCount,
+                bombRange,
+                bombsNumber,
+                false,
+                false,
+                bundle.getString(PLAYER_NAME),
+                PlayerState.State.NOT_MOVING.toString());
+
+        reference = FirebaseDatabase.getInstance().getReference(bundle.getString(CODE));
 
         reference.child(playerId).setValue(playerData);
     }
@@ -45,17 +75,18 @@ public class OnlinePlayer extends OfflinePlayer {
             getOrientation();
 
             // Update player orientation
-            rotationAngle = (int) ((Math.atan2(directionY, directionX) * 180) / Math.PI) - 90;
+            rotationAngle = getAngle();
             playerData.rotationData = rotationAngle;
         }
 
         // Update player state for animation
         playerState.update();
-        playerData.movingState = PlayerState.getEnumToString(playerState.getState());
+        playerData.movingState = playerState.getState().toString();
 
         // Use bomb
-        if (button.getIsPressed())
+        if (button.getIsPressed()) {
             playerData.bombUsed = useBomb();
+        }
 
         // Player death handler
         handleDeath();
@@ -71,10 +102,10 @@ public class OnlinePlayer extends OfflinePlayer {
         super.usePowerUp(layoutType);
         switch (layoutType) {
             case RANGE_POWER_UP:
-                ++playerData.bombRange;
+                playerData.bombRange++;
                 break;
             case BOMB_POWER_UP:
-                ++playerData.bombCount;
+                playerData.bombCount++;
                 break;
             default:
                 break;
@@ -94,14 +125,14 @@ public class OnlinePlayer extends OfflinePlayer {
                     tileIsLayoutType(bottom, right, Tile.LayoutType.EXPLOSION) ||
                     tileIsLayoutType(top, left, Tile.LayoutType.EXPLOSION) ||
                     tileIsLayoutType(top, right, Tile.LayoutType.EXPLOSION)) {
-                --livesCount;
-                --playerData.livesCount;
+                livesCount--;
+                playerData.livesCount--;
                 playerData.died = true;
                 time = INVINCIBILITY_TIME;
                 usedPaint = INVINCIBILITY_PAINT;
             }
         } else {
-            --time;
+            time--;
             playerData.died = false;
             int aux = time % 4;
             switch (aux) {

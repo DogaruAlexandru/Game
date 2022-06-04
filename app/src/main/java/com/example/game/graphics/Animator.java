@@ -38,7 +38,7 @@ public class Animator {
                         player.getRotationAngle(), paint);
                 break;
             case IS_MOVING:
-                --updatesBeforeNextMoveFrame;
+                updatesBeforeNextMoveFrame--;
                 if (updatesBeforeNextMoveFrame == 0) {
                     updatesBeforeNextMoveFrame = MAX_UPDATES_BEFORE_NEXT_MOVE_FRAME;
                     toggleIdxMovingFrame();
@@ -67,7 +67,7 @@ public class Animator {
                         enemy.getPlayerData().rotationData, paint);
                 break;
             case IS_MOVING:
-                --updatesBeforeNextMoveFrame;
+                updatesBeforeNextMoveFrame--;
                 if (updatesBeforeNextMoveFrame == 0) {
                     updatesBeforeNextMoveFrame = MAX_UPDATES_BEFORE_NEXT_MOVE_FRAME;
                     toggleIdxMovingFrame();

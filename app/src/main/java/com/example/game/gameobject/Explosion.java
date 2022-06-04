@@ -9,24 +9,24 @@ import com.example.game.map.Tilemap;
 import java.util.List;
 
 public class Explosion {
-    private final int DURATION = (int) (MAX_UPS * 0.8);
-    private int row;
-    private int column;
+
+    private static final int EXPLOSION_TILE_LAYOUT_ID = 5;
+
+    private final int row;
+    private final int column;
     private int updatesBeforeDisappear;
-    private List<Explosion> explosionList;
-    private Tilemap tilemap;
+    private final Tilemap tilemap;
 
     private int tileBehindExplosion;
 
     public Explosion(int row, int column, List<Explosion> explosionList, Tilemap tilemap) {
         this.row = row;
         this.column = column;
-        this.explosionList = explosionList;
         this.tilemap = tilemap;
 
         tileBehindExplosion = 1;
 
-        updatesBeforeDisappear = DURATION;
+        updatesBeforeDisappear = (int) (MAX_UPS * 0.8);
 
         switch (tilemap.getTilemap()[row][column].getLayoutType()) {
             case EXPLOSION:
@@ -35,14 +35,14 @@ public class Explosion {
                 explosionList.remove(explosion);
                 break;
             case CRATE:
-                if (Utils.generator.nextFloat() < .5) {
-                    tileBehindExplosion = Utils.generator.nextInt(90) % 3 + 6;
+                if (Utils.generator.nextFloat() < .3) {
+                    tileBehindExplosion = getPowerUpBehindExplosion();
                 }
-                tilemap.changeTile(row, column, 5);
+                tilemap.changeTile(row, column, EXPLOSION_TILE_LAYOUT_ID);
                 tilemap.setTilemapChanged(true);
                 break;
             default:
-                tilemap.changeTile(row, column, 5);
+                tilemap.changeTile(row, column, EXPLOSION_TILE_LAYOUT_ID);
                 tilemap.setTilemapChanged(true);
                 break;
         }
@@ -50,12 +50,16 @@ public class Explosion {
         ((ExplosionTile) tilemap.getTilemap()[row][column]).setExplosion(this);
     }
 
+    private int getPowerUpBehindExplosion() {
+        return Utils.generator.nextInt(90) % 3 + 6;
+    }
+
     public int getTileBehindExplosion() {
         return tileBehindExplosion;
     }
 
     public void update(List<Explosion> explosionRemoveList) {
-        --updatesBeforeDisappear;
+        updatesBeforeDisappear--;
 
         if (updatesBeforeDisappear == 0) {
 

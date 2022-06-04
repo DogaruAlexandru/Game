@@ -14,6 +14,11 @@ public class CrateTile extends Tile {
         sprite = spriteSheet.getDarkCrateSprite();
     }
 
+    public CrateTile() {
+        super(null, LayoutType.CRATE);
+        sprite = null;
+    }
+
     @Override
     public void draw(Canvas canvas) {
         sprite.draw(canvas, mapLocationRect);

@@ -17,6 +17,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 public class OnlineEnemy {
+
     private final Paint INVINCIBILITY_PAINT;
     private final int INVINCIBILITY_TIME;
     private final ArrayList<Tile.LayoutType> powerUpsLayoutTypes;
@@ -78,16 +79,8 @@ public class OnlineEnemy {
         this.playerData = playerData;
     }
 
-    public Animator getAnimator() {
-        return animator;
-    }
-
     public void setAnimator(Animator animator) {
         this.animator = animator;
-    }
-
-    public Paint getUsedPaint() {
-        return usedPaint;
     }
 
     public Tilemap getTilemap() {
@@ -98,16 +91,8 @@ public class OnlineEnemy {
         this.tilemap = tilemap;
     }
 
-    public ArrayList<Bomb> getBombList() {
-        return bombList;
-    }
-
     public void setBombList(ArrayList<Bomb> bombList) {
         this.bombList = bombList;
-    }
-
-    public ArrayList<Explosion> getExplosionList() {
-        return explosionList;
     }
 
     public void setExplosionList(ArrayList<Explosion> explosionList) {
@@ -130,14 +115,14 @@ public class OnlineEnemy {
     public void update() {
         enemyRect.offsetTo((int) (playerData.posX * tilemap.getMapRect().width()),
                 (int) (playerData.posY * tilemap.getMapRect().height()));
-        state = PlayerState.getStringToEnum(playerData.movingState);
+        state = PlayerState.State.valueOf(playerData.movingState);
 
         if (playerData.bombUsed) {
             int rowIdx = enemyRect.centerY() / enemyRect.width();
             int columnIdx = enemyRect.centerX() / enemyRect.height();
 
             bombList.add(new Bomb(playerData.bombRange, rowIdx, columnIdx, playerId,
-                    bombList, explosionList, tilemap));
+                    explosionList, tilemap));
         }
 
         handleDeath();
@@ -183,10 +168,9 @@ public class OnlineEnemy {
             if (playerData.died) {
                 time = INVINCIBILITY_TIME;
                 usedPaint = INVINCIBILITY_PAINT;
-
             }
         } else {
-            --time;
+            time--;
             int aux = time % 4;
             switch (aux) {
                 case 0:

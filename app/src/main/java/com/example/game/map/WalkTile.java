@@ -14,6 +14,11 @@ public class WalkTile extends Tile {
         sprite = spriteSheet.getLightWalkSprite();
     }
 
+    public WalkTile() {
+        super(null, LayoutType.WALK);
+        sprite = null;
+    }
+
     @Override
     public void draw(Canvas canvas) {
         sprite.draw(canvas, mapLocationRect);

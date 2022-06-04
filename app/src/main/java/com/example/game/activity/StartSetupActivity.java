@@ -1,5 +1,7 @@
 package com.example.game.activity;
 
+import static com.example.game.Utils.NIL;
+
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -10,6 +12,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.game.R;
 
 public abstract class StartSetupActivity extends AppCompatActivity {
+
+    public final static String MAX_HEIGHT = "Using maximum height.";
+    public final static String MIN_HEIGHT = "Using minimum height.";
+    public final static String MAX_WIDTH = "Using maximum width.";
+    public final static String MIN_WIDTH = "Using minimum width.";
+    public final static String MAX_SPAWN = "Using maximum crate spawn probability.";
+    public final static String INVALID_HEIGHT = "Invalid height. Using default.";
+    public final static String INVALID_WIDTH = "Invalid width. Using default.";
+    public final static String INVALID_SPAWN = "Invalid crate spawn probability. Using default.";
 
     protected EditText mapHeightEdt;
     protected EditText mapWidthEdt;
@@ -26,74 +37,68 @@ public abstract class StartSetupActivity extends AppCompatActivity {
     protected void verifyInputs() {
         if (mapHeight > 31) {
             mapHeight = 31;
-            Toast.makeText(StartSetupActivity.this,
-                    "Using maximum height.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(StartSetupActivity.this, MAX_HEIGHT, Toast.LENGTH_SHORT).show();
         } else if (mapHeight < 11) {
             mapHeight = 11;
-            Toast.makeText(StartSetupActivity.this,
-                    "Using minimum height.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(StartSetupActivity.this, MIN_HEIGHT, Toast.LENGTH_SHORT).show();
         }
 
         if (mapWidth > 41) {
             mapWidth = 41;
-            Toast.makeText(StartSetupActivity.this,
-                    "Using maximum width.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(StartSetupActivity.this, MAX_WIDTH, Toast.LENGTH_SHORT).show();
         } else if (mapWidth < 11) {
             mapWidth = 11;
-            Toast.makeText(StartSetupActivity.this,
-                    "Using minimum width.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(StartSetupActivity.this, MIN_WIDTH, Toast.LENGTH_SHORT).show();
         }
 
         if (crateSpawnProbability > 100) {
             crateSpawnProbability = 100;
-            Toast.makeText(StartSetupActivity.this,
-                    "Using maximum crate spawn probability.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(StartSetupActivity.this, MAX_SPAWN, Toast.LENGTH_SHORT).show();
         }
     }
 
     protected void getInputs() {
         try {
             String s = mapHeightEdt.getText().toString();
-            if (s.equals(""))
+            if (s.equals(NIL)) {
                 mapHeight = 11;
-            else
+            } else {
                 mapHeight = Integer.parseInt(s);
+            }
 
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
-            Toast.makeText(StartSetupActivity.this,
-                    "Invalid height. Using default.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(StartSetupActivity.this, INVALID_HEIGHT, Toast.LENGTH_SHORT).show();
 
             mapHeight = 11;
         }
 
         try {
             String s = mapWidthEdt.getText().toString();
-            if (s.equals(""))
+            if (s.equals(NIL)) {
                 mapWidth = 11;
-            else
+            } else {
                 mapWidth = Integer.parseInt(s);
+            }
 
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
-            Toast.makeText(StartSetupActivity.this,
-                    "Invalid width. Using default.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(StartSetupActivity.this, INVALID_WIDTH, Toast.LENGTH_SHORT).show();
 
             mapWidth = 11;
         }
 
         try {
             String s = crateSpawnProbabilityEdt.getText().toString();
-            if (s.equals(""))
+            if (s.equals(NIL)) {
                 crateSpawnProbability = 50;
-            else
+            } else {
                 crateSpawnProbability = Integer.parseInt(s);
+            }
 
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
-            Toast.makeText(StartSetupActivity.this,
-                    "Invalid crate spawn probability. Using default.",
-                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(StartSetupActivity.this, INVALID_SPAWN, Toast.LENGTH_SHORT).show();
 
             crateSpawnProbability = 50;
         }

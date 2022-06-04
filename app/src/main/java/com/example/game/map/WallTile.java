@@ -14,6 +14,11 @@ public class WallTile extends Tile {
         sprite = spriteSheet.getDarkWallSprite();
     }
 
+    public WallTile() {
+        super(null, LayoutType.WALL);
+        sprite = null;
+    }
+
     @Override
     public void draw(Canvas canvas) {
         sprite.draw(canvas, mapLocationRect);

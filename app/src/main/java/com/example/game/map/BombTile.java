@@ -8,14 +8,24 @@ import com.example.game.graphics.Sprite;
 import com.example.game.graphics.SpriteSheet;
 
 public class BombTile extends Tile {
+
     private final Sprite walkSprite;
     private final Sprite bombSprite;
     private Bomb bomb;
 
     public BombTile(SpriteSheet spriteSheet, Rect mapLocationRect) {
         super(mapLocationRect, LayoutType.BOMB);
+
         bombSprite = spriteSheet.getBombSprite();
         walkSprite = spriteSheet.getLightWalkSprite();
+        bomb = null;
+    }
+
+    public BombTile() {
+        super(null, LayoutType.BOMB);
+
+        bombSprite = null;
+        walkSprite = null;
         bomb = null;
     }
 

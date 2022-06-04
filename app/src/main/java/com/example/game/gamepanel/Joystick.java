@@ -2,7 +2,6 @@ package com.example.game.gamepanel;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 
 import androidx.core.content.ContextCompat;
@@ -12,18 +11,17 @@ import com.example.game.Utils;
 
 public class Joystick {
 
-    private Paint innerCirclePaint;
-    private Paint outerCirclePaint;
+    private final Paint innerCirclePaint;
+    private final Paint outerCirclePaint;
 
-    private int outerCircleRadius;
-    private int innerCircleRadius;
+    private final int outerCircleRadius;
+    private final int innerCircleRadius;
 
-    private int outerCircleCenterPositionX;
-    private int outerCircleCenterPositionY;
+    private final int outerCircleCenterPositionX;
+    private final int outerCircleCenterPositionY;
     private int innerCircleCenterPositionX;
     private int innerCircleCenterPositionY;
 
-    private double joystickCenterToTouchDistance;
     private boolean isPressed;
     private double actuatorX;
     private double actuatorY;
@@ -74,12 +72,13 @@ public class Joystick {
     }
 
     public boolean isPressed(double touchPositionX, double touchPositionY) {
-        joystickCenterToTouchDistance = Utils.getDistanceBetweenPoints(
+        double joystickCenterToTouchDistance = Utils.getDistanceBetweenPoints(
                 outerCircleCenterPositionX,
                 outerCircleCenterPositionY,
                 touchPositionX,
                 touchPositionY
         );
+
         return joystickCenterToTouchDistance < outerCircleRadius;
     }
 

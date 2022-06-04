@@ -1,5 +1,7 @@
 package com.example.game.activity;
 
+import static com.example.game.Utils.PLAYER_NAME;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
@@ -11,8 +13,6 @@ import com.example.game.R;
 
 public class StartMenuActivity extends AppCompatActivity {
 
-    private Button multiplayerBtn;
-    private Button singlePlayerBtn;
     private EditText nameEdt;
 
     @Override
@@ -22,17 +22,17 @@ public class StartMenuActivity extends AppCompatActivity {
 
         nameEdt = findViewById(R.id.nameEdt);
 
-        singlePlayerBtn = findViewById(R.id.singleplayerBtn);
+        Button singlePlayerBtn = findViewById(R.id.singleplayerBtn);
         singlePlayerBtn.setOnClickListener(v -> openSingleplayerActivity());
 
-        multiplayerBtn = findViewById(R.id.multiplayerBtn);
+        Button multiplayerBtn = findViewById(R.id.multiplayerBtn);
         multiplayerBtn.setOnClickListener(v -> openMultiplayerSetupActivity());
     }
 
     private void openSingleplayerActivity() {
         Intent intent = new Intent(this, SingleplayerStartSetupActivity.class);
         Bundle b = new Bundle();
-        b.putString("playerName", nameEdt.getText().toString());
+        b.putString(PLAYER_NAME, nameEdt.getText().toString());
         intent.putExtras(b);
         startActivity(intent);
     }
@@ -40,7 +40,7 @@ public class StartMenuActivity extends AppCompatActivity {
     private void openMultiplayerSetupActivity() {
         Intent intent = new Intent(this, MultiplayerCodeSetupActivity.class);
         Bundle b = new Bundle();
-        b.putString("playerName", nameEdt.getText().toString());
+        b.putString(PLAYER_NAME, nameEdt.getText().toString());
         intent.putExtras(b);
         startActivity(intent);
     }

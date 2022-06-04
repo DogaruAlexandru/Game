@@ -1,5 +1,7 @@
 package com.example.game.gameobject;
 
+import static com.example.game.Utils.PLAYER_ID;
+
 import android.os.Bundle;
 
 import com.example.game.gamepanel.Button;
@@ -14,24 +16,42 @@ public class OfflinePlayer extends Player {
     protected final Joystick joystick;
     protected final Button button;
 
-    public OfflinePlayer(Joystick joystick, Button button, int rowTile, int columnTile,
-                         Tilemap tilemap, Animator animator, List<Bomb> bombList,
-                         List<Explosion> explosionList, int speedUps, int bombRange, int bombsNumber,
-                         int livesCount, Bundle bundle) {
+    public OfflinePlayer(Joystick joystick,
+                         Button button,
+                         int rowTile,
+                         int columnTile,
+                         Tilemap tilemap,
+                         Animator animator,
+                         List<Bomb> bombList,
+                         List<Explosion> explosionList,
+                         int speedUps,
+                         int bombRange,
+                         int bombsNumber,
+                         int livesCount,
+                         Bundle bundle) {
 
-        super(rowTile, columnTile, tilemap, animator, bombList, explosionList, speedUps, bombRange,
-                bombsNumber, livesCount);
+        super(rowTile,
+                columnTile,
+                tilemap,
+                animator,
+                bombList,
+                explosionList,
+                speedUps,
+                bombRange,
+                bombsNumber,
+                livesCount);
 
         this.joystick = joystick;
         this.button = button;
 
-        playerId = bundle.getString("playerId");
+        playerId = bundle.getString(PLAYER_ID);
     }
 
     @Override
     public void update() {
-        if (livesCount < 1)
+        if (livesCount < 1) {
             return;
+        }
 
         selectDirectionFromActuator();
 
@@ -43,7 +63,7 @@ public class OfflinePlayer extends Player {
             getOrientation();
 
             // Update player orientation
-            rotationAngle = (int) ((Math.atan2(directionY, directionX) * 180) / Math.PI) - 90;
+            rotationAngle = getAngle();
         }
 
         // Update player state for animation
@@ -67,12 +87,12 @@ public class OfflinePlayer extends Player {
 
         // Select direction by actuator value
         if (Math.abs(actuatorX) > Math.abs(actuatorY)) {
-            velocityX = actuatorX * defaultMaxSpeed * (1 + INCREASE_IN_SPEED_BY_POWER_UP * speedUps);
+            velocityX = actuatorX * getMaxSpeed();
             velocityY = 0;
             return;
         }
         if (Math.abs(actuatorX) < Math.abs(actuatorY)) {
-            velocityY = actuatorY * defaultMaxSpeed * (1 + INCREASE_IN_SPEED_BY_POWER_UP * speedUps);
+            velocityY = actuatorY * getMaxSpeed();
             velocityX = 0;
             return;
         }

@@ -6,10 +6,10 @@ import com.google.firebase.database.IgnoreExtraProperties;
 public class ServerData {
     public Long seed;
     public String gameState;
-    public PlayerData player1;
-    public PlayerData player2;
-    public PlayerData player3;
-    public PlayerData player4;
+    public PlayerData PLAYER1;
+    public PlayerData PLAYER2;
+    public PlayerData PLAYER3;
+    public PlayerData PLAYER4;
 
     public ServerData() {
     }
@@ -18,9 +18,9 @@ public class ServerData {
                       PlayerData player3, PlayerData player4) {
         this.seed = seed;
         this.gameState = gameState;
-        this.player1 = player1;
-        this.player2 = player2;
-        this.player3 = player3;
-        this.player4 = player4;
+        this.PLAYER1 = player1;
+        this.PLAYER2 = player2;
+        this.PLAYER3 = player3;
+        this.PLAYER4 = player4;
     }
 }

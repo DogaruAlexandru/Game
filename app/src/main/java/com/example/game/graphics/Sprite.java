@@ -4,8 +4,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
-import com.example.game.Utils;
-
 public class Sprite {
     private final SpriteSheet spriteSheet;
     private final Rect spriteRect;

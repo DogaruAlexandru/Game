@@ -1,5 +1,12 @@
 package com.example.game.activity;
 
+import static com.example.game.Utils.CODE;
+import static com.example.game.Utils.GAME_STATE;
+import static com.example.game.Utils.PLAYER_ID;
+import static com.example.game.Utils.PLAYER_NAME;
+import static com.example.game.Utils.SEED;
+import static com.example.game.Utils.STARTING;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
@@ -20,11 +27,12 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class MultiplayerStartWaitActivity extends AppCompatActivity {
 
-    private Button backButton;
-    private ListView listView;
+    private final static String SERVER_CLOSED = "The creator closed the server.";
+
     private ArrayList<String> list;
 
     private Bundle bundle;
@@ -41,9 +49,9 @@ public class MultiplayerStartWaitActivity extends AppCompatActivity {
 
         list = new ArrayList<>();
         bundle = getIntent().getExtras();
-        reference = FirebaseDatabase.getInstance().getReference(bundle.getString("code"));
+        reference = FirebaseDatabase.getInstance().getReference(bundle.getString(CODE));
 
-        listView = findViewById(R.id.listView);
+        ListView listView = findViewById(R.id.listView);
         TextView textView = new TextView(this);
         textView.setText(R.string.PlayersListHeader);
         listView.addHeaderView(textView);
@@ -59,8 +67,8 @@ public class MultiplayerStartWaitActivity extends AppCompatActivity {
                 if (dataSnapshot.exists()) {
                     return;
                 }
-                Toast.makeText(MultiplayerStartWaitActivity.this,
-                        "The creator closed the server.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MultiplayerStartWaitActivity.this, SERVER_CLOSED,
+                        Toast.LENGTH_SHORT).show();
                 onBackPressed();
             }
 
@@ -73,12 +81,13 @@ public class MultiplayerStartWaitActivity extends AppCompatActivity {
         childEventListener = reference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
-                switch (dataSnapshot.getKey()) {
-                    case "gameState":
-                    case "seed":
+                switch (Objects.requireNonNull(dataSnapshot.getKey())) {
+                    case GAME_STATE:
+                    case SEED:
                         return;
                 }
-                list.add(dataSnapshot.child("playerName").getValue(String.class));
+
+                list.add(dataSnapshot.child(PLAYER_NAME).getValue(String.class));
                 adapter.notifyDataSetChanged();
             }
 
@@ -88,12 +97,13 @@ public class MultiplayerStartWaitActivity extends AppCompatActivity {
 
             @Override
             public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
-                switch (dataSnapshot.getKey()) {
-                    case "gameState":
-                    case "seed":
+                switch (Objects.requireNonNull(dataSnapshot.getKey())) {
+                    case GAME_STATE:
+                    case SEED:
                         return;
                 }
-                list.remove(dataSnapshot.child("playerName").getValue(String.class));
+
+                list.remove(dataSnapshot.child(PLAYER_NAME).getValue(String.class));
                 adapter.notifyDataSetChanged();
             }
 
@@ -107,11 +117,11 @@ public class MultiplayerStartWaitActivity extends AppCompatActivity {
         });
 
         // Listener for gameState changing
-        gameStateValueEventListener = reference.child("gameState").
+        gameStateValueEventListener = reference.child(GAME_STATE).
                 addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        if (!"starting game".equals(dataSnapshot.getValue(String.class))) {
+                        if (!STARTING.equals(dataSnapshot.getValue(String.class))) {
                             return;
                         }
                         startGameplayActivity();
@@ -122,17 +132,17 @@ public class MultiplayerStartWaitActivity extends AppCompatActivity {
                     }
                 });
 
-        backButton = findViewById(R.id.backButton);
+        Button backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(v -> onBackPressed());
     }
 
     @Override
     public void onBackPressed() {
-        reference.child(bundle.getString("playerId")).removeValue();
+        reference.child(bundle.getString(PLAYER_ID)).removeValue();
 
         reference.removeEventListener(gameInstanceValueEventListener);
         reference.removeEventListener(childEventListener);
-        reference.child("gameState").removeEventListener(gameStateValueEventListener);
+        reference.child(GAME_STATE).removeEventListener(gameStateValueEventListener);
 
         super.onBackPressed();
 
@@ -142,7 +152,7 @@ public class MultiplayerStartWaitActivity extends AppCompatActivity {
     private void startGameplayActivity() {
         reference.removeEventListener(gameInstanceValueEventListener);
         reference.removeEventListener(childEventListener);
-        reference.child("gameState").removeEventListener(gameStateValueEventListener);
+        reference.child(GAME_STATE).removeEventListener(gameStateValueEventListener);
 
         Intent intent = new Intent(this, MultiplayerGameplayActivity.class);
         intent.putExtras(bundle);

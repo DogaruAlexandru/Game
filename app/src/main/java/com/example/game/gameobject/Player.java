@@ -1,7 +1,7 @@
 package com.example.game.gameobject;
 
-import static com.example.game.game.GameLoop.MAX_UPS;
 import static com.example.game.Utils.spriteSizeOnScreen;
+import static com.example.game.game.GameLoop.MAX_UPS;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -17,7 +17,9 @@ import java.util.List;
 
 public abstract class Player {
 
-    protected final float INCREASE_IN_SPEED_BY_POWER_UP = .4f;
+    static final int WALK_TILE_LAYOUT_ID = 1;
+
+    protected final float INCREASE_IN_SPEED_BY_POWER_UP = .3f;
     protected final float SPEED_MINIMIZING = .8f;
     protected final int INVINCIBILITY_TIME = (int) MAX_UPS * 2;
     protected final Paint INVINCIBILITY_PAINT;
@@ -44,14 +46,18 @@ public abstract class Player {
     protected int speedUps;
     protected int bombsNumber;
     protected int time = 0;
-    //    private boolean canThrow;
-    //    private boolean canKick;
 
     protected final ArrayList<Tile.LayoutType> powerUpsLayoutTypes;
 
-    public Player(int rowTile, int columnTile,
-                  Tilemap tilemap, Animator animator, List<Bomb> bombList,
-                  List<Explosion> explosionList, int speedUps, int bombRange, int bombsNumber,
+    public Player(int rowTile,
+                  int columnTile,
+                  Tilemap tilemap,
+                  Animator animator,
+                  List<Bomb> bombList,
+                  List<Explosion> explosionList,
+                  int speedUps,
+                  int bombRange,
+                  int bombsNumber,
                   int livesCount) {
 
         this.tilemap = tilemap;
@@ -88,14 +94,6 @@ public abstract class Player {
         powerUpsLayoutTypes.add(Tile.LayoutType.SPEED_POWER_UP);
     }
 
-//    protected void getRectangle(Integer bottom, Integer left, Integer right, Integer top) {
-//        int safe = spriteSizeOnScreen / 6;
-//        bottom = (playerRect.bottom - 1 - safe) / spriteSizeOnScreen;
-//        left = (playerRect.left + safe) / spriteSizeOnScreen;
-//        right = (playerRect.right - 1 - safe) / spriteSizeOnScreen;
-//        top = (playerRect.top + safe) / spriteSizeOnScreen;
-//    }
-
     protected void handleDeath() {
         if (time == 0) {
             int safe = spriteSizeOnScreen / 6;
@@ -108,12 +106,12 @@ public abstract class Player {
                     tileIsLayoutType(bottom, right, Tile.LayoutType.EXPLOSION) ||
                     tileIsLayoutType(top, left, Tile.LayoutType.EXPLOSION) ||
                     tileIsLayoutType(top, right, Tile.LayoutType.EXPLOSION)) {
-                --livesCount;
+                livesCount--;
                 time = INVINCIBILITY_TIME;
                 usedPaint = INVINCIBILITY_PAINT;
             }
         } else {
-            --time;
+            time--;
             int aux = time % 4;
             switch (aux) {
                 case 0:
@@ -128,7 +126,6 @@ public abstract class Player {
 
     protected void handlePowerUpCollision() {
 
-        int walkTileIdx = 1;
         int safe = spriteSizeOnScreen / 6;
         int bottom = (playerRect.bottom - 1 - safe) / spriteSizeOnScreen;
         int left = (playerRect.left + safe) / spriteSizeOnScreen;
@@ -138,22 +135,22 @@ public abstract class Player {
         for (Tile.LayoutType layoutType : powerUpsLayoutTypes) {
             if (tileIsLayoutType(bottom, left, layoutType)) {
                 usePowerUp(layoutType);
-                tilemap.changeTile(bottom, left, walkTileIdx);
+                tilemap.changeTile(bottom, left, WALK_TILE_LAYOUT_ID);
                 tilemap.setTilemapChanged(true);
 
             } else if (tileIsLayoutType(bottom, right, layoutType)) {
                 usePowerUp(layoutType);
-                tilemap.changeTile(bottom, right, walkTileIdx);
+                tilemap.changeTile(bottom, right, WALK_TILE_LAYOUT_ID);
                 tilemap.setTilemapChanged(true);
 
             } else if (tileIsLayoutType(top, left, layoutType)) {
                 usePowerUp(layoutType);
-                tilemap.changeTile(top, left, walkTileIdx);
+                tilemap.changeTile(top, left, WALK_TILE_LAYOUT_ID);
                 tilemap.setTilemapChanged(true);
 
             } else if (tileIsLayoutType(top, right, layoutType)) {
                 usePowerUp(layoutType);
-                tilemap.changeTile(top, right, walkTileIdx);
+                tilemap.changeTile(top, right, WALK_TILE_LAYOUT_ID);
                 tilemap.setTilemapChanged(true);
             }
         }
@@ -162,17 +159,21 @@ public abstract class Player {
     protected void usePowerUp(Tile.LayoutType layoutType) {
         switch (layoutType) {
             case BOMB_POWER_UP:
-                ++bombsNumber;
+                bombsNumber++;
                 break;
             case RANGE_POWER_UP:
-                ++bombRange;
+                bombRange++;
                 break;
             case SPEED_POWER_UP:
-                ++speedUps;
+                speedUps++;
                 break;
             default:
                 break;
         }
+    }
+
+    protected double getMaxSpeed() {
+        return defaultMaxSpeed * (1 + INCREASE_IN_SPEED_BY_POWER_UP * speedUps);
     }
 
     protected boolean tileIsLayoutType(int row, int column, Tile.LayoutType layoutType) {
@@ -180,21 +181,23 @@ public abstract class Player {
     }
 
     protected boolean useBomb() {
-        int rowIdx = playerRect.centerY() / playerRect.width();
-        int columnIdx = playerRect.centerX() / playerRect.height();
-        if (!tileIsLayoutType(rowIdx, columnIdx, Tile.LayoutType.WALK))
+        int rowIdx = Utils.getPlayerRow(this);
+        int columnIdx = Utils.getPlayerColumn(this);
+        if (!tileIsLayoutType(rowIdx, columnIdx, Tile.LayoutType.WALK)) {
             return false;
+        }
 
         int count = 0;
         for (int i = 0; i < bombList.size(); i++) {
-            if (bombList.get(i).getPlayerId().equals(playerId))
+            if (bombList.get(i).getPlayerId().equals(playerId)) {
                 ++count;
+            }
         }
-        if (count >= bombsNumber)
+        if (count >= bombsNumber) {
             return false;
+        }
 
-        bombList.add(new Bomb(bombRange, rowIdx, columnIdx, playerId,
-                bombList, explosionList, tilemap));
+        bombList.add(new Bomb(bombRange, rowIdx, columnIdx, playerId, explosionList, tilemap));
         return true;
     }
 
@@ -206,6 +209,10 @@ public abstract class Player {
         directionY = velocityY / distance;
     }
 
+    protected int getAngle() {
+        return (int) ((Math.atan2(directionY, directionX) * 180) / Math.PI) - 90;
+    }
+
     protected void movePlayer() {
         positionX += velocityX;
         positionY += velocityY;
@@ -213,19 +220,20 @@ public abstract class Player {
     }
 
     protected void detectCollisions() {
-        if (velocityX == 0 && velocityY == 0)
+        if (velocityX == 0 && velocityY == 0) {
             return;
+        }
 
         Rect newRect = new Rect(playerRect);
         newRect.offsetTo((int) (positionX + velocityX), (int) (positionY + velocityY));
 
-        if (velocityX != 0)
+        if (velocityX != 0) {
             if (velocityX < 0) {
                 goesLeft(newRect);
             } else {
                 goesRight(newRect);
             }
-        else if (velocityY < 0) {
+        } else if (velocityY < 0) {
             goesUp(newRect);
         } else {
             goesDown(newRect);
