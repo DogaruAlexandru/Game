@@ -54,7 +54,7 @@ public class OnlinePlayer extends OfflinePlayer {
                 bombRange,
                 bombsNumber,
                 false,
-                false,
+                0,
                 bundle.getString(PLAYER_NAME),
                 PlayerState.State.NOT_MOVING.toString());
 
@@ -127,13 +127,11 @@ public class OnlinePlayer extends OfflinePlayer {
                     tileIsLayoutType(top, right, Tile.LayoutType.EXPLOSION)) {
                 livesCount--;
                 playerData.livesCount--;
-                playerData.died = true;
                 time = INVINCIBILITY_TIME;
                 usedPaint = INVINCIBILITY_PAINT;
             }
         } else {
             time--;
-            playerData.died = false;
             int aux = time % 4;
             switch (aux) {
                 case 0:
@@ -144,6 +142,7 @@ public class OnlinePlayer extends OfflinePlayer {
                     break;
             }
         }
+        playerData.died = time;
     }
 
     @Override

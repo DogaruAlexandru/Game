@@ -1,6 +1,5 @@
 package com.example.game.gameobject;
 
-import static com.example.game.game.GameLoop.MAX_UPS;
 import static com.example.game.Utils.spriteSizeOnScreen;
 
 import android.graphics.Canvas;
@@ -19,7 +18,6 @@ import java.util.ArrayList;
 public class OnlineEnemy {
 
     private final Paint INVINCIBILITY_PAINT;
-    private final int INVINCIBILITY_TIME;
     private final ArrayList<Tile.LayoutType> powerUpsLayoutTypes;
     private final Rect enemyRect;
     private ArrayList<Bomb> bombList;
@@ -39,8 +37,6 @@ public class OnlineEnemy {
         enemyRect = new Rect(0, 0, Utils.spriteSizeOnScreen, Utils.spriteSizeOnScreen);
 
         state = PlayerState.State.NOT_MOVING;
-
-        INVINCIBILITY_TIME = (int) MAX_UPS * 2;
 
         INVINCIBILITY_PAINT = new Paint();
         INVINCIBILITY_PAINT.setAlpha(80);
@@ -165,8 +161,8 @@ public class OnlineEnemy {
 
     private void handleDeath() {
         if (time == 0) {
-            if (playerData.died) {
-                time = INVINCIBILITY_TIME;
+            if (playerData.died != 0) {
+                time = playerData.died;
                 usedPaint = INVINCIBILITY_PAINT;
             }
         } else {

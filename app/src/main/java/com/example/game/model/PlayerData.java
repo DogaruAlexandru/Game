@@ -13,7 +13,7 @@ public class PlayerData {
     public int bombRange;
     public int bombCount;
     public boolean bombUsed;
-    public boolean died;
+    public int died;
     public String playerName;
     public String movingState;
 
@@ -29,7 +29,7 @@ public class PlayerData {
                       int bombRange,
                       int bombCount,
                       boolean bombUsed,
-                      boolean died,
+                      int died,
                       String playerName,
                       String movingState) {
 
