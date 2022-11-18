@@ -10,8 +10,8 @@
     <string name="back">Back</string>
     <string name="PlayersListHeader">Players</string>
     <string name="start">Start</string>
-    <string name="map_height">Map Height</string>
-    <string name="crate_spawn_probability">Crate Spawn Probability</string>
-    <string name="map_width">Map Width</string>
+    <string name="map_height">Map Height [11–31]</string>
+    <string name="crate_spawn_probability">Crate Spawn Probability [0–100]</string>
+    <string name="map_width">Map Width [11–41]</string>
     <string name="share_code">Share Code</string>
 </resources>

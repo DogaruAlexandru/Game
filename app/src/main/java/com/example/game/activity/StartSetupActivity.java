@@ -37,24 +37,28 @@ public abstract class StartSetupActivity extends AppCompatActivity {
     protected void verifyInputs() {
         if (mapHeight > 31) {
             mapHeight = 31;
-            Toast.makeText(StartSetupActivity.this, MAX_HEIGHT, Toast.LENGTH_SHORT).show();
+            makeToast(MAX_HEIGHT);
         } else if (mapHeight < 11) {
             mapHeight = 11;
-            Toast.makeText(StartSetupActivity.this, MIN_HEIGHT, Toast.LENGTH_SHORT).show();
+            makeToast(MIN_HEIGHT);
         }
 
         if (mapWidth > 41) {
             mapWidth = 41;
-            Toast.makeText(StartSetupActivity.this, MAX_WIDTH, Toast.LENGTH_SHORT).show();
+            makeToast(MAX_WIDTH);
         } else if (mapWidth < 11) {
             mapWidth = 11;
-            Toast.makeText(StartSetupActivity.this, MIN_WIDTH, Toast.LENGTH_SHORT).show();
+            makeToast(MIN_WIDTH);
         }
 
         if (crateSpawnProbability > 100) {
             crateSpawnProbability = 100;
-            Toast.makeText(StartSetupActivity.this, MAX_SPAWN, Toast.LENGTH_SHORT).show();
+            makeToast(MAX_SPAWN);
         }
+    }
+
+    private void makeToast(String str) {
+        Toast.makeText(StartSetupActivity.this, str, Toast.LENGTH_SHORT).show();
     }
 
     protected void getInputs() {
@@ -68,7 +72,7 @@ public abstract class StartSetupActivity extends AppCompatActivity {
 
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
-            Toast.makeText(StartSetupActivity.this, INVALID_HEIGHT, Toast.LENGTH_SHORT).show();
+            makeToast(INVALID_HEIGHT);
 
             mapHeight = 11;
         }
@@ -83,7 +87,7 @@ public abstract class StartSetupActivity extends AppCompatActivity {
 
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
-            Toast.makeText(StartSetupActivity.this, INVALID_WIDTH, Toast.LENGTH_SHORT).show();
+            makeToast(INVALID_WIDTH);
 
             mapWidth = 11;
         }
@@ -98,7 +102,7 @@ public abstract class StartSetupActivity extends AppCompatActivity {
 
         } catch (NumberFormatException ex) {
             ex.printStackTrace();
-            Toast.makeText(StartSetupActivity.this, INVALID_SPAWN, Toast.LENGTH_SHORT).show();
+            makeToast(INVALID_SPAWN);
 
             crateSpawnProbability = 50;
         }
