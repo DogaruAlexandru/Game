@@ -12,11 +12,11 @@
         </deviceKey>
       </Target>
     </targetSelectedWithDropDown>
-    <timeTargetWasSelectedWithDropDown value="2022-05-29T16:29:32.716431500Z" />
+    <timeTargetWasSelectedWithDropDown value="2022-11-18T11:44:56.418201800Z" />
     <multipleDevicesSelectedInDropDown value="true" />
-    <runningDeviceTargetsSelectedWithDialog>
+    <targetsSelectedWithDialog>
       <Target>
-        <type value="RUNNING_DEVICE_TARGET" />
+        <type value="QUICK_BOOT_TARGET" />
         <deviceKey>
           <Key>
             <type value="VIRTUAL_DEVICE_PATH" />
@@ -24,15 +24,6 @@
           </Key>
         </deviceKey>
       </Target>
-      <Target>
-        <type value="RUNNING_DEVICE_TARGET" />
-        <deviceKey>
-          <Key>
-            <type value="SERIAL_NUMBER" />
-            <value value="3401f0f8ac0c4631" />
-          </Key>
-        </deviceKey>
-      </Target>
-    </runningDeviceTargetsSelectedWithDialog>
+    </targetsSelectedWithDialog>
   </component>
 </project>

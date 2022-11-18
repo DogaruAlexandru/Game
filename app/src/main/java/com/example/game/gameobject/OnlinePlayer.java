@@ -19,6 +19,8 @@ public class OnlinePlayer extends OfflinePlayer {
 
     protected final PlayerData playerData;
 
+    private int timeUsingBomb;
+
     public OnlinePlayer(Joystick joystick,
                         com.example.game.gamepanel.Button button,
                         int rowTile,
@@ -47,13 +49,15 @@ public class OnlinePlayer extends OfflinePlayer {
                 livesCount,
                 bundle);
 
+        timeUsingBomb = 0;
+
         playerData = new PlayerData(getRelativePoxX(),
                 getRelativePoxY(),
                 rotationAngle,
                 livesCount,
                 bombRange,
                 bombsNumber,
-                false,
+                0,
                 0,
                 bundle.getString(PLAYER_NAME),
                 PlayerState.State.NOT_MOVING.toString());
@@ -85,7 +89,9 @@ public class OnlinePlayer extends OfflinePlayer {
 
         // Use bomb
         if (button.getIsPressed()) {
-            playerData.bombUsed = useBomb();
+            playerData.bombUsed = useBomb() ? ++timeUsingBomb : 0;
+        } else {
+            playerData.bombUsed = 0;
         }
 
         // Player death handler

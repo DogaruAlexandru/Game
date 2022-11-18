@@ -107,18 +107,19 @@ public class OnlineEnemy {
         return state;
     }
 
-
     public void update() {
         enemyRect.offsetTo((int) (playerData.posX * tilemap.getMapRect().width()),
                 (int) (playerData.posY * tilemap.getMapRect().height()));
         state = PlayerState.State.valueOf(playerData.movingState);
 
-        if (playerData.bombUsed) {
+        if (playerData.bombUsed != 0) {
             int rowIdx = enemyRect.centerY() / enemyRect.width();
             int columnIdx = enemyRect.centerX() / enemyRect.height();
 
-            bombList.add(new Bomb(playerData.bombRange, rowIdx, columnIdx, playerId,
-                    explosionList, tilemap));
+            if (tileIsLayoutType(rowIdx, columnIdx, Tile.LayoutType.WALK)) {
+                bombList.add(new Bomb(playerData.bombRange, rowIdx, columnIdx, playerId,
+                        explosionList, tilemap));
+            }
         }
 
         handleDeath();
