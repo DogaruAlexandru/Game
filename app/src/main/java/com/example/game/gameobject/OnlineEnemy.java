@@ -1,6 +1,5 @@
 package com.example.game.gameobject;
 
-import static com.example.game.game.GameLoop.MAX_UPS;
 import static com.example.game.Utils.spriteSizeOnScreen;
 
 import android.graphics.Canvas;
@@ -19,7 +18,6 @@ import java.util.ArrayList;
 public class OnlineEnemy {
 
     private final Paint INVINCIBILITY_PAINT;
-    private final int INVINCIBILITY_TIME;
     private final ArrayList<Tile.LayoutType> powerUpsLayoutTypes;
     private final Rect enemyRect;
     private ArrayList<Bomb> bombList;
@@ -39,8 +37,6 @@ public class OnlineEnemy {
         enemyRect = new Rect(0, 0, Utils.spriteSizeOnScreen, Utils.spriteSizeOnScreen);
 
         state = PlayerState.State.NOT_MOVING;
-
-        INVINCIBILITY_TIME = (int) MAX_UPS * 2;
 
         INVINCIBILITY_PAINT = new Paint();
         INVINCIBILITY_PAINT.setAlpha(80);
@@ -111,18 +107,19 @@ public class OnlineEnemy {
         return state;
     }
 
-
     public void update() {
         enemyRect.offsetTo((int) (playerData.posX * tilemap.getMapRect().width()),
                 (int) (playerData.posY * tilemap.getMapRect().height()));
         state = PlayerState.State.valueOf(playerData.movingState);
 
-        if (playerData.bombUsed) {
+        if (playerData.bombUsed != 0) {
             int rowIdx = enemyRect.centerY() / enemyRect.width();
             int columnIdx = enemyRect.centerX() / enemyRect.height();
 
-            bombList.add(new Bomb(playerData.bombRange, rowIdx, columnIdx, playerId,
-                    explosionList, tilemap));
+            if (tileIsLayoutType(rowIdx, columnIdx, Tile.LayoutType.WALK)) {
+                bombList.add(new Bomb(playerData.bombRange, rowIdx, columnIdx, playerId,
+                        explosionList, tilemap));
+            }
         }
 
         handleDeath();
@@ -165,8 +162,8 @@ public class OnlineEnemy {
 
     private void handleDeath() {
         if (time == 0) {
-            if (playerData.died) {
-                time = INVINCIBILITY_TIME;
+            if (playerData.died != 0) {
+                time = playerData.died;
                 usedPaint = INVINCIBILITY_PAINT;
             }
         } else {

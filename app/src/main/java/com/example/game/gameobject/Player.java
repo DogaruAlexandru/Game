@@ -183,9 +183,6 @@ public abstract class Player {
     protected boolean useBomb() {
         int rowIdx = Utils.getPlayerRow(this);
         int columnIdx = Utils.getPlayerColumn(this);
-        if (!tileIsLayoutType(rowIdx, columnIdx, Tile.LayoutType.WALK)) {
-            return false;
-        }
 
         int count = 0;
         for (int i = 0; i < bombList.size(); i++) {
@@ -197,7 +194,10 @@ public abstract class Player {
             return false;
         }
 
-        bombList.add(new Bomb(bombRange, rowIdx, columnIdx, playerId, explosionList, tilemap));
+        if (tileIsLayoutType(rowIdx, columnIdx, Tile.LayoutType.WALK)) {
+            bombList.add(new Bomb(bombRange, rowIdx, columnIdx, playerId, explosionList, tilemap));
+        }
+
         return true;
     }
 
