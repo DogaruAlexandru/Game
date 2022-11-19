@@ -5,6 +5,8 @@ import static com.example.game.Utils.ROWS;
 import static com.example.game.Utils.getPlayerColumn;
 import static com.example.game.Utils.getPlayerRow;
 
+import android.content.Context;
+
 import androidx.core.util.Pair;
 
 import com.example.game.graphics.Animator;
@@ -45,7 +47,8 @@ public class OfflineEnemy extends Player {
     private int[][] scores;
     private final Map<String, Pair<Integer, Integer>> enemiesPos;
 
-    public OfflineEnemy(int rowTile,
+    public OfflineEnemy(Context context,
+                        int rowTile,
                         int columnTile,
                         Tilemap tilemap,
                         Animator animator,
@@ -57,7 +60,8 @@ public class OfflineEnemy extends Player {
                         int livesCount,
                         Map<String, Pair<Integer, Integer>> enemiesPos) {
 
-        super(rowTile,
+        super(context,
+                rowTile,
                 columnTile,
                 tilemap,
                 animator,

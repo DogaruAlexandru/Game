@@ -2,6 +2,7 @@ package com.example.game.gameobject;
 
 import static com.example.game.Utils.PLAYER_ID;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import com.example.game.gamepanel.Button;
@@ -16,7 +17,8 @@ public class OfflinePlayer extends Player {
     protected final Joystick joystick;
     protected final Button button;
 
-    public OfflinePlayer(Joystick joystick,
+    public OfflinePlayer(Context context,
+                         Joystick joystick,
                          Button button,
                          int rowTile,
                          int columnTile,
@@ -30,7 +32,8 @@ public class OfflinePlayer extends Player {
                          int livesCount,
                          Bundle bundle) {
 
-        super(rowTile,
+        super(context,
+                rowTile,
                 columnTile,
                 tilemap,
                 animator,

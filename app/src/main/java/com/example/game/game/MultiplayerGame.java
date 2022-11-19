@@ -78,6 +78,7 @@ public class MultiplayerGame extends Game {
         }
 
         player = new OnlinePlayer(
+                context,
                 joystick,
                 button,
                 rowTile,

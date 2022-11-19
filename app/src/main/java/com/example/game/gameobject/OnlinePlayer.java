@@ -4,6 +4,8 @@ import static com.example.game.Utils.CODE;
 import static com.example.game.Utils.PLAYER_NAME;
 import static com.example.game.Utils.spriteSizeOnScreen;
 
+import android.content.Context;
+
 import com.example.game.gamepanel.Joystick;
 import com.example.game.map.Tile;
 import com.example.game.map.Tilemap;
@@ -21,7 +23,8 @@ public class OnlinePlayer extends OfflinePlayer {
 
     private int timeUsingBomb;
 
-    public OnlinePlayer(Joystick joystick,
+    public OnlinePlayer(Context context,
+                        Joystick joystick,
                         com.example.game.gamepanel.Button button,
                         int rowTile,
                         int columnTile,
@@ -35,7 +38,8 @@ public class OnlinePlayer extends OfflinePlayer {
                         int livesCount,
                         android.os.Bundle bundle) {
 
-        super(joystick,
+        super(context,
+                joystick,
                 button,
                 rowTile,
                 columnTile,

@@ -44,6 +44,7 @@ public class SingleplayerGame extends Game {
 
 
         player = new OfflinePlayer(
+                context,
                 joystick,
                 button,
                 PLAYER_ROW,
@@ -106,6 +107,7 @@ public class SingleplayerGame extends Game {
 
     protected void createEnemy(int rowTile, int columnTile, Animator animator, String key) {
         enemies.put(key, new OfflineEnemy(
+                context,
                 rowTile,
                 columnTile,
                 tilemap,

@@ -11,4 +11,5 @@
     <color name="player">#FF0000</color>
     <color name="controller_secondary">#CC808080</color>
     <color name="controller_primary">#CC3333FF</color>
+    <color name="stats_bar_border">#88A0A0A0</color>
 </resources>

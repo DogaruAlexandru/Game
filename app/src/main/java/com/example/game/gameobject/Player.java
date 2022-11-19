@@ -3,11 +3,13 @@ package com.example.game.gameobject;
 import static com.example.game.Utils.spriteSizeOnScreen;
 import static com.example.game.game.GameLoop.MAX_UPS;
 
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
 import com.example.game.Utils;
+import com.example.game.gamepanel.StatsBar;
 import com.example.game.graphics.Animator;
 import com.example.game.map.Tile;
 import com.example.game.map.Tilemap;
@@ -25,6 +27,7 @@ public abstract class Player {
     protected final Paint INVINCIBILITY_PAINT;
 
     protected final Tilemap tilemap;
+    protected final Context context;
     protected String playerId;
 
     protected double velocityX, velocityY;
@@ -48,8 +51,10 @@ public abstract class Player {
     protected int time = 0;
 
     protected final ArrayList<Tile.LayoutType> powerUpsLayoutTypes;
+    private final StatsBar statsBar;
 
-    public Player(int rowTile,
+    public Player(Context context,
+                  int rowTile,
                   int columnTile,
                   Tilemap tilemap,
                   Animator animator,
@@ -59,6 +64,8 @@ public abstract class Player {
                   int bombRange,
                   int bombsNumber,
                   int livesCount) {
+
+        this.context = context;
 
         this.tilemap = tilemap;
         this.bombList = bombList;
@@ -92,6 +99,8 @@ public abstract class Player {
         powerUpsLayoutTypes.add(Tile.LayoutType.BOMB_POWER_UP);
         powerUpsLayoutTypes.add(Tile.LayoutType.RANGE_POWER_UP);
         powerUpsLayoutTypes.add(Tile.LayoutType.SPEED_POWER_UP);
+
+        statsBar = new StatsBar(context, this);
     }
 
     protected void handleDeath() {
@@ -392,6 +401,7 @@ public abstract class Player {
     }
 
     public void draw(Canvas canvas) {
+        statsBar.draw(canvas);
         animator.draw(canvas, this, usedPaint);
     }
 
