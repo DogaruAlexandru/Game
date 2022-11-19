@@ -30,11 +30,11 @@ public class SpriteSheet {
         return getPlayerSpriteArray(1);
     }
 
-    public Sprite[] getGreenPlayerSpriteArray() {
+    public Sprite[] getYellowPlayerSpriteArray() {
         return getPlayerSpriteArray(2);
     }
 
-    public Sprite[] getYellowPlayerSpriteArray() {
+    public Sprite[] getGreenPlayerSpriteArray() {
         return getPlayerSpriteArray(3);
     }
 

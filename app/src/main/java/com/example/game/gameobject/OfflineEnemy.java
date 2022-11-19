@@ -9,6 +9,7 @@ import android.content.Context;
 
 import androidx.core.util.Pair;
 
+import com.example.game.Utils;
 import com.example.game.graphics.Animator;
 import com.example.game.map.BombCountPowerUpTile;
 import com.example.game.map.BombTile;
@@ -109,7 +110,7 @@ public class OfflineEnemy extends Player {
         ArrayList<OriginDirection> path = getPath(endPos);
 
         if (path.size() == 0) {
-            if (isSafeToUse(endPos)) {
+            if (isSafeToUse(endPos) || Utils.generator.nextFloat() < .01) {
                 useBomb();
             }
         } else {
@@ -133,7 +134,10 @@ public class OfflineEnemy extends Player {
                     velocityY = getMaxSpeed();
                     break;
             }
-
+            if (Utils.generator.nextFloat() < .3) {
+                velocityX /= 2;
+                velocityY /= 2;
+            }
         }
     }
 
@@ -302,7 +306,7 @@ public class OfflineEnemy extends Player {
         return null;
     }
 
-    //region update map future explosions
+    //region Update map future explosions
     private Tile[][] findFutureExplosions() {
         Tile[][] map = new Tile[tilemap.getNumberOfRowTiles()][tilemap.getNumberOfColumnTiles()];
         copyOldTilemap(map);

@@ -36,7 +36,7 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
     protected final static int SPEED_UPS = 1;
     protected final static int RANGE_UPS = 3;
-    protected final static int BOMB_UPS = 2;
+    protected final static int BOMB_UPS = 1;
     protected final static int LIVES = 3;
 
     private final static String GAME_CLASS_TAG = "Game.java";
