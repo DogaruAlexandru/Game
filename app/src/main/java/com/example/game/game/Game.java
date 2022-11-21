@@ -31,6 +31,7 @@ import com.example.game.map.Tilemap;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public abstract class Game extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -237,7 +238,27 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
     }
 
     protected void endgameMessage(String msg) {
+        // End message
         handler.post(() -> Toast.makeText(context, msg, Toast.LENGTH_LONG).show());
+
+        // Going back message
+        new Thread(this::returnToMenu).start();
+
+        try {
+            TimeUnit.MILLISECONDS.sleep(9500);
+            gameplayActivity.finish();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void returnToMenu() {
+        for (int i = 3; i > 0; i--) {
+            int finalI = i;
+            handler.post(() -> Toast.makeText(context,
+                    "Game ended - Going to menu in " + finalI + "...",
+                    Toast.LENGTH_SHORT).show());
+        }
     }
 
     protected abstract void handleGameEnded();
