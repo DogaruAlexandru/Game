@@ -33,10 +33,10 @@ public class Utils {
     public final static String ENEMY_COUNT = "enemyCount";
     public final static String WIN_END_MSG = "You Won";
     public final static String TIE_END_MSG = "Tie";
-    public final static String BLUE_MSG = "[blue]";
-    public final static String RED_MSG = "[red]";
-    public final static String GREEN_MSG = "[green]";
-    public final static String YELLOW_MSG = "[yellow]";
+    public final static String BLUE_MSG = "[Blue]";
+    public final static String RED_MSG = "[Red]";
+    public final static String GREEN_MSG = "[Green]";
+    public final static String YELLOW_MSG = "[Yellow]";
     //endregion
 
     public static int screenHeight = 0;

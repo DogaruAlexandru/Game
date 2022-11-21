@@ -31,7 +31,7 @@ public class Tilemap {
         this.numberOfColumnTiles = numberOfColumnTiles;
         tilemapChanged = false;
 
-        spriteSizeOnScreen = Utils.screenHeight / numberOfRowTiles;
+        setSpriteSizeOnScreen();
 
         mapLayout = new MapLayout(numberOfRowTiles, numberOfColumnTiles, crateSpawnProbability);
 
@@ -48,6 +48,13 @@ public class Tilemap {
         Utils.mapOffsetY = mapRect.top;
 
         initializeTilemap();
+    }
+
+    private void setSpriteSizeOnScreen() {
+        int height = Utils.screenHeight / numberOfRowTiles;
+        int width = (int) (Utils.screenWidth * 0.9 / numberOfColumnTiles);
+
+        spriteSizeOnScreen = Math.min(height, width);
     }
 
     private void initializeTilemap() {
