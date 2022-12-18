@@ -43,7 +43,7 @@ public class MapLayout {
             for (int idx2 = 1; idx2 < numberOfColumnTiles - 1; idx2++) {
                 //add obstacles
                 if (idx1 % 2 == 0 && idx2 % 2 == 0) {
-                    layout[idx1][idx2] =WALL_TILE_LAYOUT_ID;
+                    layout[idx1][idx2] = WALL_TILE_LAYOUT_ID;
                 }
                 //add crates
                 else {
