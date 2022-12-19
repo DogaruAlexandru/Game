@@ -93,7 +93,7 @@ public class Tilemap {
     }
 
     public void changeTile(int idxRow, int idxCol, int layoutTypeIdx) {
-        tilemap[idxRow][idxCol] = tilemap[idxRow][idxCol] = Tile.getTile(
+        tilemap[idxRow][idxCol] = Tile.getTile(
                 layoutTypeIdx,
                 spriteSheet,
                 tilemap[idxRow][idxCol].mapLocationRect
