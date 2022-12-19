@@ -85,8 +85,8 @@ public class Tilemap {
 
         Canvas mapCanvas = new Canvas(mapBitmap);
 
-        for (int idx1 = 0; idx1 < numberOfRowTiles; ++idx1) {
-            for (int idx2 = 0; idx2 < numberOfColumnTiles; ++idx2) {
+        for (int idx1 = 0; idx1 < numberOfRowTiles; idx1++) {
+            for (int idx2 = 0; idx2 < numberOfColumnTiles; idx2++) {
                 tilemap[idx1][idx2].draw(mapCanvas);
             }
         }
