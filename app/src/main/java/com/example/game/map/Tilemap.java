@@ -12,7 +12,6 @@ import com.example.game.graphics.SpriteSheet;
 public class Tilemap {
 
     private final SpriteSheet spriteSheet;
-    private final MapLayout mapLayout;
     private final int numberOfRowTiles;
     private final int numberOfColumnTiles;
 
@@ -33,7 +32,7 @@ public class Tilemap {
 
         setSpriteSizeOnScreen();
 
-        mapLayout = new MapLayout(numberOfRowTiles, numberOfColumnTiles, crateSpawnProbability);
+        MapLayout mapLayout = new MapLayout(numberOfRowTiles, numberOfColumnTiles, crateSpawnProbability);
 
         int mapHeightOffset = (spriteSizeOnScreen * numberOfRowTiles) >> 1;
         int mapWidthOffset = (spriteSizeOnScreen * numberOfColumnTiles) >> 1;
@@ -47,7 +46,7 @@ public class Tilemap {
         Utils.mapOffsetX = mapRect.left;
         Utils.mapOffsetY = mapRect.top;
 
-        initializeTilemap();
+        initializeTilemap(mapLayout.getLayout());
     }
 
     private void setSpriteSizeOnScreen() {
@@ -57,8 +56,7 @@ public class Tilemap {
         spriteSizeOnScreen = Math.min(height, width);
     }
 
-    private void initializeTilemap() {
-        int[][] layout = mapLayout.getLayout();
+    private void initializeTilemap(int[][] layout) {
         tilemap = new Tile[numberOfRowTiles][numberOfColumnTiles];
 
         for (int idx1 = 0; idx1 < numberOfRowTiles; ++idx1) {
