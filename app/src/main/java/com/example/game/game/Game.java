@@ -213,6 +213,9 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
     }
 
     public void update() {
+
+        tilemap.update();
+
         List<Bomb> bombRemoveList = new ArrayList<>();
         for (int idx = 0; idx < bombList.size(); idx++) {
             bombList.get(idx).update(bombRemoveList);

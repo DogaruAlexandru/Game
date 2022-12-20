@@ -8,6 +8,7 @@ import com.example.game.graphics.Sprite;
 import com.example.game.graphics.SpriteSheet;
 
 public class ExplosionTile extends Tile {
+
     private final Sprite walkSprite;
     private final Sprite explosionSprite;
     private Explosion explosion;

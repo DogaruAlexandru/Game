@@ -110,11 +110,15 @@ public class Tilemap {
     }
 
     public void draw(Canvas canvas) {
-        if (tilemapChanged) {
-            drawTilemapInBitmap();
-            tilemapChanged = false;
-        }
         canvas.drawBitmap(mapBitmap, null, mapRect, null);
+    }
+
+    public void update() {
+        if (!tilemapChanged) {
+            return;
+        }
+        drawTilemapInBitmap();
+        tilemapChanged = false;
     }
 
     public Tile[][] getTilemap() {
