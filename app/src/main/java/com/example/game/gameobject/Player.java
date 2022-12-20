@@ -94,8 +94,7 @@ public abstract class Player {
         INVINCIBILITY_PAINT = new Paint();
         INVINCIBILITY_PAINT.setAlpha(80);
         usedPaint = null;
-
-
+        
         powerUpsLayoutTypes = new ArrayList<>();
         powerUpsLayoutTypes.add(Tile.LayoutType.BOMB_POWER_UP);
         powerUpsLayoutTypes.add(Tile.LayoutType.RANGE_POWER_UP);
