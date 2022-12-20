@@ -94,7 +94,7 @@ public abstract class Player {
         INVINCIBILITY_PAINT = new Paint();
         INVINCIBILITY_PAINT.setAlpha(80);
         usedPaint = null;
-        
+
         powerUpsLayoutTypes = new ArrayList<>();
         powerUpsLayoutTypes.add(Tile.LayoutType.BOMB_POWER_UP);
         powerUpsLayoutTypes.add(Tile.LayoutType.RANGE_POWER_UP);
@@ -145,22 +145,18 @@ public abstract class Player {
             if (tileIsLayoutType(bottom, left, layoutType)) {
                 usePowerUp(layoutType);
                 tilemap.changeTile(bottom, left, WALK_TILE_LAYOUT_ID);
-                tilemap.setTilemapChanged(true);
 
             } else if (tileIsLayoutType(bottom, right, layoutType)) {
                 usePowerUp(layoutType);
                 tilemap.changeTile(bottom, right, WALK_TILE_LAYOUT_ID);
-                tilemap.setTilemapChanged(true);
 
             } else if (tileIsLayoutType(top, left, layoutType)) {
                 usePowerUp(layoutType);
                 tilemap.changeTile(top, left, WALK_TILE_LAYOUT_ID);
-                tilemap.setTilemapChanged(true);
 
             } else if (tileIsLayoutType(top, right, layoutType)) {
                 usePowerUp(layoutType);
                 tilemap.changeTile(top, right, WALK_TILE_LAYOUT_ID);
-                tilemap.setTilemapChanged(true);
             }
         }
     }

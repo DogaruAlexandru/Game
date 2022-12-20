@@ -34,11 +34,8 @@ public class Bomb {
 
         updatesBeforeExplosion = (int) (MAX_UPS * 2.5);
 
-
         tilemap.changeTile(row, column, BOMB_TILE_LAYOUT_ID);
         ((BombTile) tilemap.getTilemap()[row][column]).setBomb(this);
-
-        tilemap.setTilemapChanged(true);
     }
 
     public Bomb(Bomb bomb) {
@@ -69,8 +66,6 @@ public class Bomb {
         if (!bombRemoveList.contains(this)) {
             bombRemoveList.add(this);
         }
-
-        tilemap.setTilemapChanged(true);
     }
 
     private void explodeLength(List<Bomb> bombRemoveList, int idxRow, int idxColumn) {

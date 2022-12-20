@@ -39,11 +39,9 @@ public class Explosion {
                     tileBehindExplosion = getPowerUpBehindExplosion();
                 }
                 tilemap.changeTile(row, column, EXPLOSION_TILE_LAYOUT_ID);
-                tilemap.setTilemapChanged(true);
                 break;
             default:
                 tilemap.changeTile(row, column, EXPLOSION_TILE_LAYOUT_ID);
-                tilemap.setTilemapChanged(true);
                 break;
         }
 
@@ -62,10 +60,7 @@ public class Explosion {
         updatesBeforeDisappear--;
 
         if (updatesBeforeDisappear == 0) {
-
             tilemap.changeTile(row, column, tileBehindExplosion);
-
-            tilemap.setTilemapChanged(true);
 
             explosionRemoveList.add(this);
         }

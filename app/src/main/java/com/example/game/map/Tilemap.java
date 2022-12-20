@@ -96,6 +96,8 @@ public class Tilemap {
                 spriteSheet,
                 tilemap[idxRow][idxCol].mapLocationRect
         );
+
+        tilemapChanged = true;
     }
 
     private Rect getRectByIndex(int idxRow, int idxCol) {
@@ -129,10 +131,6 @@ public class Tilemap {
 
     public SpriteSheet getSpriteSheet() {
         return spriteSheet;
-    }
-
-    public void setTilemapChanged(boolean tilemapChanged) {
-        this.tilemapChanged = tilemapChanged;
     }
 
     public int getNumberOfRowTiles() {

@@ -107,19 +107,15 @@ public class OnlineEnemy extends Player {
         for (Tile.LayoutType layoutType : powerUpsLayoutTypes) {
             if (tileIsLayoutType(bottom, left, layoutType)) {
                 tilemap.changeTile(bottom, left, walkTileIdx);
-                tilemap.setTilemapChanged(true);
 
             } else if (tileIsLayoutType(bottom, right, layoutType)) {
                 tilemap.changeTile(bottom, right, walkTileIdx);
-                tilemap.setTilemapChanged(true);
 
             } else if (tileIsLayoutType(top, left, layoutType)) {
                 tilemap.changeTile(top, left, walkTileIdx);
-                tilemap.setTilemapChanged(true);
 
             } else if (tileIsLayoutType(top, right, layoutType)) {
                 tilemap.changeTile(top, right, walkTileIdx);
-                tilemap.setTilemapChanged(true);
             }
         }
     }
