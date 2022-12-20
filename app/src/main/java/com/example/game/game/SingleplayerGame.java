@@ -42,7 +42,6 @@ public class SingleplayerGame extends Game {
     public SingleplayerGame(Context context, Bundle bundle, GameplayActivity gameplayActivity) {
         super(context, bundle, gameplayActivity);
 
-
         player = new OfflinePlayer(
                 context,
                 joystick,
@@ -174,6 +173,8 @@ public class SingleplayerGame extends Game {
             }
         }
 
+        tilemap.update();
+
         if (enemies.size() < 2 && player.getLivesCount() < 1)
             return;
 
@@ -190,8 +191,6 @@ public class SingleplayerGame extends Game {
             enemiesPos.remove(enemy.getPlayerId());
             iterator.remove();
         }
-
-        tilemap.update();
     }
 
     @Override
