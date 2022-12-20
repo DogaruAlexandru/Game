@@ -173,8 +173,6 @@ public class SingleplayerGame extends Game {
             }
         }
 
-        tilemap.update();
-
         if (enemies.size() < 2 && player.getLivesCount() < 1)
             return;
 

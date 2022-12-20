@@ -204,8 +204,6 @@ public class MultiplayerGame extends Game {
             reference.removeEventListener(enemy.getListener());
             iterator.remove();
         }
-
-        tilemap.update();
     }
 
     public boolean canLeave() {

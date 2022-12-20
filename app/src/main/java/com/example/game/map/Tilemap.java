@@ -17,8 +17,8 @@ public class Tilemap {
 
     private Tile[][] tilemap;
 
-    private boolean tilemapChanged;
     private Bitmap mapBitmap;
+    private Canvas mapCanvas;
 
     Rect mapRect;
 
@@ -28,7 +28,6 @@ public class Tilemap {
         this.spriteSheet = spriteSheet;
         this.numberOfRowTiles = numberOfRowTiles;
         this.numberOfColumnTiles = numberOfColumnTiles;
-        tilemapChanged = false;
 
         setSpriteSizeOnScreen();
 
@@ -81,7 +80,7 @@ public class Tilemap {
                 config
         );
 
-        Canvas mapCanvas = new Canvas(mapBitmap);
+        mapCanvas = new Canvas(mapBitmap);
 
         for (int idx1 = 0; idx1 < numberOfRowTiles; idx1++) {
             for (int idx2 = 0; idx2 < numberOfColumnTiles; idx2++) {
@@ -97,7 +96,7 @@ public class Tilemap {
                 tilemap[idxRow][idxCol].mapLocationRect
         );
 
-        tilemapChanged = true;
+        tilemap[idxRow][idxCol].draw(mapCanvas);
     }
 
     private Rect getRectByIndex(int idxRow, int idxCol) {
@@ -111,14 +110,6 @@ public class Tilemap {
 
     public void draw(Canvas canvas) {
         canvas.drawBitmap(mapBitmap, null, mapRect, null);
-    }
-
-    public void update() {
-        if (!tilemapChanged) {
-            return;
-        }
-        drawTilemapInBitmap();
-        tilemapChanged = false;
     }
 
     public Tile[][] getTilemap() {
