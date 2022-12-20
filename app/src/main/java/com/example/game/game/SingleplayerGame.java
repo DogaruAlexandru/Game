@@ -190,6 +190,8 @@ public class SingleplayerGame extends Game {
             enemiesPos.remove(enemy.getPlayerId());
             iterator.remove();
         }
+
+        tilemap.update();
     }
 
     @Override

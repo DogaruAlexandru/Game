@@ -232,8 +232,6 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
         if (playerCountChanged) {
             handleGameEnded();
         }
-
-        tilemap.update();
     }
 
     public void pause() {
