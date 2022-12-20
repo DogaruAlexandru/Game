@@ -2,53 +2,45 @@ package com.example.game.gameobject;
 
 import static com.example.game.Utils.spriteSizeOnScreen;
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Rect;
+import android.content.Context;
 
-import com.example.game.Utils;
 import com.example.game.graphics.Animator;
 import com.example.game.map.Tile;
 import com.example.game.map.Tilemap;
 import com.example.game.model.PlayerData;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
+import java.util.List;
 
-public class OnlineEnemy {
+public class OnlineEnemy extends Player {
 
-    private final Paint INVINCIBILITY_PAINT;
-    private final ArrayList<Tile.LayoutType> powerUpsLayoutTypes;
-    private final Rect enemyRect;
-    private ArrayList<Bomb> bombList;
-    private ArrayList<Explosion> explosionList;
-
-    private String playerId;
     private ValueEventListener listener;
     private PlayerData playerData;
-    private Animator animator;
 
-    private Paint usedPaint;
-    private Tilemap tilemap;
-    private int time;
-    private PlayerState.State state;
+    public OnlineEnemy(Context context,
+                       Tilemap tilemap,
+                       Animator animator,
+                       List<Bomb> bombList,
+                       List<Explosion> explosionList,
+                       int speedUps,
+                       int bombRange,
+                       int bombsNumber,
+                       int livesCount) {
 
-    public OnlineEnemy() {
-        enemyRect = new Rect(0, 0, Utils.spriteSizeOnScreen, Utils.spriteSizeOnScreen);
-
-        state = PlayerState.State.NOT_MOVING;
-
-        INVINCIBILITY_PAINT = new Paint();
-        INVINCIBILITY_PAINT.setAlpha(80);
-        usedPaint = null;
+        super(context,
+                0,
+                0,
+                tilemap,
+                animator,
+                bombList,
+                explosionList,
+                speedUps,
+                bombRange,
+                bombsNumber,
+                livesCount);
 
         playerData = new PlayerData();
         playerData.livesCount = 1;
-
-        powerUpsLayoutTypes = new ArrayList<>();
-        powerUpsLayoutTypes.add(Tile.LayoutType.BOMB_POWER_UP);
-        powerUpsLayoutTypes.add(Tile.LayoutType.RANGE_POWER_UP);
-        powerUpsLayoutTypes.add(Tile.LayoutType.SPEED_POWER_UP);
     }
 
     public String getPlayerId() {
@@ -75,46 +67,21 @@ public class OnlineEnemy {
         this.playerData = playerData;
     }
 
-    public void setAnimator(Animator animator) {
-        this.animator = animator;
-    }
-
     public Tilemap getTilemap() {
         return tilemap;
     }
 
-    public void setTilemap(Tilemap tilemap) {
-        this.tilemap = tilemap;
-    }
-
-    public void setBombList(ArrayList<Bomb> bombList) {
-        this.bombList = bombList;
-    }
-
-    public void setExplosionList(ArrayList<Explosion> explosionList) {
-        this.explosionList = explosionList;
-    }
-
-    public void draw(Canvas canvas) {
-        animator.draw(canvas, this, usedPaint);
-    }
-
-    public Rect getEnemyRect() {
-        return enemyRect;
-    }
-
-    public PlayerState.State getState() {
-        return state;
-    }
-
+    @Override
     public void update() {
-        enemyRect.offsetTo((int) (playerData.posX * tilemap.getMapRect().width()),
+        playerRect.offsetTo((int) (playerData.posX * tilemap.getMapRect().width()),
                 (int) (playerData.posY * tilemap.getMapRect().height()));
-        state = PlayerState.State.valueOf(playerData.movingState);
+        playerState.setState(PlayerState.State.valueOf(playerData.movingState));
+        rotationAngle = playerData.rotationData;
+        livesCount = playerData.livesCount;
 
         if (playerData.bombUsed != 0) {
-            int rowIdx = enemyRect.centerY() / enemyRect.width();
-            int columnIdx = enemyRect.centerX() / enemyRect.height();
+            int rowIdx = playerRect.centerY() / playerRect.width();
+            int columnIdx = playerRect.centerX() / playerRect.height();
 
             if (tileIsLayoutType(rowIdx, columnIdx, Tile.LayoutType.WALK)) {
                 bombList.add(new Bomb(playerData.bombRange, rowIdx, columnIdx, playerId,
@@ -127,14 +94,15 @@ public class OnlineEnemy {
         handlePowerUpCollision();
     }
 
+    @Override
     protected void handlePowerUpCollision() {
 
         int walkTileIdx = 1;
         int safe = spriteSizeOnScreen / 6;
-        int bottom = (enemyRect.bottom - 1 - safe) / spriteSizeOnScreen;
-        int left = (enemyRect.left + safe) / spriteSizeOnScreen;
-        int right = (enemyRect.right - 1 - safe) / spriteSizeOnScreen;
-        int top = (enemyRect.top + safe) / spriteSizeOnScreen;
+        int bottom = (playerRect.bottom - 1 - safe) / spriteSizeOnScreen;
+        int left = (playerRect.left + safe) / spriteSizeOnScreen;
+        int right = (playerRect.right - 1 - safe) / spriteSizeOnScreen;
+        int top = (playerRect.top + safe) / spriteSizeOnScreen;
 
         for (Tile.LayoutType layoutType : powerUpsLayoutTypes) {
             if (tileIsLayoutType(bottom, left, layoutType)) {
@@ -156,11 +124,8 @@ public class OnlineEnemy {
         }
     }
 
-    protected boolean tileIsLayoutType(int row, int column, Tile.LayoutType layoutType) {
-        return tilemap.getTilemap()[row][column].getLayoutType() == layoutType;
-    }
-
-    private void handleDeath() {
+    @Override
+    protected void handleDeath() {
         if (time == 0) {
             if (playerData.died != 0) {
                 time = playerData.died;

@@ -19,6 +19,10 @@ public class PlayerState {
         return state;
     }
 
+    public void setState(State state) {
+        this.state = state;
+    }
+
     public void update() {
         switch (state) {
             case NOT_MOVING:

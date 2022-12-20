@@ -7,7 +7,6 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 
 import com.example.game.Utils;
-import com.example.game.gameobject.OnlineEnemy;
 import com.example.game.gameobject.Player;
 
 public class Animator {
@@ -45,35 +44,6 @@ public class Animator {
                 }
                 playerSpriteArray[idxMovingFrame].draw(canvas, drawnRect,
                         player.getRotationAngle(), paint);
-                break;
-            default:
-                break;
-        }
-    }
-
-    public void draw(Canvas canvas, OnlineEnemy enemy, Paint paint) {
-        int idxNotMovingFrame = 0;
-        Rect drawnRect = new Rect(enemy.getEnemyRect());
-        drawnRect.offset(Utils.mapOffsetX, Utils.mapOffsetY);
-
-        switch (enemy.getState()) {
-            case NOT_MOVING:
-                playerSpriteArray[idxNotMovingFrame].draw(canvas, drawnRect,
-                        enemy.getPlayerData().rotationData, paint);
-                break;
-            case STARTED_MOVING:
-                updatesBeforeNextMoveFrame = MAX_UPDATES_BEFORE_NEXT_MOVE_FRAME;
-                playerSpriteArray[idxMovingFrame].draw(canvas, drawnRect,
-                        enemy.getPlayerData().rotationData, paint);
-                break;
-            case IS_MOVING:
-                updatesBeforeNextMoveFrame--;
-                if (updatesBeforeNextMoveFrame == 0) {
-                    updatesBeforeNextMoveFrame = MAX_UPDATES_BEFORE_NEXT_MOVE_FRAME;
-                    toggleIdxMovingFrame();
-                }
-                playerSpriteArray[idxMovingFrame].draw(canvas, drawnRect,
-                        enemy.getPlayerData().rotationData, paint);
                 break;
             default:
                 break;

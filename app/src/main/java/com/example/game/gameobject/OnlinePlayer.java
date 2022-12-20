@@ -6,7 +6,9 @@ import static com.example.game.Utils.spriteSizeOnScreen;
 
 import android.content.Context;
 
+import com.example.game.gamepanel.Button;
 import com.example.game.gamepanel.Joystick;
+import com.example.game.graphics.Animator;
 import com.example.game.map.Tile;
 import com.example.game.map.Tilemap;
 import com.example.game.model.PlayerData;
@@ -25,11 +27,11 @@ public class OnlinePlayer extends OfflinePlayer {
 
     public OnlinePlayer(Context context,
                         Joystick joystick,
-                        com.example.game.gamepanel.Button button,
+                        Button button,
                         int rowTile,
                         int columnTile,
                         Tilemap tilemap,
-                        com.example.game.graphics.Animator animator,
+                        Animator animator,
                         List<Bomb> bombList,
                         List<Explosion> explosionList,
                         int speedUps,

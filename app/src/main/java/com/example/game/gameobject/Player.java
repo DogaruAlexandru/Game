@@ -51,7 +51,7 @@ public abstract class Player {
     protected int time = 0;
 
     protected final ArrayList<Tile.LayoutType> powerUpsLayoutTypes;
-    private final StatsBar statsBar;
+    protected final StatsBar statsBar;
 
     public Player(Context context,
                   int rowTile,
@@ -94,6 +94,7 @@ public abstract class Player {
         INVINCIBILITY_PAINT = new Paint();
         INVINCIBILITY_PAINT.setAlpha(80);
         usedPaint = null;
+
 
         powerUpsLayoutTypes = new ArrayList<>();
         powerUpsLayoutTypes.add(Tile.LayoutType.BOMB_POWER_UP);

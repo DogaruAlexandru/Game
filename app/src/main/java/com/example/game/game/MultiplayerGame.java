@@ -128,26 +128,34 @@ public class MultiplayerGame extends Game {
     }
 
     private void createEnemy(String id) {
-        OnlineEnemy enemy = new OnlineEnemy();
-        enemy.setPlayerId(id);
-        enemy.setTilemap(tilemap);
+        Animator animator = null;
         switch (Players.valueOf(id)) {
             case PLAYER1:
-                enemy.setAnimator(new Animator(spriteSheet.getBluePlayerSpriteArray()));
+                animator = new Animator(spriteSheet.getBluePlayerSpriteArray());
                 break;
             case PLAYER2:
-                enemy.setAnimator(new Animator(spriteSheet.getRedPlayerSpriteArray()));
+                animator = new Animator(spriteSheet.getRedPlayerSpriteArray());
                 break;
             case PLAYER3:
-                enemy.setAnimator(new Animator(spriteSheet.getGreenPlayerSpriteArray()));
+                animator = new Animator(spriteSheet.getGreenPlayerSpriteArray());
                 break;
             case PLAYER4:
-                enemy.setAnimator(new Animator(spriteSheet.getYellowPlayerSpriteArray()));
+                animator = new Animator(spriteSheet.getYellowPlayerSpriteArray());
                 break;
         }
+        OnlineEnemy enemy = new OnlineEnemy(
+                context,
+                tilemap,
+                animator,
+                bombList,
+                explosionList,
+                SPEED_UPS,
+                RANGE_UPS,
+                BOMB_UPS,
+                LIVES);
+        enemy.setPlayerId(id);
+
         createListener(enemy);
-        enemy.setBombList(bombList);
-        enemy.setExplosionList(explosionList);
         enemies.add(enemy);
     }
 
@@ -207,13 +215,17 @@ public class MultiplayerGame extends Game {
     public void handleGameEnded() {
         if (((OnlinePlayer) player).getPlayerData().livesCount > 0) {
             if (enemies.isEmpty()) {
+                deleteServer = true;
                 endgameMessage(WIN_END_MSG);
+                removeServer();
             }
         } else {
             switch (enemies.size()) {
                 case 0:
+                    deleteServer = true;
                     endgameMessage(TIE_END_MSG);
                     removeListeners();
+                    removeServer();
                     break;
                 case 1:
                     String color;
@@ -237,6 +249,7 @@ public class MultiplayerGame extends Game {
                     }
                     endgameMessage(enemies.get(0).getPlayerData().playerName + " " + color + " Won");
                     removeListeners();
+                    removeServer();
                     break;
                 default:
                     break;
