@@ -12,6 +12,8 @@ public class Explosion {
 
     private static final int EXPLOSION_TILE_LAYOUT_ID = 5;
 
+    public static final int EXPLOSION_DURATION = (int) (MAX_UPS * 0.8);
+
     private final int row;
     private final int column;
     private int updatesBeforeDisappear;
@@ -26,7 +28,7 @@ public class Explosion {
 
         tileBehindExplosion = 1;
 
-        updatesBeforeDisappear = (int) (MAX_UPS * 0.8);
+        updatesBeforeDisappear = EXPLOSION_DURATION;
 
         switch (tilemap.getTilemap()[row][column].getLayoutType()) {
             case EXPLOSION:
@@ -64,5 +66,9 @@ public class Explosion {
 
             explosionRemoveList.add(this);
         }
+    }
+
+    public void setUpdatesBeforeDisappear(int updatesBeforeDisappear) {
+        this.updatesBeforeDisappear = updatesBeforeDisappear;
     }
 }

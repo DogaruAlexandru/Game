@@ -5,6 +5,7 @@ import static com.example.game.Utils.ROWS;
 import static com.example.game.game.GameLoop.MAX_UPS;
 
 import com.example.game.map.BombTile;
+import com.example.game.map.ExplosionTile;
 import com.example.game.map.Tilemap;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 public class Bomb {
 
     private static final int BOMB_TILE_LAYOUT_ID = 4;
+    private static final int BOMB_DURATION = (int) (MAX_UPS * 2.5);
 
     private final String playerId;
     private final int range;
@@ -32,7 +34,7 @@ public class Bomb {
         this.tilemap = tilemap;
         this.playerId = playerId;
 
-        updatesBeforeExplosion = (int) (MAX_UPS * 2.5);
+        updatesBeforeExplosion = BOMB_DURATION;
 
         tilemap.changeTile(row, column, BOMB_TILE_LAYOUT_ID);
         ((BombTile) tilemap.getTilemap()[row][column]).setBomb(this);
@@ -76,6 +78,8 @@ public class Bomb {
                             .getBomb().triggerExplosion(bombRemoveList);
                     break;
                 case EXPLOSION:
+                    ((ExplosionTile) tilemap.getTilemap()[row + idxRow * idx][column + idxColumn * idx])
+                            .getExplosion().setUpdatesBeforeDisappear(Explosion.EXPLOSION_DURATION);
                     break;
                 case CRATE:
                     explosionList.add(new Explosion(row + idxRow * idx,
