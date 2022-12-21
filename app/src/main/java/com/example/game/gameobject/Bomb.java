@@ -51,12 +51,12 @@ public class Bomb {
     public void update(List<Bomb> bombRemoveList) {
         updatesBeforeExplosion--;
 
-        if (updatesBeforeExplosion == 0) {
+        if (updatesBeforeExplosion < 1) {
             triggerExplosion(bombRemoveList);
         }
     }
 
-    public void triggerExplosion(List<Bomb> bombRemoveList) {
+    private void triggerExplosion(List<Bomb> bombRemoveList) {
         explosionList.add(new Explosion(row, column, explosionList, tilemap));
 
         for (int i = 0; i < 4; i++) {
