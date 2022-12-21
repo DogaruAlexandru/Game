@@ -213,6 +213,9 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
     }
 
     public void update() {
+        if (playerCountChanged) {
+            handleGameEnded();
+        }
 
         List<Bomb> bombRemoveList = new ArrayList<>();
         for (int idx = 0; idx < bombList.size(); idx++) {
@@ -228,10 +231,6 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
         joystick.update();
         button.update();
-
-        if (playerCountChanged) {
-            handleGameEnded();
-        }
     }
 
     public void pause() {
