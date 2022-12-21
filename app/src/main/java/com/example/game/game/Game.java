@@ -228,10 +228,6 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
         joystick.update();
         button.update();
-
-        if (playerCountChanged) {
-            handleGameEnded();
-        }
     }
 
     public void pause() {
