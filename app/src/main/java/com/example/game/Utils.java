@@ -1,7 +1,7 @@
 package com.example.game;
 
 import com.example.game.game.GameLoop;
-import com.example.game.gameobject.Player;
+import com.example.game.gameobject.player.Player;
 
 import java.util.Random;
 

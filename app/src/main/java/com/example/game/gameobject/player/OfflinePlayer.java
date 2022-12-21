@@ -1,10 +1,12 @@
-package com.example.game.gameobject;
+package com.example.game.gameobject.player;
 
 import static com.example.game.Utils.PLAYER_ID;
 
 import android.content.Context;
 import android.os.Bundle;
 
+import com.example.game.gameobject.Bomb;
+import com.example.game.gameobject.Explosion;
 import com.example.game.gamepanel.Button;
 import com.example.game.gamepanel.Joystick;
 import com.example.game.graphics.Animator;

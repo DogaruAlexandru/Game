@@ -1,9 +1,13 @@
-package com.example.game.gameobject;
+package com.example.game.gameobject.enemy;
 
 import static com.example.game.Utils.spriteSizeOnScreen;
 
 import android.content.Context;
 
+import com.example.game.gameobject.Bomb;
+import com.example.game.gameobject.Explosion;
+import com.example.game.gameobject.player.Player;
+import com.example.game.gameobject.player.PlayerState;
 import com.example.game.graphics.Animator;
 import com.example.game.map.Tile;
 import com.example.game.map.Tilemap;

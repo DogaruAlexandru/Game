@@ -7,7 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 
 import com.example.game.Utils;
-import com.example.game.gameobject.Player;
+import com.example.game.gameobject.player.Player;
 
 public class Animator {
     private final int MAX_UPDATES_BEFORE_NEXT_MOVE_FRAME = (int) (MAX_UPS * 0.1);

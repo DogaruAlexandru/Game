@@ -1,4 +1,4 @@
-package com.example.game.gameobject;
+package com.example.game.gameobject.player;
 
 import static com.example.game.Utils.CODE;
 import static com.example.game.Utils.PLAYER_NAME;
@@ -6,6 +6,8 @@ import static com.example.game.Utils.spriteSizeOnScreen;
 
 import android.content.Context;
 
+import com.example.game.gameobject.Bomb;
+import com.example.game.gameobject.Explosion;
 import com.example.game.gamepanel.Button;
 import com.example.game.gamepanel.Joystick;
 import com.example.game.graphics.Animator;

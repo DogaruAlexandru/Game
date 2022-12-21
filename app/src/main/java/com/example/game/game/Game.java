@@ -21,7 +21,7 @@ import com.example.game.Utils;
 import com.example.game.activity.GameplayActivity;
 import com.example.game.gameobject.Bomb;
 import com.example.game.gameobject.Explosion;
-import com.example.game.gameobject.Player;
+import com.example.game.gameobject.player.Player;
 import com.example.game.gamepanel.Background;
 import com.example.game.gamepanel.Button;
 import com.example.game.gamepanel.Joystick;

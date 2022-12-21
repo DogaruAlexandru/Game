@@ -1,6 +1,6 @@
 package com.example.game.model;
 
-import com.example.game.gameobject.PlayerState;
+import com.example.game.gameobject.player.PlayerState;
 import com.google.firebase.database.IgnoreExtraProperties;
 
 @IgnoreExtraProperties

@@ -12,7 +12,7 @@ import androidx.core.content.ContextCompat;
 
 import com.example.game.R;
 import com.example.game.Utils;
-import com.example.game.gameobject.Player;
+import com.example.game.gameobject.player.Player;
 
 public class StatsBar {
     public static final int HEART_WIDTH_PIXELS = 512;

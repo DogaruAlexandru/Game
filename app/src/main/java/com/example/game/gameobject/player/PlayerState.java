@@ -1,4 +1,4 @@
-package com.example.game.gameobject;
+package com.example.game.gameobject.player;
 
 public class PlayerState {
     public enum State {

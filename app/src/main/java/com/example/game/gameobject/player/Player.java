@@ -1,4 +1,4 @@
-package com.example.game.gameobject;
+package com.example.game.gameobject.player;
 
 import static com.example.game.Utils.spriteSizeOnScreen;
 import static com.example.game.game.GameLoop.MAX_UPS;
@@ -9,6 +9,8 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 
 import com.example.game.Utils;
+import com.example.game.gameobject.Bomb;
+import com.example.game.gameobject.Explosion;
 import com.example.game.gamepanel.StatsBar;
 import com.example.game.graphics.Animator;
 import com.example.game.map.Tile;
