@@ -189,10 +189,6 @@ public class SingleplayerGame extends Game {
             enemiesPos.remove(enemy.getPlayerId());
             iterator.remove();
         }
-
-        if (playerCountChanged) {
-            handleGameEnded();
-        }
     }
 
     @Override

@@ -204,10 +204,6 @@ public class MultiplayerGame extends Game {
             reference.removeEventListener(enemy.getListener());
             iterator.remove();
         }
-
-        if (playerCountChanged) {
-            handleGameEnded();
-        }
     }
 
     public boolean canLeave() {
