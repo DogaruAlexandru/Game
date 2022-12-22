@@ -4,6 +4,8 @@ import static com.example.game.game.GameLoop.MAX_UPS;
 
 import com.example.game.Utils;
 import com.example.game.map.ExplosionTile;
+import com.example.game.map.MapLayout;
+import com.example.game.map.Tile;
 import com.example.game.map.Tilemap;
 
 import java.util.List;
@@ -26,26 +28,16 @@ public class Explosion {
         this.column = column;
         this.tilemap = tilemap;
 
-        tileBehindExplosion = 1;
+        tileBehindExplosion = MapLayout.WALK_TILE_LAYOUT_ID;
 
         updatesBeforeDisappear = EXPLOSION_DURATION;
 
-        switch (tilemap.getTilemap()[row][column].getLayoutType()) {
-            case EXPLOSION:
-                Explosion explosion = ((ExplosionTile) tilemap.getTilemap()[row][column]).getExplosion();
-                tileBehindExplosion = explosion.getTileBehindExplosion();
-                explosionList.remove(explosion);
-                break;
-            case CRATE:
-                if (Utils.generator.nextFloat() < .3) {
-                    tileBehindExplosion = getPowerUpBehindExplosion();
-                }
-                tilemap.changeTile(row, column, EXPLOSION_TILE_LAYOUT_ID);
-                break;
-            default:
-                tilemap.changeTile(row, column, EXPLOSION_TILE_LAYOUT_ID);
-                break;
+        if (tilemap.getTilemap()[row][column].getLayoutType() == Tile.LayoutType.CRATE) {
+            if (Utils.generator.nextFloat() < .3) {
+                tileBehindExplosion = getPowerUpBehindExplosion();
+            }
         }
+        tilemap.changeTile(row, column, EXPLOSION_TILE_LAYOUT_ID);
 
         ((ExplosionTile) tilemap.getTilemap()[row][column]).setExplosion(this);
     }
@@ -54,14 +46,10 @@ public class Explosion {
         return Utils.generator.nextInt(90) % 3 + 6;
     }
 
-    public int getTileBehindExplosion() {
-        return tileBehindExplosion;
-    }
-
     public void update(List<Explosion> explosionRemoveList) {
         updatesBeforeDisappear--;
 
-        if (updatesBeforeDisappear == 0) {
+        if (updatesBeforeDisappear < 1) {
             tilemap.changeTile(row, column, tileBehindExplosion);
 
             explosionRemoveList.add(this);

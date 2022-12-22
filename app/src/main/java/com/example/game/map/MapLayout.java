@@ -4,9 +4,9 @@ import com.example.game.Utils;
 
 public class MapLayout {
 
-    static final int WALK_TILE_LAYOUT_ID = 1;
-    static final int CRATE_TILE_LAYOUT_ID = 3;
-    static final int WALL_TILE_LAYOUT_ID = 2;
+    public static final int WALK_TILE_LAYOUT_ID = 1;
+    public static final int CRATE_TILE_LAYOUT_ID = 3;
+    public static final int WALL_TILE_LAYOUT_ID = 2;
 
     private final float crateSpawnProbability;
     private final int numberOfRowTiles;
