@@ -67,7 +67,6 @@ public class OfflinePlayer extends Player {
             movePlayer();
 
             getOrientation();
-
             // Update player orientation
             rotationAngle = getAngle();
         }
@@ -91,18 +90,14 @@ public class OfflinePlayer extends Player {
         double actuatorX = joystick.getActuatorX();
         double actuatorY = joystick.getActuatorY();
 
+        velocityX = 0;
+        velocityY = 0;
+
         // Select direction by actuator value
         if (Math.abs(actuatorX) > Math.abs(actuatorY)) {
             velocityX = actuatorX * getMaxSpeed();
-            velocityY = 0;
-            return;
-        }
-        if (Math.abs(actuatorX) < Math.abs(actuatorY)) {
+        } else {
             velocityY = actuatorY * getMaxSpeed();
-            velocityX = 0;
-            return;
         }
-        velocityX = 0;
-        velocityY = 0;
     }
 }
