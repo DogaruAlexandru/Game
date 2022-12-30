@@ -18,17 +18,14 @@ public class Button {
     private Paint usedPaint;
 
     private final int circleRadius;
-    private final int circleCenterPositionX;
-    private final int circleCenterPositionY;
+    private final int circleCenterPosX;
+    private final int circleCenterPosY;
 
     public Button(Context context, int centerPositionX, int centerPositionY, int circleRadius) {
-        circleCenterPositionX = centerPositionX;
-        circleCenterPositionY = centerPositionY;
+        circleCenterPosX = centerPositionX;
+        circleCenterPosY = centerPositionY;
 
         this.circleRadius = circleRadius;
-
-        Paint bombPaint = new Paint();
-        bombPaint.setAlpha(150);
 
         circlePaint = new Paint();
         circlePaint.setColor(ContextCompat.getColor(context, R.color.controller_primary));
@@ -46,16 +43,12 @@ public class Button {
     }
 
     private void updateColor() {
-        if (isPressed) {
-            usedPaint = pressedCirclePaint;
-        } else {
-            usedPaint = circlePaint;
-        }
+        usedPaint = isPressed ? pressedCirclePaint : circlePaint;
     }
 
     public boolean isPressed(double touchPositionX, double touchPositionY) {
         double buttonCenterToTouchDistance = getDistanceBetweenPoints(
-                circleCenterPositionX, circleCenterPositionY, touchPositionX, touchPositionY);
+                circleCenterPosX, circleCenterPosY, touchPositionX, touchPositionY);
 
         return buttonCenterToTouchDistance < circleRadius;
     }
@@ -70,8 +63,8 @@ public class Button {
 
     public void draw(Canvas canvas) {
         canvas.drawCircle(
-                circleCenterPositionX,
-                circleCenterPositionY,
+                circleCenterPosX,
+                circleCenterPosY,
                 circleRadius,
                 usedPaint);
     }
