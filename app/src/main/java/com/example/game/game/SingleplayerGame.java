@@ -20,7 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
 
 import com.example.game.activity.GameplayActivity;
-import com.example.game.gameobject.enemy.OfflineEnemy;
+import com.example.game.gameobject.player.enemy.OfflineEnemy;
 import com.example.game.gameobject.player.OfflinePlayer;
 import com.example.game.gameobject.player.Player;
 import com.example.game.graphics.Animator;

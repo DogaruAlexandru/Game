@@ -21,7 +21,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.example.game.activity.GameplayActivity;
-import com.example.game.gameobject.enemy.OnlineEnemy;
+import com.example.game.gameobject.player.enemy.OnlineEnemy;
 import com.example.game.gameobject.player.OnlinePlayer;
 import com.example.game.graphics.Animator;
 import com.example.game.model.PlayerData;

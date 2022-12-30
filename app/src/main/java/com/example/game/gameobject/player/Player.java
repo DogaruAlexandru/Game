@@ -336,23 +336,23 @@ public abstract class Player {
             if (bottomCollision) {
                 // Both the top and bottom of the player's Rect are colliding with the given Rect
                 // Calculate the minimum distance needed to avoid the collision
-                int aux = (spriteSizeOnScreen - playerRect.right % spriteSizeOnScreen) %
+                int minVelocity = (spriteSizeOnScreen - playerRect.right % spriteSizeOnScreen) %
                         spriteSizeOnScreen;
-                velocityX = Math.min(aux, velocityX);
+                velocityX = Math.min(minVelocity, velocityX);
             } else {
                 // Only the top of the player's Rect is colliding with the given Rect
                 velocityY = velocityX * SPEED_MINIMIZING;
                 velocityX = 0;
-                int aux = (spriteSizeOnScreen - playerRect.bottom % spriteSizeOnScreen) %
+                int minVelocity = (spriteSizeOnScreen - playerRect.bottom % spriteSizeOnScreen) %
                         spriteSizeOnScreen;
-                velocityY = Math.min(aux, velocityY);
+                velocityY = Math.min(minVelocity, velocityY);
             }
         } else if (bottomCollision) {
             // Only the bottom of the player's Rect is colliding with the given Rect
             velocityY = -velocityX * SPEED_MINIMIZING;
             velocityX = 0;
-            int aux = -playerRect.top % spriteSizeOnScreen;
-            velocityY = Math.max(aux, velocityY);
+            int minVelocity = -playerRect.top % spriteSizeOnScreen;
+            velocityY = Math.max(minVelocity, velocityY);
         }
     }
 
@@ -370,21 +370,21 @@ public abstract class Player {
             if (bottomCollision) {
                 // Both the top and bottom of the player's Rect are colliding with the given Rect
                 // Calculate the minimum distance needed to avoid the collision
-                int aux = -playerRect.left % spriteSizeOnScreen;
-                velocityX = Math.max(aux, velocityX);
+                int minVelocity = -playerRect.left % spriteSizeOnScreen;
+                velocityX = Math.max(minVelocity, velocityX);
             } else {
                 // Only the top of the player's Rect is colliding with the given Rect
                 velocityY = -velocityX * SPEED_MINIMIZING;
                 velocityX = 0;
-                int aux = spriteSizeOnScreen - playerRect.top % spriteSizeOnScreen;
-                velocityY = Math.min(aux, velocityY);
+                int minVelocity = spriteSizeOnScreen - playerRect.top % spriteSizeOnScreen;
+                velocityY = Math.min(minVelocity, velocityY);
             }
         } else if (bottomCollision) {
             // Only the bottom of the player's Rect is colliding with the given Rect
             velocityY = velocityX * SPEED_MINIMIZING;
             velocityX = 0;
-            int aux = -playerRect.bottom % spriteSizeOnScreen;
-            velocityY = Math.max(aux, velocityY);
+            int minVelocity = -playerRect.bottom % spriteSizeOnScreen;
+            velocityY = Math.max(minVelocity, velocityY);
         }
     }
 

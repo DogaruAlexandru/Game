@@ -1,4 +1,4 @@
-package com.example.game.gameobject.enemy;
+package com.example.game.gameobject.player.enemy;
 
 import static com.example.game.Utils.spriteSizeOnScreen;
 
