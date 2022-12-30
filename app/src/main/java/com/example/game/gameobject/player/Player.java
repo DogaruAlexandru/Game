@@ -13,6 +13,7 @@ import com.example.game.gameobject.Bomb;
 import com.example.game.gameobject.Explosion;
 import com.example.game.gamepanel.StatsBar;
 import com.example.game.graphics.Animator;
+import com.example.game.map.MapLayout;
 import com.example.game.map.Tile;
 import com.example.game.map.Tilemap;
 
@@ -21,13 +22,11 @@ import java.util.List;
 
 public abstract class Player {
 
-    static final int WALK_TILE_LAYOUT_ID = 1;
+    protected static final float INCREASE_IN_SPEED_BY_POWER_UP = .3f;
+    protected static final float SPEED_MINIMIZING = .8f;
+    protected static final int INVINCIBILITY_TIME = (int) MAX_UPS * 2;
 
-    protected final float INCREASE_IN_SPEED_BY_POWER_UP = .3f;
-    protected final float SPEED_MINIMIZING = .8f;
-    protected final int INVINCIBILITY_TIME = (int) MAX_UPS * 2;
-    protected final Paint INVINCIBILITY_PAINT;
-
+    protected final Paint invincibilityPaint;
     protected final Tilemap tilemap;
     protected final Context context;
     protected String playerId;
@@ -54,6 +53,9 @@ public abstract class Player {
 
     protected final ArrayList<Tile.LayoutType> powerUpsLayoutTypes;
     protected final StatsBar statsBar;
+    protected final int safe;
+
+    protected int bottom, left, right, top;
 
     public Player(Context context,
                   int rowTile,
@@ -93,8 +95,10 @@ public abstract class Player {
         directionX = 0.0;
         directionY = 1.0;
 
-        INVINCIBILITY_PAINT = new Paint();
-        INVINCIBILITY_PAINT.setAlpha(80);
+        safe = spriteSizeOnScreen / 6;
+
+        invincibilityPaint = new Paint();
+        invincibilityPaint.setAlpha(80);
         usedPaint = null;
 
         powerUpsLayoutTypes = new ArrayList<>();
@@ -105,60 +109,54 @@ public abstract class Player {
         statsBar = new StatsBar(context, this);
     }
 
-    protected void handleDeath() {
-        if (time == 0) {
-            int safe = spriteSizeOnScreen / 6;
-            int bottom = (playerRect.bottom - 1 - safe) / spriteSizeOnScreen;
-            int left = (playerRect.left + safe) / spriteSizeOnScreen;
-            int right = (playerRect.right - 1 - safe) / spriteSizeOnScreen;
-            int top = (playerRect.top + safe) / spriteSizeOnScreen;
+    protected void initRectInTiles() {
+        bottom = (playerRect.bottom - 1 - safe) / spriteSizeOnScreen;
+        left = (playerRect.left + safe) / spriteSizeOnScreen;
+        right = (playerRect.right - 1 - safe) / spriteSizeOnScreen;
+        top = (playerRect.top + safe) / spriteSizeOnScreen;
+    }
 
+    protected void handleDeath() {
+        if (time < 1) {
             if (tileIsLayoutType(bottom, left, Tile.LayoutType.EXPLOSION) ||
                     tileIsLayoutType(bottom, right, Tile.LayoutType.EXPLOSION) ||
                     tileIsLayoutType(top, left, Tile.LayoutType.EXPLOSION) ||
                     tileIsLayoutType(top, right, Tile.LayoutType.EXPLOSION)) {
                 livesCount--;
                 time = INVINCIBILITY_TIME;
-                usedPaint = INVINCIBILITY_PAINT;
+                usedPaint = invincibilityPaint;
             }
-        } else {
-            time--;
-            int aux = time % 4;
-            switch (aux) {
-                case 0:
-                    usedPaint = null;
-                    break;
-                case 2:
-                    usedPaint = INVINCIBILITY_PAINT;
-                    break;
-            }
+            return;
+        }
+        time--;
+        int aux = time % 4;
+        switch (aux) {
+            case 0:
+                usedPaint = null;
+                break;
+            case 2:
+                usedPaint = invincibilityPaint;
+                break;
         }
     }
 
     protected void handlePowerUpCollision() {
-
-        int safe = spriteSizeOnScreen / 6;
-        int bottom = (playerRect.bottom - 1 - safe) / spriteSizeOnScreen;
-        int left = (playerRect.left + safe) / spriteSizeOnScreen;
-        int right = (playerRect.right - 1 - safe) / spriteSizeOnScreen;
-        int top = (playerRect.top + safe) / spriteSizeOnScreen;
-
         for (Tile.LayoutType layoutType : powerUpsLayoutTypes) {
             if (tileIsLayoutType(bottom, left, layoutType)) {
                 usePowerUp(layoutType);
-                tilemap.changeTile(bottom, left, WALK_TILE_LAYOUT_ID);
+                tilemap.changeTile(bottom, left, MapLayout.WALK_TILE_LAYOUT_ID);
 
             } else if (tileIsLayoutType(bottom, right, layoutType)) {
                 usePowerUp(layoutType);
-                tilemap.changeTile(bottom, right, WALK_TILE_LAYOUT_ID);
+                tilemap.changeTile(bottom, right, MapLayout.WALK_TILE_LAYOUT_ID);
 
             } else if (tileIsLayoutType(top, left, layoutType)) {
                 usePowerUp(layoutType);
-                tilemap.changeTile(top, left, WALK_TILE_LAYOUT_ID);
+                tilemap.changeTile(top, left, MapLayout.WALK_TILE_LAYOUT_ID);
 
             } else if (tileIsLayoutType(top, right, layoutType)) {
                 usePowerUp(layoutType);
-                tilemap.changeTile(top, right, WALK_TILE_LAYOUT_ID);
+                tilemap.changeTile(top, right, MapLayout.WALK_TILE_LAYOUT_ID);
             }
         }
     }
@@ -188,9 +186,6 @@ public abstract class Player {
     }
 
     protected boolean useBomb() {
-        int rowIdx = Utils.getPlayerRow(this);
-        int columnIdx = Utils.getPlayerColumn(this);
-
         int count = 0;
         for (int i = 0; i < bombList.size(); i++) {
             if (bombList.get(i).getPlayerId().equals(playerId)) {
@@ -201,6 +196,9 @@ public abstract class Player {
             return false;
         }
 
+        int rowIdx = Utils.getPlayerRow(this);
+        int columnIdx = Utils.getPlayerColumn(this);
+
         if (tileIsLayoutType(rowIdx, columnIdx, Tile.LayoutType.WALK)) {
             bombList.add(new Bomb(bombRange, rowIdx, columnIdx, playerId, explosionList, tilemap));
         }
@@ -209,15 +207,13 @@ public abstract class Player {
     }
 
     protected void getOrientation() {
-        // Update direction
-        // Normalize velocity to get direction (unit vector of velocity)
         double distance = Utils.getDistanceBetweenPoints(0, 0, velocityX, velocityY);
         directionX = velocityX / distance;
         directionY = velocityY / distance;
     }
 
     protected int getAngle() {
-        return (int) ((Math.atan2(directionY, directionX) * 180) / Math.PI) - 90;
+        return (int) Math.toDegrees(Math.atan2(directionY, directionX)) - 90;
     }
 
     protected void movePlayer() {
@@ -259,110 +255,136 @@ public abstract class Player {
     }
 
     protected void goesDown(Rect newRect) {
+        // Calculate the column and row indices of the given Rect
         int newRow = (newRect.bottom - 1) / spriteSizeOnScreen;
         int newLeftColumn = newRect.left / spriteSizeOnScreen;
         int newRightColumn = (newRect.right - 1) / spriteSizeOnScreen;
 
-        boolean leftBool = velocityChanging(newRow, newLeftColumn);
-        boolean rightBool = velocityChanging(newRow, newRightColumn);
+        // Check if the left or right of the player's Rect is colliding with the given Rect
+        boolean leftCollision = velocityChanging(newRow, newLeftColumn);
+        boolean rightCollision = velocityChanging(newRow, newRightColumn);
 
-        if (leftBool) {
-            if (rightBool) {
-                int aux = (spriteSizeOnScreen - playerRect.bottom
-                        % spriteSizeOnScreen) % spriteSizeOnScreen;
-                velocityY = aux < velocityY ? aux : velocityY;
+        // Update velocity based on collision status
+        if (leftCollision) {
+            if (rightCollision) {
+                // Both the left and right of the player's Rect are colliding with the given Rect
+                // Calculate the minimum distance needed to avoid the collision
+                int minVelocity = (spriteSizeOnScreen - playerRect.bottom % spriteSizeOnScreen) %
+                        spriteSizeOnScreen;
+                velocityY = Math.min(velocityY, minVelocity);
             } else {
+                // Only left column is occupied by an obstacle, set velocityX and velocityY to 0
                 velocityX = velocityY * SPEED_MINIMIZING;
                 velocityY = 0;
-                int aux = (spriteSizeOnScreen - playerRect.right %
-                        spriteSizeOnScreen) % spriteSizeOnScreen;
-                velocityX = aux < velocityX ? aux : velocityX;
+                int minVelocity = (spriteSizeOnScreen - playerRect.right % spriteSizeOnScreen) %
+                        spriteSizeOnScreen;
+                velocityX = Math.min(velocityX, minVelocity);
             }
-        } else if (rightBool) {
+        } else if (rightCollision) {
+            // Only right column is occupied by an obstacle, set velocityX and velocityY to 0
             velocityX = -velocityY * SPEED_MINIMIZING;
             velocityY = 0;
-            int aux = -playerRect.left % spriteSizeOnScreen;
-            velocityX = aux > velocityX ? aux : velocityX;
+            int minVelocity = -playerRect.left % spriteSizeOnScreen;
+            velocityX = Math.max(velocityX, minVelocity);
         }
     }
 
     protected void goesUp(Rect newRect) {
+        // Calculate the column and row indices of the given Rect
         int newRow = newRect.top / spriteSizeOnScreen;
         int newLeftColumn = newRect.left / spriteSizeOnScreen;
         int newRightColumn = (newRect.right - 1) / spriteSizeOnScreen;
 
-        boolean leftBool = velocityChanging(newRow, newLeftColumn);
-        boolean rightBool = velocityChanging(newRow, newRightColumn);
+        // Check if the left or right of the player's Rect is colliding with the given Rect
+        boolean leftCollision = velocityChanging(newRow, newLeftColumn);
+        boolean rightCollision = velocityChanging(newRow, newRightColumn);
 
-        if (leftBool) {
-            if (rightBool) {
-                int aux = -playerRect.top % spriteSizeOnScreen;
-                velocityY = aux > velocityY ? aux : velocityY;
+        // Update velocity based on collision status
+        if (leftCollision) {
+            if (rightCollision) {
+                // Both the left and right of the player's Rect are colliding with the given Rect
+                // Calculate the minimum distance needed to avoid the collision
+                int minVelocity = -playerRect.top % spriteSizeOnScreen;
+                velocityY = Math.max(velocityY, minVelocity);
             } else {
+                // Only left column is occupied by an obstacle, set velocityX and velocityY to 0
                 velocityX = -velocityY * SPEED_MINIMIZING;
                 velocityY = 0;
-                int aux = playerRect.left % spriteSizeOnScreen;
-                velocityX = aux < velocityX ? aux : velocityX;
+                int minVelocity = playerRect.left % spriteSizeOnScreen;
+                velocityX = Math.min(velocityX, minVelocity);
             }
-        } else if (rightBool) {
+        } else if (rightCollision) {
+            // Only right column is occupied by an obstacle, set velocityX and velocityY to 0
             velocityX = velocityY * SPEED_MINIMIZING;
             velocityY = 0;
-            int aux = -playerRect.right % spriteSizeOnScreen;
-            velocityX = aux > velocityX ? aux : velocityX;
+            int minVelocity = -playerRect.right % spriteSizeOnScreen;
+            velocityX = Math.max(velocityX, minVelocity);
         }
     }
 
     protected void goesRight(Rect newRect) {
+        // Calculate the column and row indices of the given Rect
         int newColumn = (newRect.right - 1) / spriteSizeOnScreen;
         int newTopRow = newRect.top / spriteSizeOnScreen;
         int newBottomRow = (newRect.bottom - 1) / spriteSizeOnScreen;
 
-        boolean topBool = velocityChanging(newTopRow, newColumn);
-        boolean bottomBool = velocityChanging(newBottomRow, newColumn);
+        // Check if the top or bottom of the player's Rect is colliding with the given Rect
+        boolean topCollision = velocityChanging(newTopRow, newColumn);
+        boolean bottomCollision = velocityChanging(newBottomRow, newColumn);
 
-        if (topBool) {
-            if (bottomBool) {
-                int aux = (spriteSizeOnScreen - playerRect.right %
-                        spriteSizeOnScreen) % spriteSizeOnScreen;
-                velocityX = aux < velocityX ? aux : velocityX;
+        if (topCollision) {
+            if (bottomCollision) {
+                // Both the top and bottom of the player's Rect are colliding with the given Rect
+                // Calculate the minimum distance needed to avoid the collision
+                int aux = (spriteSizeOnScreen - playerRect.right % spriteSizeOnScreen) %
+                        spriteSizeOnScreen;
+                velocityX = Math.min(aux, velocityX);
             } else {
+                // Only the top of the player's Rect is colliding with the given Rect
                 velocityY = velocityX * SPEED_MINIMIZING;
                 velocityX = 0;
-                int aux = (spriteSizeOnScreen - playerRect.bottom
-                        % spriteSizeOnScreen) % spriteSizeOnScreen;
-                velocityY = aux < velocityY ? aux : velocityY;
+                int aux = (spriteSizeOnScreen - playerRect.bottom % spriteSizeOnScreen) %
+                        spriteSizeOnScreen;
+                velocityY = Math.min(aux, velocityY);
             }
-        } else if (bottomBool) {
+        } else if (bottomCollision) {
+            // Only the bottom of the player's Rect is colliding with the given Rect
             velocityY = -velocityX * SPEED_MINIMIZING;
             velocityX = 0;
             int aux = -playerRect.top % spriteSizeOnScreen;
-            velocityY = aux > velocityY ? aux : velocityY;
+            velocityY = Math.max(aux, velocityY);
         }
     }
 
     protected void goesLeft(Rect newRect) {
+        // Calculate the column and row indices of the given Rect
         int newColumn = newRect.left / spriteSizeOnScreen;
         int newTopRow = newRect.top / spriteSizeOnScreen;
         int newBottomRow = (newRect.bottom - 1) / spriteSizeOnScreen;
 
-        boolean topBool = velocityChanging(newTopRow, newColumn);
-        boolean bottomBool = velocityChanging(newBottomRow, newColumn);
+        // Check if the top or bottom of the player's Rect is colliding with the given Rect
+        boolean topCollision = velocityChanging(newTopRow, newColumn);
+        boolean bottomCollision = velocityChanging(newBottomRow, newColumn);
 
-        if (topBool) {
-            if (bottomBool) {
+        if (topCollision) {
+            if (bottomCollision) {
+                // Both the top and bottom of the player's Rect are colliding with the given Rect
+                // Calculate the minimum distance needed to avoid the collision
                 int aux = -playerRect.left % spriteSizeOnScreen;
-                velocityX = aux > velocityX ? aux : velocityX;
+                velocityX = Math.max(aux, velocityX);
             } else {
+                // Only the top of the player's Rect is colliding with the given Rect
                 velocityY = -velocityX * SPEED_MINIMIZING;
                 velocityX = 0;
                 int aux = spriteSizeOnScreen - playerRect.top % spriteSizeOnScreen;
-                velocityY = aux < velocityY ? aux : velocityY;
+                velocityY = Math.min(aux, velocityY);
             }
-        } else if (bottomBool) {
+        } else if (bottomCollision) {
+            // Only the bottom of the player's Rect is colliding with the given Rect
             velocityY = velocityX * SPEED_MINIMIZING;
             velocityX = 0;
             int aux = -playerRect.bottom % spriteSizeOnScreen;
-            velocityY = aux > velocityY ? aux : velocityY;
+            velocityY = Math.max(aux, velocityY);
         }
     }
 

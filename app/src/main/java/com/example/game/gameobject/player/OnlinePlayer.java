@@ -77,6 +77,8 @@ public class OnlinePlayer extends OfflinePlayer {
 
     @Override
     public void update() {
+        initRectInTiles();
+
         selectDirectionFromActuator();
 
         detectCollisions();
@@ -142,7 +144,7 @@ public class OnlinePlayer extends OfflinePlayer {
                 livesCount--;
                 playerData.livesCount--;
                 time = INVINCIBILITY_TIME;
-                usedPaint = INVINCIBILITY_PAINT;
+                usedPaint = invincibilityPaint;
             }
         } else {
             time--;
@@ -152,7 +154,7 @@ public class OnlinePlayer extends OfflinePlayer {
                     usedPaint = null;
                     break;
                 case 2:
-                    usedPaint = INVINCIBILITY_PAINT;
+                    usedPaint = invincibilityPaint;
                     break;
             }
         }

@@ -77,6 +77,8 @@ public class OnlineEnemy extends Player {
 
     @Override
     public void update() {
+        initRectInTiles();
+
         playerRect.offsetTo((int) (playerData.posX * tilemap.getMapRect().width()),
                 (int) (playerData.posY * tilemap.getMapRect().height()));
         playerState.setState(PlayerState.State.valueOf(playerData.movingState));
@@ -129,7 +131,7 @@ public class OnlineEnemy extends Player {
         if (time == 0) {
             if (playerData.died != 0) {
                 time = playerData.died;
-                usedPaint = INVINCIBILITY_PAINT;
+                usedPaint = invincibilityPaint;
             }
         } else {
             time--;
@@ -139,7 +141,7 @@ public class OnlineEnemy extends Player {
                     usedPaint = null;
                     break;
                 case 2:
-                    usedPaint = INVINCIBILITY_PAINT;
+                    usedPaint = invincibilityPaint;
                     break;
             }
         }

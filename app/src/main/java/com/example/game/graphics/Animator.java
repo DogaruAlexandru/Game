@@ -10,25 +10,25 @@ import com.example.game.Utils;
 import com.example.game.gameobject.player.Player;
 
 public class Animator {
-    private final int MAX_UPDATES_BEFORE_NEXT_MOVE_FRAME = (int) (MAX_UPS * 0.1);
+    private final static int MAX_UPDATES_BEFORE_NEXT_MOVE_FRAME = (int) (MAX_UPS * 0.1);
+    private final static int ID_NOT_MOVING_FRAME = 0;
     private final Sprite[] playerSpriteArray;
 
     private int idxMovingFrame = 1;
     private boolean oddTimeAction = true;
-    private int updatesBeforeNextMoveFrame = MAX_UPDATES_BEFORE_NEXT_MOVE_FRAME;
+    private int updatesBeforeNextMoveFrame;
 
     public Animator(Sprite[] playerSpriteArray) {
         this.playerSpriteArray = playerSpriteArray;
     }
 
     public void draw(Canvas canvas, Player player, Paint paint) {
-        int idxNotMovingFrame = 0;
         Rect drawnRect = new Rect(player.getPlayerRect());
         drawnRect.offset(Utils.mapOffsetX, Utils.mapOffsetY);
 
         switch (player.getPlayerState().getState()) {
             case NOT_MOVING:
-                playerSpriteArray[idxNotMovingFrame].draw(canvas, drawnRect,
+                playerSpriteArray[ID_NOT_MOVING_FRAME].draw(canvas, drawnRect,
                         player.getRotationAngle(), paint);
                 break;
             case STARTED_MOVING:
@@ -38,7 +38,7 @@ public class Animator {
                 break;
             case IS_MOVING:
                 updatesBeforeNextMoveFrame--;
-                if (updatesBeforeNextMoveFrame == 0) {
+                if (updatesBeforeNextMoveFrame < 1) {
                     updatesBeforeNextMoveFrame = MAX_UPDATES_BEFORE_NEXT_MOVE_FRAME;
                     toggleIdxMovingFrame();
                 }

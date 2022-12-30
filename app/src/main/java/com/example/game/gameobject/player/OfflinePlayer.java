@@ -57,6 +57,7 @@ public class OfflinePlayer extends Player {
         if (livesCount < 1) {
             return;
         }
+        initRectInTiles();
 
         selectDirectionFromActuator();
 
