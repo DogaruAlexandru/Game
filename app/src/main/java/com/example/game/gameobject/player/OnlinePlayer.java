@@ -2,7 +2,6 @@ package com.example.game.gameobject.player;
 
 import static com.example.game.Utils.CODE;
 import static com.example.game.Utils.PLAYER_NAME;
-import static com.example.game.Utils.spriteSizeOnScreen;
 
 import android.content.Context;
 
@@ -131,12 +130,6 @@ public class OnlinePlayer extends OfflinePlayer {
     @Override
     protected void handleDeath() {
         if (time == 0) {
-            int safe = spriteSizeOnScreen / 6;
-            int bottom = (playerRect.bottom - 1 - safe) / spriteSizeOnScreen;
-            int left = (playerRect.left + safe) / spriteSizeOnScreen;
-            int right = (playerRect.right - 1 - safe) / spriteSizeOnScreen;
-            int top = (playerRect.top + safe) / spriteSizeOnScreen;
-
             if (tileIsLayoutType(bottom, left, Tile.LayoutType.EXPLOSION) ||
                     tileIsLayoutType(bottom, right, Tile.LayoutType.EXPLOSION) ||
                     tileIsLayoutType(top, left, Tile.LayoutType.EXPLOSION) ||

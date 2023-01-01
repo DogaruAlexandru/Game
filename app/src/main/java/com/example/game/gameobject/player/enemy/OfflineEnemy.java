@@ -1,4 +1,4 @@
-package com.example.game.gameobject;
+package com.example.game.gameobject.player.enemy;
 
 import static com.example.game.Utils.COLUMNS;
 import static com.example.game.Utils.ROWS;
@@ -10,6 +10,9 @@ import android.content.Context;
 import androidx.core.util.Pair;
 
 import com.example.game.Utils;
+import com.example.game.gameobject.Bomb;
+import com.example.game.gameobject.Explosion;
+import com.example.game.gameobject.player.Player;
 import com.example.game.graphics.Animator;
 import com.example.game.map.BombCountPowerUpTile;
 import com.example.game.map.BombTile;
@@ -43,7 +46,7 @@ public class OfflineEnemy extends Player {
     private static final int ENEMY_SCORE = 50;
     private static final int EXPLOSION_SCORE = -1000;
 
-    private Tile[][] futureExplosions;
+    private Tile[][] auxMap;
     private OriginDirection[][] directions;
     private int[][] scores;
     private final Map<String, Pair<Integer, Integer>> enemiesPos;
@@ -78,6 +81,7 @@ public class OfflineEnemy extends Player {
 
     @Override
     public void update() {
+        initRectInTiles();
 
         makeMoves();
 
@@ -89,7 +93,7 @@ public class OfflineEnemy extends Player {
             getOrientation();
 
             // Update player orientation
-            rotationAngle = (int) ((Math.atan2(directionY, directionX) * 180) / Math.PI) - 90;
+            rotationAngle = getAngle();
         }
 
         // Update player state for animation
@@ -103,34 +107,27 @@ public class OfflineEnemy extends Player {
     }
 
     private void makeMoves() {
-
-        futureExplosions = findFutureExplosions();
-
         Pair<Integer, Integer> endPos = findDirectionsAndEndPos();
         ArrayList<OriginDirection> path = getPath(endPos);
 
-        if (path.size() == 0) {
-            if (isSafeToUse(endPos) || Utils.generator.nextFloat() < .01) {
-                useBomb();
-            }
+        if (path.size() == 0 || Utils.generator.nextFloat() < .01) {
+            useBomb();
         } else {
+            velocityX = 0;
+            velocityY = 0;
             switch (path.get(path.size() - 1)) {
                 case NONE:
                     break;
                 case LEFT:
                     velocityX = -getMaxSpeed();
-                    velocityY = 0;
                     break;
                 case UP:
-                    velocityX = 0;
                     velocityY = -getMaxSpeed();
                     break;
                 case RIGHT:
                     velocityX = getMaxSpeed();
-                    velocityY = 0;
                     break;
                 case DOWN:
-                    velocityX = 0;
                     velocityY = getMaxSpeed();
                     break;
             }
@@ -139,23 +136,6 @@ public class OfflineEnemy extends Player {
                 velocityY /= 2;
             }
         }
-    }
-
-    private boolean isSafeToUse(Pair<Integer, Integer> endPos) {
-        int row = endPos.first;
-        int column = endPos.second;
-        Tile prevTile = tilemap.getTilemap()[row][column];
-
-        BombTile tile = new BombTile();
-        tile.setBomb(new Bomb(bombRange, row, column, null, null, tilemap));
-        tilemap.getTilemap()[row][column] = tile;
-
-        futureExplosions = findFutureExplosions();
-        Pair<Integer, Integer> newEndPos = findDirectionsAndEndPos();
-
-        tilemap.getTilemap()[row][column] = prevTile;
-
-        return scores[newEndPos.first][newEndPos.second] > 0;
     }
 
     private ArrayList<OriginDirection> getPath(Pair<Integer, Integer> pos) {
@@ -187,9 +167,17 @@ public class OfflineEnemy extends Player {
     }
 
     private Pair<Integer, Integer> findDirectionsAndEndPos() {
+        auxMap = findFutureExplosions();
+
         int rows = tilemap.getNumberOfRowTiles();
         int columns = tilemap.getNumberOfColumnTiles();
+
         scores = new int[rows][columns];
+        directions = new OriginDirection[rows][columns];
+
+        breadthFirstSearch();
+
+        auxMap = tilemap.getTilemap();
         directions = new OriginDirection[rows][columns];
         Pair<Integer, Integer> endPos = breadthFirstSearch();
 
@@ -218,7 +206,7 @@ public class OfflineEnemy extends Player {
 
         searchQueue.add(new Pair<>(row, column));
         directions[row][column] = OriginDirection.NONE;
-        switch (futureExplosions[row][column].getLayoutType()) {
+        switch (auxMap[row][column].getLayoutType()) {
             case EXPLOSION:
             case BOMB:
                 scores[row][column] += EXPLOSION_SCORE;
@@ -242,7 +230,7 @@ public class OfflineEnemy extends Player {
                     continue;
                 }
 
-                switch (futureExplosions[row][column].getLayoutType()) {
+                switch (auxMap[row][column].getLayoutType()) {
                     case WALK:
                         if (startedWithExplosion) {
                             startedWithExplosion = false;
@@ -306,7 +294,7 @@ public class OfflineEnemy extends Player {
         return null;
     }
 
-    //region Update map future explosions
+    //region Obtain map future explosions
     private Tile[][] findFutureExplosions() {
         Tile[][] map = new Tile[tilemap.getNumberOfRowTiles()][tilemap.getNumberOfColumnTiles()];
         copyOldTilemap(map);
@@ -337,7 +325,7 @@ public class OfflineEnemy extends Player {
         int column = bomb.getColumn();
         int range = bomb.getRange();
 
-        for (int idx = 1; idx < range; ++idx) {
+        for (int idx = 1; idx < range; idx++) {
             switch (map[row + idxRow * idx][column + idxColumn * idx].getLayoutType()) {
                 case EXPLOSION:
                 case BOMB:
@@ -360,8 +348,8 @@ public class OfflineEnemy extends Player {
         int rows = tilemap.getNumberOfRowTiles();
         int columns = tilemap.getNumberOfColumnTiles();
 
-        for (int row = 0; row < rows; ++row) {
-            for (int column = 0; column < columns; ++column) {
+        for (int row = 0; row < rows; row++) {
+            for (int column = 0; column < columns; column++) {
                 Tile tile = tilemap.getTilemap()[row][column];
                 switch (tile.getLayoutType()) {
                     case WALK:
