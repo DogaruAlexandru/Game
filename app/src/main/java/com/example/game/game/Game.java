@@ -243,7 +243,10 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
         // Going back message
         new Thread(this::returnToMenu).start();
+        new Thread(this::waiting).start();
+    }
 
+    private void waiting() {
         try {
             TimeUnit.MILLISECONDS.sleep(9500);
             gameplayActivity.finish();

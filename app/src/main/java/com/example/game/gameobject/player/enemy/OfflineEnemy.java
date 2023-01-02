@@ -41,15 +41,22 @@ public class OfflineEnemy extends Player {
         DOWN
     }
 
-    private static final int POWER_UP_SCORE = 30;
-    private static final int CRATE_SCORE = 10;
-    private static final int ENEMY_SCORE = 50;
-    private static final int EXPLOSION_SCORE = -1000;
+    private enum SearchType {
+        stepOnNoExplosion,
+        stepOnNoCurrentExplosion,
+        stepOnAllExplosion
+    }
 
-    private Tile[][] auxMap;
-    private OriginDirection[][] directions;
-    private int[][] scores;
+    private static final int POWER_UP_SCORE = 30;
+    private static final int CRATE_SCORE = 20;
+    private static final int ENEMY_SCORE = 50;
+
     private final Map<String, Pair<Integer, Integer>> enemiesPos;
+
+    private Tile[][] allExplosionMap;
+    private OriginDirection[][] directions;
+    private int playerRow, playerColumn;
+    private int endPosScore;
 
     public OfflineEnemy(Context context,
                         int rowTile,
@@ -107,10 +114,13 @@ public class OfflineEnemy extends Player {
     }
 
     private void makeMoves() {
-        Pair<Integer, Integer> endPos = findDirectionsAndEndPos();
+        Pair<Integer, Integer> endPos = findDestination();
+        if (endPos == null) {
+            return;
+        }
         ArrayList<OriginDirection> path = getPath(endPos);
 
-        if (path.size() == 0 || Utils.generator.nextFloat() < .01) {
+        if ((endPosScore > 0 && path.size() == 0)) {
             useBomb();
         } else {
             velocityX = 0;
@@ -166,61 +176,69 @@ public class OfflineEnemy extends Player {
         return path;
     }
 
-    private Pair<Integer, Integer> findDirectionsAndEndPos() {
-        auxMap = findFutureExplosions();
+    private Pair<Integer, Integer> findDestination() {
+        allExplosionMap = findFutureExplosions();
+        endPosScore = 0;
 
+        playerRow = getPlayerRow(this);
+        playerColumn = getPlayerColumn(this);
+
+        boolean allExpTile = tileIsDangerous(allExplosionMap[playerRow][playerColumn]);
+        boolean nowExpTile = tileIsDangerous(tilemap.getTilemap()[playerRow][playerColumn]);
+
+        if (nowExpTile) {
+            //search in allExplosionMap first safe space
+            return search(SearchType.stepOnAllExplosion);
+        }
+        if (allExpTile) {
+            //search in allExplosionMap first safe space, but cant step on current danger
+            return search(SearchType.stepOnNoCurrentExplosion);
+        }
+        //search in allExplosionMap for place to use bomb
+        return search(SearchType.stepOnNoExplosion);
+    }
+
+    private Pair<Integer, Integer> search(SearchType searchType) {
         int rows = tilemap.getNumberOfRowTiles();
         int columns = tilemap.getNumberOfColumnTiles();
 
-        scores = new int[rows][columns];
         directions = new OriginDirection[rows][columns];
+        directions[playerRow][playerColumn] = OriginDirection.NONE;
 
-        breadthFirstSearch();
+        Queue<Pair<Integer, Integer>> searchQueue = new LinkedList<>();
 
-        auxMap = tilemap.getTilemap();
-        directions = new OriginDirection[rows][columns];
-        Pair<Integer, Integer> endPos = breadthFirstSearch();
+        searchQueue.add(new Pair<>(playerRow, playerColumn));
 
-        // add enemies position score
+        switch (searchType) {
+            case stepOnNoExplosion:
+                return searchNoExplosion(searchQueue);
+            case stepOnNoCurrentExplosion:
+            case stepOnAllExplosion:
+                return searchExplosions(searchQueue, searchType);
+            default:
+                throw new IllegalStateException("Unexpected value: " + searchType);
+        }
+    }
+
+    private Pair<Integer, Integer> searchNoExplosion(Queue<Pair<Integer, Integer>> searchQueue) {
+        int rows = tilemap.getNumberOfRowTiles();
+        int columns = tilemap.getNumberOfColumnTiles();
+        int[][] scores = new int[rows][columns];
+
         int row, column;
+
         for (Map.Entry<String, Pair<Integer, Integer>> entry : enemiesPos.entrySet()) {
             row = entry.getValue().first;
             column = entry.getValue().second;
-            if (!entry.getKey().equals(playerId) && directions[row][column] != null) {
-                scores[row][column] += ENEMY_SCORE;
+            if (entry.getKey().equals(playerId)) {
+                continue;
             }
-            if (scores[row][column] > scores[endPos.first][endPos.second]) {
-                endPos = new Pair<>(row, column);
-            }
+            scores[row][column] += ENEMY_SCORE;
         }
-
-        return endPos;
-    }
-
-    private Pair<Integer, Integer> breadthFirstSearch() {
-
-        int row = getPlayerRow(this);
-        int column = getPlayerColumn(this);
-        boolean startedWithExplosion = false;
-        Queue<Pair<Integer, Integer>> searchQueue = new LinkedList<>();
-
-        searchQueue.add(new Pair<>(row, column));
-        directions[row][column] = OriginDirection.NONE;
-        switch (auxMap[row][column].getLayoutType()) {
-            case EXPLOSION:
-            case BOMB:
-                scores[row][column] += EXPLOSION_SCORE;
-                startedWithExplosion = true;
-                break;
-        }
-
-        int crateCount;
-        int maxScore = -10;
-        Pair<Integer, Integer> endPos = searchQueue.peek();
+        Pair<Integer, Integer> endPos = null;
 
         while (!searchQueue.isEmpty()) {
             Pair<Integer, Integer> pair = searchQueue.remove();
-            crateCount = 0;
 
             for (int i = 0; i < 4; i++) {
                 row = pair.first + ROWS[i];
@@ -230,22 +248,10 @@ public class OfflineEnemy extends Player {
                     continue;
                 }
 
-                switch (auxMap[row][column].getLayoutType()) {
+                switch (allExplosionMap[row][column].getLayoutType()) {
                     case WALK:
-                        if (startedWithExplosion) {
-                            startedWithExplosion = false;
-                            searchQueue.clear();
-                        }
                         searchQueue.add(new Pair<>(row, column));
                         directions[row][column] = getDirection(pair.first, pair.second, row, column);
-                        break;
-                    case EXPLOSION:
-                        if (!startedWithExplosion) {
-                            break;
-                        }
-                        searchQueue.add(new Pair<>(row, column));
-                        directions[row][column] = getDirection(pair.first, pair.second, row, column);
-                        scores[row][column] += EXPLOSION_SCORE;
                         break;
                     case BOMB_POWER_UP:
                     case RANGE_POWER_UP:
@@ -255,23 +261,62 @@ public class OfflineEnemy extends Player {
                         scores[row][column] += POWER_UP_SCORE;
                         break;
                     case CRATE:
-                        crateCount++;
+                        scores[pair.first][pair.second] += CRATE_SCORE;
                         break;
+                    case EXPLOSION:
                     case BOMB:
                     case WALL:
                     default:
                         break;
                 }
             }
-            scores[pair.first][pair.second] += (CRATE_SCORE * crateCount);
-
-            if (scores[pair.first][pair.second] > maxScore) {
-                maxScore = scores[pair.first][pair.second];
+            if (scores[pair.first][pair.second] > endPosScore) {
+                endPosScore = scores[pair.first][pair.second];
                 endPos = pair;
             }
         }
-
         return endPos;
+    }
+
+    private Pair<Integer, Integer> searchExplosions(Queue<Pair<Integer, Integer>> searchQueue,
+                                                    SearchType searchType) {
+        while (!searchQueue.isEmpty()) {
+            int row, column;
+            Pair<Integer, Integer> pair = searchQueue.remove();
+
+            for (int i = 0; i < 4; i++) {
+                row = pair.first + ROWS[i];
+                column = pair.second + COLUMNS[i];
+
+                if (directions[row][column] != null) {
+                    continue;
+                }
+
+                switch (allExplosionMap[row][column].getLayoutType()) {
+                    case WALK:
+                    case BOMB_POWER_UP:
+                    case RANGE_POWER_UP:
+                    case SPEED_POWER_UP:
+                        directions[row][column] = getDirection(pair.first, pair.second, row, column);
+                        return new Pair<>(row, column);
+                    case EXPLOSION:
+                        if (searchType == SearchType.stepOnNoCurrentExplosion) {
+                            if (tileIsDangerous(tilemap.getTilemap()[row][column])) {
+                                break;
+                            }
+                        }
+                        searchQueue.add(new Pair<>(row, column));
+                        directions[row][column] = getDirection(pair.first, pair.second, row, column);
+                        break;
+                    case CRATE:
+                    case BOMB:
+                    case WALL:
+                    default:
+                        break;
+                }
+            }
+        }
+        return null;
     }
 
     private OriginDirection getDirection(int rowStart, int columnStart, int rowEnd, int columnEnd) {
@@ -294,6 +339,10 @@ public class OfflineEnemy extends Player {
         return null;
     }
 
+    protected boolean tileIsDangerous(Tile tile) {
+        return (tile.getLayoutType() == Tile.LayoutType.EXPLOSION);
+    }
+
     //region Obtain map future explosions
     private Tile[][] findFutureExplosions() {
         Tile[][] map = new Tile[tilemap.getNumberOfRowTiles()][tilemap.getNumberOfColumnTiles()];
@@ -309,6 +358,7 @@ public class OfflineEnemy extends Player {
             for (int idy = 1; idy < columns - 1; idy++) {
                 if (map[idx][idy].getLayoutType() == Tile.LayoutType.BOMB) {
                     triggerBomb(((BombTile) map[idx][idy]).getBomb(), map);
+                    map[idx][idy] = new ExplosionTile();
                 }
             }
         }
