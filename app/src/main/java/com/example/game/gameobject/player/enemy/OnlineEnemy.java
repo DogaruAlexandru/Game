@@ -1,7 +1,5 @@
 package com.example.game.gameobject.player.enemy;
 
-import static com.example.game.Utils.spriteSizeOnScreen;
-
 import android.content.Context;
 
 import com.example.game.gameobject.Bomb;
@@ -9,6 +7,7 @@ import com.example.game.gameobject.Explosion;
 import com.example.game.gameobject.player.Player;
 import com.example.game.gameobject.player.PlayerState;
 import com.example.game.graphics.Animator;
+import com.example.game.map.MapLayout;
 import com.example.game.map.Tile;
 import com.example.game.map.Tilemap;
 import com.example.game.model.PlayerData;
@@ -89,7 +88,7 @@ public class OnlineEnemy extends Player {
             int rowIdx = playerRect.centerY() / playerRect.width();
             int columnIdx = playerRect.centerX() / playerRect.height();
 
-            if (tileIsLayoutType(rowIdx, columnIdx, Tile.LayoutType.WALK)) {
+            if (tileIsLayoutType(rowIdx, columnIdx, Tile.LayoutType.WALK) && !maxBombCountReached()) {
                 bombList.add(new Bomb(playerData.bombRange, rowIdx, columnIdx, playerId,
                         explosionList, tilemap));
             }
@@ -102,26 +101,18 @@ public class OnlineEnemy extends Player {
 
     @Override
     protected void handlePowerUpCollision() {
-
-        int walkTileIdx = 1;
-        int safe = spriteSizeOnScreen / 6;
-        int bottom = (playerRect.bottom - 1 - safe) / spriteSizeOnScreen;
-        int left = (playerRect.left + safe) / spriteSizeOnScreen;
-        int right = (playerRect.right - 1 - safe) / spriteSizeOnScreen;
-        int top = (playerRect.top + safe) / spriteSizeOnScreen;
-
         for (Tile.LayoutType layoutType : powerUpsLayoutTypes) {
             if (tileIsLayoutType(bottom, left, layoutType)) {
-                tilemap.changeTile(bottom, left, walkTileIdx);
+                tilemap.changeTile(bottom, left, MapLayout.WALK_TILE_LAYOUT_ID);
 
             } else if (tileIsLayoutType(bottom, right, layoutType)) {
-                tilemap.changeTile(bottom, right, walkTileIdx);
+                tilemap.changeTile(bottom, right, MapLayout.WALK_TILE_LAYOUT_ID);
 
             } else if (tileIsLayoutType(top, left, layoutType)) {
-                tilemap.changeTile(top, left, walkTileIdx);
+                tilemap.changeTile(top, left, MapLayout.WALK_TILE_LAYOUT_ID);
 
             } else if (tileIsLayoutType(top, right, layoutType)) {
-                tilemap.changeTile(top, right, walkTileIdx);
+                tilemap.changeTile(top, right, MapLayout.WALK_TILE_LAYOUT_ID);
             }
         }
     }
@@ -129,8 +120,8 @@ public class OnlineEnemy extends Player {
     @Override
     protected void handleDeath() {
         if (time == 0) {
-            if (playerData.died != 0) {
-                time = playerData.died;
+            if (playerData.invincibilityTime != 0) {
+                time = playerData.invincibilityTime;
                 usedPaint = invincibilityPaint;
             }
         } else {

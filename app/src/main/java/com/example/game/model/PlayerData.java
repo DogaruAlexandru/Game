@@ -13,7 +13,7 @@ public class PlayerData {
     public int bombRange;
     public int bombCount;
     public int bombUsed;
-    public int died;
+    public int invincibilityTime;
     public String playerName;
     public String movingState;
 
@@ -29,7 +29,7 @@ public class PlayerData {
                       int bombRange,
                       int bombCount,
                       int bombUsed,
-                      int died,
+                      int invincibilityTime,
                       String playerName,
                       String movingState) {
 
@@ -40,7 +40,7 @@ public class PlayerData {
         this.bombRange = bombRange;
         this.bombCount = bombCount;
         this.bombUsed = bombUsed;
-        this.died = died;
+        this.invincibilityTime = invincibilityTime;
         this.playerName = playerName;
         this.movingState = movingState;
     }

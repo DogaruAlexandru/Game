@@ -185,15 +185,9 @@ public abstract class Player {
         return tilemap.getTilemap()[row][column].getLayoutType() == layoutType;
     }
 
-    protected boolean useBomb() {
-        int count = 0;
-        for (int i = 0; i < bombList.size(); i++) {
-            if (bombList.get(i).getPlayerId().equals(playerId)) {
-                ++count;
-            }
-        }
-        if (count >= bombsNumber) {
-            return false;
+    protected void useBomb() {
+        if (maxBombCountReached()) {
+            return;
         }
 
         int rowIdx = Utils.getPlayerRow(this);
@@ -202,8 +196,16 @@ public abstract class Player {
         if (tileIsLayoutType(rowIdx, columnIdx, Tile.LayoutType.WALK)) {
             bombList.add(new Bomb(bombRange, rowIdx, columnIdx, playerId, explosionList, tilemap));
         }
+    }
 
-        return true;
+    protected boolean maxBombCountReached() {
+        int count = 0;
+        for (int i = 0; i < bombList.size(); i++) {
+            if (bombList.get(i).getPlayerId().equals(playerId)) {
+                ++count;
+            }
+        }
+        return count >= bombsNumber;
     }
 
     protected void getOrientation() {

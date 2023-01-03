@@ -70,12 +70,14 @@ public class OnlinePlayer extends OfflinePlayer {
                 PlayerState.State.NOT_MOVING.toString());
 
         reference = FirebaseDatabase.getInstance().getReference(bundle.getString(CODE));
-
         reference.child(playerId).setValue(playerData);
     }
 
     @Override
     public void update() {
+        if (livesCount < 1) {
+            return;
+        }
         initRectInTiles();
 
         selectDirectionFromActuator();
@@ -98,7 +100,8 @@ public class OnlinePlayer extends OfflinePlayer {
 
         // Use bomb
         if (button.getIsPressed()) {
-            playerData.bombUsed = useBomb() ? ++timeUsingBomb : 0;
+            useBomb();
+            playerData.bombUsed = ++timeUsingBomb;
         } else {
             playerData.bombUsed = 0;
         }
@@ -151,7 +154,7 @@ public class OnlinePlayer extends OfflinePlayer {
                     break;
             }
         }
-        playerData.died = time;
+        playerData.invincibilityTime = time;
     }
 
     @Override

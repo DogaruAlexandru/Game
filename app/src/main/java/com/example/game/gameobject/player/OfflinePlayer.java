@@ -75,8 +75,9 @@ public class OfflinePlayer extends Player {
         playerState.update();
 
         // Use bomb
-        if (button.getIsPressed())
+        if (button.getIsPressed()) {
             useBomb();
+        }
 
         // Player death handler
         handleDeath();
