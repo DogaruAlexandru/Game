@@ -11,7 +11,7 @@ public class PlayerData {
     public int rotationData;
     public int livesCount;
     public int bombRange;
-    public int bombCount;
+    public int bombNumber;
     public int bombUsed;
     public int invincibilityTime;
     public String playerName;
@@ -27,7 +27,7 @@ public class PlayerData {
                       int rotationData,
                       int livesCount,
                       int bombRange,
-                      int bombCount,
+                      int bombNumber,
                       int bombUsed,
                       int invincibilityTime,
                       String playerName,
@@ -38,7 +38,7 @@ public class PlayerData {
         this.rotationData = rotationData;
         this.livesCount = livesCount;
         this.bombRange = bombRange;
-        this.bombCount = bombCount;
+        this.bombNumber = bombNumber;
         this.bombUsed = bombUsed;
         this.invincibilityTime = invincibilityTime;
         this.playerName = playerName;
