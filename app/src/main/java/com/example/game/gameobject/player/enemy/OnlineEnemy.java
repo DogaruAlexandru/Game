@@ -74,27 +74,24 @@ public class OnlineEnemy extends Player {
         return tilemap;
     }
 
-    private int getPosX() {
-        return (int) (playerData.posX * tilemap.getMapRect().width());
-    }
-
-    private int getPosY() {
-        return (int) (playerData.posY * tilemap.getMapRect().height());
-    }
-
     @Override
     public void update() {
         initRectInTiles();
 
-        playerRect.offsetTo(getPosX(), getPosY());
+        playerRect.offsetTo((int) (playerData.posX * tilemap.getMapRect().width()),
+                (int) (playerData.posY * tilemap.getMapRect().height()));
         playerState.setState(PlayerState.State.valueOf(playerData.movingState));
         rotationAngle = playerData.rotationData;
         livesCount = playerData.livesCount;
-        bombsNumber = playerData.bombNumber;
-        bombRange = playerData.bombRange;
 
-        if (playerData.bombUsed > 0) {
-            useBomb();
+        if (playerData.bombUsed != 0) {
+            int rowIdx = playerRect.centerY() / playerRect.width();
+            int columnIdx = playerRect.centerX() / playerRect.height();
+
+            if (tileIsLayoutType(rowIdx, columnIdx, Tile.LayoutType.WALK) && !maxBombCountReached()) {
+                bombList.add(new Bomb(playerData.bombRange, rowIdx, columnIdx, playerId,
+                        explosionList, tilemap));
+            }
         }
 
         handleDeath();
@@ -122,14 +119,22 @@ public class OnlineEnemy extends Player {
 
     @Override
     protected void handleDeath() {
-        int aux = playerData.invincibilityTime % 4;
-        switch (aux) {
-            case 0:
-                usedPaint = null;
-                break;
-            case 2:
+        if (time == 0) {
+            if (playerData.invincibilityTime != 0) {
+                time = playerData.invincibilityTime;
                 usedPaint = invincibilityPaint;
-                break;
+            }
+        } else {
+            time--;
+            int aux = time % 4;
+            switch (aux) {
+                case 0:
+                    usedPaint = null;
+                    break;
+                case 2:
+                    usedPaint = invincibilityPaint;
+                    break;
+            }
         }
     }
 }

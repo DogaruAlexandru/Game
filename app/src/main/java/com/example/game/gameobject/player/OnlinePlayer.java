@@ -58,8 +58,8 @@ public class OnlinePlayer extends OfflinePlayer {
 
         timeUsingBomb = 0;
 
-        playerData = new PlayerData(getRelativePosX(),
-                getRelativePosY(),
+        playerData = new PlayerData(getRelativePoxX(),
+                getRelativePoxY(),
                 rotationAngle,
                 livesCount,
                 bombRange,
@@ -123,7 +123,7 @@ public class OnlinePlayer extends OfflinePlayer {
                 playerData.bombRange++;
                 break;
             case BOMB_POWER_UP:
-                playerData.bombNumber++;
+                playerData.bombCount++;
                 break;
             default:
                 break;
@@ -161,15 +161,15 @@ public class OnlinePlayer extends OfflinePlayer {
     protected void movePlayer() {
         super.movePlayer();
 
-        playerData.posX = getRelativePosX();
-        playerData.posY = getRelativePosY();
+        playerData.posX = getRelativePoxX();
+        playerData.posY = getRelativePoxY();
     }
 
-    private double getRelativePosX() {
+    private double getRelativePoxX() {
         return positionX / tilemap.getMapRect().width();
     }
 
-    private double getRelativePosY() {
+    private double getRelativePoxY() {
         return positionY / tilemap.getMapRect().height();
     }
 
