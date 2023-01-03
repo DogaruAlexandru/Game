@@ -132,7 +132,7 @@ public class OnlinePlayer extends OfflinePlayer {
 
     @Override
     protected void handleDeath() {
-        if (time == 0) {
+        if (time < 1) {
             if (tileIsLayoutType(bottom, left, Tile.LayoutType.EXPLOSION) ||
                     tileIsLayoutType(bottom, right, Tile.LayoutType.EXPLOSION) ||
                     tileIsLayoutType(top, left, Tile.LayoutType.EXPLOSION) ||
@@ -142,17 +142,17 @@ public class OnlinePlayer extends OfflinePlayer {
                 time = INVINCIBILITY_TIME;
                 usedPaint = invincibilityPaint;
             }
-        } else {
-            time--;
-            int aux = time % 4;
-            switch (aux) {
-                case 0:
-                    usedPaint = null;
-                    break;
-                case 2:
-                    usedPaint = invincibilityPaint;
-                    break;
-            }
+            return;
+        }
+        time--;
+        int aux = time % 4;
+        switch (aux) {
+            case 0:
+                usedPaint = null;
+                break;
+            case 2:
+                usedPaint = invincibilityPaint;
+                break;
         }
         playerData.invincibilityTime = time;
     }
