@@ -1,16 +1,11 @@
 package com.example.game.game;
 
-import static com.example.game.Utils.BLUE_MSG;
 import static com.example.game.Utils.CODE;
 import static com.example.game.Utils.FIREBASE_TAG;
-import static com.example.game.Utils.GREEN_MSG;
-import static com.example.game.Utils.NIL;
 import static com.example.game.Utils.Players;
-import static com.example.game.Utils.RED_MSG;
 import static com.example.game.Utils.RETRIEVE_DATA_ERROR;
 import static com.example.game.Utils.TIE_END_MSG;
 import static com.example.game.Utils.WIN_END_MSG;
-import static com.example.game.Utils.YELLOW_MSG;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -21,8 +16,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.example.game.activity.GameplayActivity;
-import com.example.game.gameobject.player.enemy.OnlineEnemy;
 import com.example.game.gameobject.player.OnlinePlayer;
+import com.example.game.gameobject.player.enemy.OnlineEnemy;
 import com.example.game.graphics.Animator;
 import com.example.game.model.PlayerData;
 import com.google.firebase.database.DataSnapshot;
@@ -46,11 +41,25 @@ public class MultiplayerGame extends Game {
     private final ArrayList<OnlineEnemy> enemies;
 
     private final DatabaseReference reference;
-    private boolean deleteServer;
 
     public MultiplayerGame(Context context, Bundle bundle, GameplayActivity gameplayActivity) {
         super(context, bundle, gameplayActivity);
 
+        createPlayer(context, bundle);
+
+        enemies = new ArrayList<>();
+        reference = FirebaseDatabase.getInstance().getReference(bundle.getString(CODE));
+
+        new Thread(this::addEnemiesListeners).start();
+
+        try {
+            TimeUnit.MILLISECONDS.sleep(1500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createPlayer(Context context, Bundle bundle) {
         int rowTile = 0;
         int columnTile = 0;
         Animator animator = null;
@@ -92,19 +101,6 @@ public class MultiplayerGame extends Game {
                 BOMB_UPS,
                 LIVES,
                 bundle);
-
-        enemies = new ArrayList<>();
-        reference = FirebaseDatabase.getInstance().getReference(bundle.getString(CODE));
-
-        new Thread(this::addEnemiesListeners).start();
-
-        try {
-            TimeUnit.SECONDS.sleep(2);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        deleteServer = false;
     }
 
     private void addEnemiesListeners() {
@@ -187,6 +183,10 @@ public class MultiplayerGame extends Game {
     public void update() {
         super.update();
 
+        if (gameEnded) {
+            return;
+        }
+
         if (!enemies.isEmpty() && player.getLivesCount() > 0) {
             player.update();
             if (player.getLivesCount() < 1) {
@@ -210,41 +210,25 @@ public class MultiplayerGame extends Game {
         return player.getLivesCount() == 0 || enemies.isEmpty();
     }
 
+    @Override
     public void handleGameEnded() {
         if (((OnlinePlayer) player).getPlayerData().livesCount > 0) {
             if (enemies.isEmpty()) {
-                deleteServer = true;
+                gameEnded = true;
                 endgameMessage(WIN_END_MSG);
                 removeServer();
             }
         } else {
             switch (enemies.size()) {
                 case 0:
-                    deleteServer = true;
+                    gameEnded = true;
                     endgameMessage(TIE_END_MSG);
                     removeListeners();
                     removeServer();
                     break;
                 case 1:
-                    String color;
-                    deleteServer = true;
-                    switch (Players.valueOf(enemies.get(0).getPlayerId())) {
-                        case PLAYER1:
-                            color = BLUE_MSG;
-                            break;
-                        case PLAYER2:
-                            color = RED_MSG;
-                            break;
-                        case PLAYER3:
-                            color = GREEN_MSG;
-                            break;
-                        case PLAYER4:
-                            color = YELLOW_MSG;
-                            break;
-                        default:
-                            color = NIL;
-                            break;
-                    }
+                    gameEnded = true;
+                    String color = getColorString(enemies.get(0).getPlayerId());
                     endgameMessage(enemies.get(0).getPlayerData().playerName + " " + color + " Won");
                     removeListeners();
                     removeServer();
@@ -263,8 +247,6 @@ public class MultiplayerGame extends Game {
     }
 
     public void removeServer() {
-        if (deleteServer) {
-            reference.removeValue();
-        }
+        reference.removeValue();
     }
 }

@@ -1,15 +1,11 @@
 package com.example.game.game;
 
 import static com.example.game.Utils.ENEMY_COUNT;
-import static com.example.game.Utils.GREEN_MSG;
-import static com.example.game.Utils.NIL;
-import static com.example.game.Utils.RED_MSG;
+import static com.example.game.Utils.Players;
 import static com.example.game.Utils.TIE_END_MSG;
 import static com.example.game.Utils.WIN_END_MSG;
-import static com.example.game.Utils.YELLOW_MSG;
 import static com.example.game.Utils.getPlayerColumn;
 import static com.example.game.Utils.getPlayerRow;
-import static com.example.game.Utils.Players;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -20,9 +16,9 @@ import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
 
 import com.example.game.activity.GameplayActivity;
-import com.example.game.gameobject.player.enemy.OfflineEnemy;
 import com.example.game.gameobject.player.OfflinePlayer;
 import com.example.game.gameobject.player.Player;
+import com.example.game.gameobject.player.enemy.OfflineEnemy;
 import com.example.game.graphics.Animator;
 
 import java.util.HashMap;
@@ -33,8 +29,8 @@ import java.util.Objects;
 @SuppressLint("ViewConstructor")
 public class SingleplayerGame extends Game {
 
-    private final static int PLAYER_ROW = 1;
-    private final static int PLAYER_COLUMN = 1;
+    private final static int PLAYER_START_ROW = 1;
+    private final static int PLAYER_START_COLUMN = 1;
 
     private final Map<String, OfflineEnemy> enemies;
     private final Map<String, Pair<Integer, Integer>> enemiesPos;
@@ -46,8 +42,8 @@ public class SingleplayerGame extends Game {
                 context,
                 joystick,
                 button,
-                PLAYER_ROW,
-                PLAYER_COLUMN,
+                PLAYER_START_ROW,
+                PLAYER_START_COLUMN,
                 tilemap,
                 new Animator(spriteSheet.getBluePlayerSpriteArray()),
                 bombList,
@@ -77,7 +73,7 @@ public class SingleplayerGame extends Game {
 
         // add player3
         if (count > 1) {
-            createEnemy(PLAYER_ROW,
+            createEnemy(PLAYER_START_ROW,
                     tilemap.getNumberOfColumnTiles() - 2,
                     new Animator(spriteSheet.getYellowPlayerSpriteArray()),
                     Players.PLAYER3.toString());
@@ -86,7 +82,7 @@ public class SingleplayerGame extends Game {
         // add player4
         if (count > 2) {
             createEnemy(tilemap.getNumberOfRowTiles() - 2,
-                    PLAYER_COLUMN,
+                    PLAYER_START_COLUMN,
                     new Animator(spriteSheet.getGreenPlayerSpriteArray()),
                     Players.PLAYER4.toString());
         }
@@ -125,31 +121,20 @@ public class SingleplayerGame extends Game {
     @Override
     public void handleGameEnded() {
         if (player.getLivesCount() > 0) {
-            if (enemies.isEmpty())
+            if (enemies.isEmpty()) {
+                gameEnded = true;
                 endgameMessage(WIN_END_MSG);
-
+            }
         } else {
             switch (enemies.size()) {
                 case 0:
+                    gameEnded = true;
                     endgameMessage(TIE_END_MSG);
                     break;
                 case 1:
-                    String color;
+                    gameEnded = true;
                     String enemyId = enemies.entrySet().iterator().next().getKey();
-                    switch (Players.valueOf(enemyId)) {
-                        case PLAYER2:
-                            color = RED_MSG;
-                            break;
-                        case PLAYER3:
-                            color = GREEN_MSG;
-                            break;
-                        case PLAYER4:
-                            color = YELLOW_MSG;
-                            break;
-                        default:
-                            color = NIL;
-                            break;
-                    }
+                    String color = getColorString(enemyId);
                     endgameMessage(color + " Won");
                     break;
                 default:
@@ -163,6 +148,10 @@ public class SingleplayerGame extends Game {
     public void update() {
         super.update();
 
+        if (gameEnded) {
+            return;
+        }
+
         if (!enemies.isEmpty() && player.getLivesCount() > 0) {
             player.update();
             enemiesPos.put(player.getPlayerId(), getPLayerPos(player));
@@ -172,9 +161,6 @@ public class SingleplayerGame extends Game {
                 enemiesPos.remove(player.getPlayerId());
             }
         }
-
-        if (enemies.size() < 2 && player.getLivesCount() < 1)
-            return;
 
         Iterator<Map.Entry<String, OfflineEnemy>> iterator = enemies.entrySet().iterator();
         while (iterator.hasNext()) {

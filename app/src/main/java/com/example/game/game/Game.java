@@ -1,9 +1,14 @@
 package com.example.game.game;
 
+import static com.example.game.Utils.BLUE_MSG;
 import static com.example.game.Utils.CRATE_SPAWN_PROBABILITY;
+import static com.example.game.Utils.GREEN_MSG;
 import static com.example.game.Utils.MAP_HEIGHT;
 import static com.example.game.Utils.MAP_WIDTH;
+import static com.example.game.Utils.NIL;
 import static com.example.game.Utils.PLAYER_ID;
+import static com.example.game.Utils.RED_MSG;
+import static com.example.game.Utils.YELLOW_MSG;
 
 import android.app.Activity;
 import android.content.Context;
@@ -16,6 +21,8 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 
 import com.example.game.Utils;
 import com.example.game.activity.GameplayActivity;
@@ -31,7 +38,6 @@ import com.example.game.map.Tilemap;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public abstract class Game extends SurfaceView implements SurfaceHolder.Callback {
 
@@ -67,6 +73,7 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
 
     protected Handler handler;
     protected boolean playerCountChanged;
+    protected boolean gameEnded;
 
     private void initMe() {
         handler = new Handler();
@@ -77,6 +84,7 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
         initMe();
         this.context = context;
 
+        gameEnded = false;
         playerCountChanged = false;
 
         this.gameplayActivity = gameplayActivity;
@@ -237,32 +245,36 @@ public abstract class Game extends SurfaceView implements SurfaceHolder.Callback
         gameLoop.stopLoop();
     }
 
+    @NonNull
+    protected String getColorString(String playerId) {
+        String color;
+        switch (Utils.Players.valueOf(playerId)) {
+            case PLAYER1:
+                color = BLUE_MSG;
+                break;
+            case PLAYER2:
+                color = RED_MSG;
+                break;
+            case PLAYER3:
+                color = GREEN_MSG;
+                break;
+            case PLAYER4:
+                color = YELLOW_MSG;
+                break;
+            default:
+                color = NIL;
+                break;
+        }
+        return color;
+    }
+
     protected void endgameMessage(String msg) {
         // End message
-        handler.post(() -> Toast.makeText(context, msg, Toast.LENGTH_LONG).show());
-
-        // Going back message
-        new Thread(this::returnToMenu).start();
-//        new Thread(this::waiting).start();
-        waiting();
-    }
-
-    private void waiting() {
-        try {
-            TimeUnit.MILLISECONDS.sleep(9500);
-            gameplayActivity.finish();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void returnToMenu() {
-        for (int i = 3; i > 0; i--) {
-            int finalI = i;
-            handler.post(() -> Toast.makeText(context,
-                    "Game ended - Going to menu in " + finalI + "...",
-                    Toast.LENGTH_SHORT).show());
-        }
+        handler.post(() -> {
+            Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "Game ended - Going to menu...",Toast.LENGTH_SHORT).show();
+        });
+        handler.postDelayed(() -> gameplayActivity.finish(), 5500);
     }
 
     protected abstract void handleGameEnded();
