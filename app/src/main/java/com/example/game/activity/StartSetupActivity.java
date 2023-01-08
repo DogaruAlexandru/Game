@@ -1,7 +1,5 @@
 package com.example.game.activity;
 
-import static com.example.game.Utils.NIL;
-
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -64,7 +62,7 @@ public abstract class StartSetupActivity extends AppCompatActivity {
     protected void getInputs() {
         try {
             String s = mapHeightEdt.getText().toString();
-            if (s.equals(NIL)) {
+            if (s.isEmpty()) {
                 mapHeight = 11;
             } else {
                 mapHeight = Integer.parseInt(s);
@@ -79,7 +77,7 @@ public abstract class StartSetupActivity extends AppCompatActivity {
 
         try {
             String s = mapWidthEdt.getText().toString();
-            if (s.equals(NIL)) {
+            if (s.isEmpty()) {
                 mapWidth = 11;
             } else {
                 mapWidth = Integer.parseInt(s);
@@ -94,7 +92,7 @@ public abstract class StartSetupActivity extends AppCompatActivity {
 
         try {
             String s = crateSpawnProbabilityEdt.getText().toString();
-            if (s.equals(NIL)) {
+            if (s.isEmpty()) {
                 crateSpawnProbability = 50;
             } else {
                 crateSpawnProbability = Integer.parseInt(s);

@@ -87,7 +87,6 @@ public class MultiplayerCodeSetupActivity extends AppCompatActivity {
     }
 
     private void signInAnonymously() {
-
         auth.signInAnonymously().addOnCompleteListener(this, task -> {
             if (task.isSuccessful()) {
                 // Sign in success
@@ -106,21 +105,26 @@ public class MultiplayerCodeSetupActivity extends AppCompatActivity {
     }
 
     private void createGameActivity() {
-        if (codeEdt.getText().toString().length() > 3) {
-            createGameData();
+        if (isCodeShort()) {
             return;
         }
-        Toast.makeText(MultiplayerCodeSetupActivity.this, CODE_LENGTH_WARNING,
-                Toast.LENGTH_SHORT).show();
+        createGameData();
     }
 
     private void joinGameActivity() {
-        if (codeEdt.getText().toString().length() > 3) {
-            getGameData();
+        if (isCodeShort()) {
             return;
         }
-        Toast.makeText(MultiplayerCodeSetupActivity.this, CODE_LENGTH_WARNING,
-                Toast.LENGTH_SHORT).show();
+        getGameData();
+    }
+
+    private boolean isCodeShort() {
+        if (codeEdt.getText().toString().length() <= 3) {
+            Toast.makeText(MultiplayerCodeSetupActivity.this, CODE_LENGTH_WARNING,
+                    Toast.LENGTH_SHORT).show();
+            return true;
+        }
+        return false;
     }
 
     private void getGameData() {
@@ -160,23 +164,23 @@ public class MultiplayerCodeSetupActivity extends AppCompatActivity {
                 playerData.playerName = bundle.getString(PLAYER_NAME);
 
                 if (!gameInstance.hasChild(Players.PLAYER1.toString())) {
-                    reference.child(codeEdt.getText().toString()).child(Players.PLAYER1.toString()).
-                            setValue(playerData);
+                    reference.child(codeEdt.getText().toString()).
+                            child(Players.PLAYER1.toString()).setValue(playerData);
                     bundle.putString(PLAYER_ID, Players.PLAYER1.toString());
 
                 } else if (!gameInstance.hasChild(Players.PLAYER2.toString())) {
-                    reference.child(codeEdt.getText().toString()).child(Players.PLAYER2.toString()).
-                            setValue(playerData);
+                    reference.child(codeEdt.getText().toString()).
+                            child(Players.PLAYER2.toString()).setValue(playerData);
                     bundle.putString(PLAYER_ID, Players.PLAYER2.toString());
 
                 } else if (!gameInstance.hasChild(Players.PLAYER3.toString())) {
-                    reference.child(codeEdt.getText().toString()).child(Players.PLAYER3.toString()).
-                            setValue(playerData);
+                    reference.child(codeEdt.getText().toString()).
+                            child(Players.PLAYER3.toString()).setValue(playerData);
                     bundle.putString(PLAYER_ID, Players.PLAYER3.toString());
 
                 } else if (!gameInstance.hasChild(Players.PLAYER4.toString())) {
-                    reference.child(codeEdt.getText().toString()).child(Players.PLAYER4.toString()).
-                            setValue(playerData);
+                    reference.child(codeEdt.getText().toString()).
+                            child(Players.PLAYER4.toString()).setValue(playerData);
                     bundle.putString(PLAYER_ID, Players.PLAYER4.toString());
                 }
 

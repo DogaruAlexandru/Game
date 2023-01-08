@@ -139,24 +139,24 @@ public class MultiplayerStartWaitActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         reference.child(bundle.getString(PLAYER_ID)).removeValue();
-
-        reference.removeEventListener(gameInstanceValueEventListener);
-        reference.removeEventListener(childEventListener);
-        reference.child(GAME_STATE).removeEventListener(gameStateValueEventListener);
+        removeListeners();
 
         super.onBackPressed();
-
         finish();
     }
 
     private void startGameplayActivity() {
-        reference.removeEventListener(gameInstanceValueEventListener);
-        reference.removeEventListener(childEventListener);
-        reference.child(GAME_STATE).removeEventListener(gameStateValueEventListener);
+        removeListeners();
 
         Intent intent = new Intent(this, MultiplayerGameplayActivity.class);
         intent.putExtras(bundle);
         startActivity(intent);
         finish();
+    }
+
+    private void removeListeners() {
+        reference.removeEventListener(gameInstanceValueEventListener);
+        reference.removeEventListener(childEventListener);
+        reference.child(GAME_STATE).removeEventListener(gameStateValueEventListener);
     }
 }

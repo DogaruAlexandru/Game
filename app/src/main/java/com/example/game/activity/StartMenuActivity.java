@@ -4,6 +4,7 @@ import static com.example.game.Utils.PLAYER_NAME;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.widget.Button;
 import android.widget.EditText;
 
@@ -21,24 +22,22 @@ public class StartMenuActivity extends AppCompatActivity {
         setContentView(R.layout.activity_start_menu);
 
         nameEdt = findViewById(R.id.nameEdt);
+        String name = PreferenceManager.getDefaultSharedPreferences(this).
+                getString(PLAYER_NAME, "");
+        nameEdt.setText(name);
 
         Button singlePlayerBtn = findViewById(R.id.singleplayerBtn);
-        singlePlayerBtn.setOnClickListener(v -> openSingleplayerActivity());
+        singlePlayerBtn.setOnClickListener(v -> openActivity(
+                new Intent(this, SingleplayerStartSetupActivity.class)));
 
         Button multiplayerBtn = findViewById(R.id.multiplayerBtn);
-        multiplayerBtn.setOnClickListener(v -> openMultiplayerSetupActivity());
+        multiplayerBtn.setOnClickListener(v -> openActivity(
+                new Intent(this, MultiplayerCodeSetupActivity.class)));
     }
 
-    private void openSingleplayerActivity() {
-        Intent intent = new Intent(this, SingleplayerStartSetupActivity.class);
-        Bundle b = new Bundle();
-        b.putString(PLAYER_NAME, nameEdt.getText().toString());
-        intent.putExtras(b);
-        startActivity(intent);
-    }
-
-    private void openMultiplayerSetupActivity() {
-        Intent intent = new Intent(this, MultiplayerCodeSetupActivity.class);
+    private void openActivity(Intent intent) {
+        PreferenceManager.getDefaultSharedPreferences(this).edit().
+                putString(PLAYER_NAME, nameEdt.getText().toString()).apply();
         Bundle b = new Bundle();
         b.putString(PLAYER_NAME, nameEdt.getText().toString());
         intent.putExtras(b);
