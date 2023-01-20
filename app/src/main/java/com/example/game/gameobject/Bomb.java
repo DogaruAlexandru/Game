@@ -40,16 +40,6 @@ public class Bomb {
         ((BombTile) tilemap.getTilemap()[row][column]).setBomb(this);
     }
 
-    public Bomb(Bomb bomb) {
-        range = bomb.range;
-        row = bomb.row;
-        column = bomb.column;
-        playerId = null;
-        explosionList = null;
-        tilemap = null;
-        updatesBeforeExplosion = -1;
-    }
-
     public void update(List<Bomb> bombRemoveList) {
         updatesBeforeExplosion--;
 
@@ -59,7 +49,7 @@ public class Bomb {
     }
 
     private void triggerExplosion(List<Bomb> bombRemoveList) {
-        explosionList.add(new Explosion(row, column, explosionList, tilemap));
+        explosionList.add(new Explosion(row, column, tilemap));
 
         for (int i = 0; i < 4; i++) {
             explodeLength(bombRemoveList, ROWS[i], COLUMNS[i]);
@@ -83,14 +73,14 @@ public class Bomb {
                     break;
                 case CRATE:
                     explosionList.add(new Explosion(row + idxRow * idx,
-                            column + idxColumn * idx, explosionList, tilemap));
+                            column + idxColumn * idx, tilemap));
                     return;
                 case WALK:
                 case BOMB_POWER_UP:
                 case RANGE_POWER_UP:
                 case SPEED_POWER_UP:
                     explosionList.add(new Explosion(row + idxRow * idx,
-                            column + idxColumn * idx, explosionList, tilemap));
+                            column + idxColumn * idx, tilemap));
                     break;
                 case WALL:
                 default:

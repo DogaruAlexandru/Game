@@ -23,7 +23,7 @@ public class Explosion {
 
     private int tileBehindExplosion;
 
-    public Explosion(int row, int column, List<Explosion> explosionList, Tilemap tilemap) {
+    public Explosion(int row, int column, Tilemap tilemap) {
         this.row = row;
         this.column = column;
         this.tilemap = tilemap;
