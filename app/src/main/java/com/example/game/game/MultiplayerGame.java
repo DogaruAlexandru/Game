@@ -197,7 +197,7 @@ public class MultiplayerGame extends Game {
         for (Iterator<OnlineEnemy> iterator = enemies.iterator(); iterator.hasNext(); ) {
             OnlineEnemy enemy = iterator.next();
             enemy.update();
-            if (enemy.getPlayerData().livesCount > 0) {
+            if (enemy.getPlayerData() != null && enemy.getPlayerData().livesCount > 0) {
                 continue;
             }
             playerCountChanged = true;
