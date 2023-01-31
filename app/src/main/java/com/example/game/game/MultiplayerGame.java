@@ -53,7 +53,7 @@ public class MultiplayerGame extends Game {
         new Thread(this::addEnemiesListeners).start();
 
         try {
-            TimeUnit.MILLISECONDS.sleep(1500);
+            TimeUnit.MILLISECONDS.sleep(2500);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

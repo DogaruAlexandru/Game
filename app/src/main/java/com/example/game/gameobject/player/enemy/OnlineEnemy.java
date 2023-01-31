@@ -84,6 +84,9 @@ public class OnlineEnemy extends Player {
 
     @Override
     public void update() {
+        if (playerData == null) {
+            return;
+        }
         initRectInTiles();
 
         playerRect.offsetTo(getPosX(), getPosY());
